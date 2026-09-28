@@ -346,8 +346,8 @@ Pane list on the left (Planning, Appearance, Import, Data, About), pane on the r
 
 `SmokeHarness` seeds `SampleData` into a temp home (43 classes of a mechanical-engineering degree, fall 2024 → current
 fall 2026, summer 2027 switched off, route to Spring 2028), sizes the window to 1440 × 900, then captures `10-planner`,
-`11-route`, `12-settings`, every registered scene (`30+`), `70-planner-dark`, `71-route-dark`, and every Settings pane
-(`80-settings-…`). Register extra states in YOUR area's file — the registry line
+`11-route`, `12-settings`, every registered scene (`30+`), `900-planner-dark`, `901-route-dark`, and every Settings pane
+(`950-settings-…`; these sit above the scene range so scene numbers never collide). Register extra states in YOUR area's file — the registry line
 `SmokeScenes.all = planner + route + classDetail + settings` is pre-wired and frozen:
 
 ```swift

@@ -42,6 +42,12 @@ struct ThubanPlannerApp: App {
                 Button("Fit Route") { appModel.routeFitRequest += 1 }
                     .keyboardShortcut("0", modifiers: .command)
                     .disabled(appModel.section != .route)
+                Button("Zoom In") { appModel.routeZoom(by: 1.25) }
+                    .keyboardShortcut("+", modifiers: .command)
+                    .disabled(appModel.section != .route)
+                Button("Zoom Out") { appModel.routeZoom(by: 0.8) }
+                    .keyboardShortcut("-", modifiers: .command)
+                    .disabled(appModel.section != .route)
             }
         }
     }

@@ -61,7 +61,7 @@ enum SmokeHarness {
             for (index, section) in [AppSection.planner, .route].enumerated() {
                 app.section = section
                 await sleep(1.0)
-                try capture(window, name: String(format: "%02d-%@-dark", 70 + index, section.rawValue), in: directory)
+                try capture(window, name: String(format: "%03d-%@-dark", 900 + index, section.rawValue), in: directory)
             }
             app.setThemeSelection(ThemeSelection(mode: .light, schemeId: SchemePresets.defaultId, custom: nil))
             await sleep(0.5)
@@ -71,7 +71,7 @@ enum SmokeHarness {
                 app.openSettings(pane)
                 await sleep(0.9)
                 let slug = pane.rawValue.lowercased().map { $0.isLetter ? $0 : "-" }
-                try capture(window, name: String(format: "%02d-settings-%@", 80 + index, String(slug)), in: directory)
+                try capture(window, name: String(format: "%03d-settings-%@", 950 + index, String(slug)), in: directory)
             }
             app.section = .planner
         } catch {
