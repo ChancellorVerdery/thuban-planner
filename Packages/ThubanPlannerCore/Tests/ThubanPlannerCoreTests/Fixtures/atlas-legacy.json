@@ -1,0 +1,87 @@
+{
+ "format": "thuban.atlas-course.v1",
+ "email": "lifter@example.com",
+ "user_found": true,
+ "settings": [
+  {
+   "max_credits": 16,
+   "summer_max": "-1",
+   "strategy": "bogus",
+   "disabled_terms": [
+    "summer-2026",
+    42,
+    null
+   ]
+  }
+ ],
+ "terms": [
+  {
+   "key": "fall-2025",
+   "season": "fall",
+   "year": 2025,
+   "current": true
+  },
+  {
+   "key": "x",
+   "season": "fall",
+   "year": "2025",
+   "current": true
+  },
+  {
+   "key": "stale",
+   "season": "spring",
+   "year": 2026,
+   "current": true
+  },
+  {
+   "season": "winter",
+   "year": 2026
+  },
+  {
+   "season": "summer",
+   "year": "soon"
+  },
+  "garbage"
+ ],
+ "courses": [
+  {
+   "id": "c-x",
+   "code": "CS 101"
+  },
+  {
+   "code": "NO-ID",
+   "title": "dropped"
+  },
+  {
+   "id": "c-x",
+   "code": "CS 101"
+  },
+  {
+   "id": "c-y",
+   "code": " MATH 2 ",
+   "title": 42,
+   "credits": "4",
+   "prereqs": [
+    "CS 101",
+    "",
+    3
+   ],
+   "summer_ok": 1,
+   "term_key": ""
+  },
+  {
+   "id": "c-z",
+   "code": "CS 102",
+   "credits": null,
+   "prereqs": null,
+   "coreqs": [
+    "CS 101"
+   ],
+   "pre_or_co": [
+    "CS 101",
+    "MATH 2"
+   ],
+   "term_key": "fall-2010"
+  }
+ ]
+}
