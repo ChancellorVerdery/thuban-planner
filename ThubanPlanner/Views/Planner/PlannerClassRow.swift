@@ -1,3 +1,4 @@
+import AppKit
 import SwiftUI
 import ThubanPlannerCore
 
@@ -42,12 +43,14 @@ struct PlannerClassRow: View {
                 app.setPrereqs(of: course.id, text: text)
             }
             .frame(width: columns.prereqs)
+            .zIndex(focus.wrappedValue == .cell(course.id, .prereqs) ? 1 : 0)
 
             PlannerRefsCell(refs: course.coreqs, kind: .coreq, focusValue: .cell(course.id, .coreqs), focus: focus,
                             rowActive: hovering || isSelected, width: columns.coreqs) { text in
                 app.setCoreqs(of: course.id, text: text)
             }
             .frame(width: columns.coreqs)
+            .zIndex(focus.wrappedValue == .cell(course.id, .coreqs) ? 1 : 0)
 
             PlannerCheckbox(isOn: course.summerOk, label: "Offered in summer") {
                 app.updateCourse(course.id, CoursePatch(summerOk: !course.summerOk))
@@ -142,6 +145,8 @@ struct PlannerTextCell: View {
     var rowActive: Bool
     var accessibility: String
     var validate: (String) -> Bool = { _ in true }
+    /// Put the cursor at the end (and scroll there) when the cell takes focus, instead of selecting from the start.
+    var cursorAtEnd: Bool = false
     var commit: (String) -> Void
     @State private var draft = ""
     @State private var loaded = false
@@ -172,6 +177,13 @@ struct PlannerTextCell: View {
             }
             .onChange(of: isFocused) { was, now in
                 if was && !now { commitDraft() }
+                if now && !was && cursorAtEnd { PlannerFieldEditor.moveCursorToEnd() }
+            }
+            // A section switch, "Calculate route", ⌘R… removes the Planner while a cell may still be first responder:
+            // its focus-loss commit would never run. Commit whatever was typed when the cell goes away or the app quits.
+            .onDisappear { commitDraft() }
+            .onReceive(NotificationCenter.default.publisher(for: NSApplication.willTerminateNotification)) { _ in
+                commitDraft()
             }
             .onSubmit {
                 commitDraft()
@@ -189,7 +201,7 @@ struct PlannerTextCell: View {
     }
 
     private func commitDraft() {
-        guard draft != value else { return }
+        guard loaded, draft != value else { return }
         if validate(draft) { commit(draft) } else { draft = value }
     }
 }
@@ -216,7 +228,10 @@ struct PlannerRefsCell: View {
         ZStack(alignment: .leading) {
             PlannerTextCell(value: AppModel.plannerRefsText(refs), placeholder: kind == .prereq ? "MATH 1241, …" : "Codes, …",
                             mono: true, focusValue: focusValue, focus: focus, rowActive: rowActive && refs.isEmpty,
-                            accessibility: kind == .prereq ? "Prerequisites" : "Corequisites", commit: commit)
+                            accessibility: kind == .prereq ? "Prerequisites" : "Corequisites", cursorAtEnd: true,
+                            commit: commit)
+                // While editing, the field widens over the next columns to show the whole list.
+                .frame(width: isFocused ? editWidth : width, alignment: .leading)
                 .opacity(isFocused ? 1 : 0)
             if !isFocused {
                 chips
@@ -226,7 +241,15 @@ struct PlannerRefsCell: View {
                     .accessibilityHidden(true)
             }
         }
-        .frame(height: 30)
+        .frame(width: width, height: 30, alignment: .leading)
+        .zIndex(isFocused ? 1 : 0)
+    }
+
+    /// Room for the whole comma-separated list (monospaced), up to the cell plus about two more columns.
+    private var editWidth: CGFloat {
+        let text = AppModel.plannerRefsText(refs)
+        let needed = CGFloat(text.count + 4) * 7.9 * textScale + 16
+        return min(max(width, needed), width + 300)
     }
 
     @ViewBuilder
@@ -318,9 +341,9 @@ struct PlannerCheckbox: View {
     var body: some View {
         Button(action: toggle) {
             RoundedRectangle(cornerRadius: 4, style: .continuous)
-                .fill(isOn ? theme.accentColor : (hovering ? theme.panel2Color : theme.panelColor))
+                .fill(isOn ? theme.accentColor : (hovering ? theme.panel2Color.opacity(0.7) : Color.clear))
                 .overlay(RoundedRectangle(cornerRadius: 4, style: .continuous)
-                    .strokeBorder(isOn ? theme.accentColor : theme.line2Color, lineWidth: 1))
+                    .strokeBorder(isOn ? theme.accentColor : theme.inkFaintColor.opacity(0.7), lineWidth: 1))
                 .overlay { if isOn { Icon(.check, size: 12).foregroundStyle(theme.onAccentColor) } }
                 .frame(width: 16, height: 16)
                 .frame(width: 30, height: 30)
@@ -388,5 +411,21 @@ struct PlannerTermMenu: View {
     private var labelText: String {
         guard let key = course.term else { return "To take" }
         return app.termLabel(key)
+    }
+}
+
+// MARK: - Field editor
+
+enum PlannerFieldEditor {
+    /// Moves the key window's field editor cursor to the end of its text and scrolls it into view (the list fields
+    /// otherwise open scrolled to the start, cutting the last code in half).
+    @MainActor
+    static func moveCursorToEnd() {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+            guard let editor = NSApp.keyWindow?.firstResponder as? NSTextView else { return }
+            let end = (editor.string as NSString).length
+            editor.setSelectedRange(NSRange(location: end, length: 0))
+            editor.scrollRangeToVisible(NSRange(location: end, length: 0))
+        }
     }
 }

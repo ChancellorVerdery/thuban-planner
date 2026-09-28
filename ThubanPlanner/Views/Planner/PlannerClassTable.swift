@@ -25,7 +25,7 @@ struct PlannerColumns: Equatable {
         let flexible = max(360, width - PlannerColumns.inset * 2 - fixed - PlannerColumns.gap * 8)
         title = (flexible * 0.38).rounded(.down)
         prereqs = (flexible * 0.31).rounded(.down)
-        coreqs = (flexible * 0.31).rounded(.down)
+        coreqs = flexible - title - prereqs   // the remainder, so a row is exactly as wide as the card
     }
 }
 
@@ -162,7 +162,7 @@ struct PlannerGroupHeaderRow: View {
                     .foregroundStyle(theme.signalTextColor)
             }
             Text(app.plannerGroupCaption(group))
-                .font(ThubanFont.mono(12))
+                .font(ThubanFont.body(12))
                 .monospacedDigit()
                 .foregroundStyle(theme.inkFaintColor)
             if group.termKey == nil {

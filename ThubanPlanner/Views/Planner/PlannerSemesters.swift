@@ -36,7 +36,8 @@ struct PlannerGroupCard<Accessory: View, Content: View>: View {
         }
         .padding(.horizontal, 18)
         .padding(.vertical, 16)
-        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+        // Each card is as tall as its own content (the row top-aligns them), not stretched to its neighbour.
+        .frame(maxWidth: .infinity, alignment: .topLeading)
         .background(theme.panelColor, in: RoundedRectangle(cornerRadius: ThubanMetrics.cardRadius, style: .continuous))
         .overlay(RoundedRectangle(cornerRadius: ThubanMetrics.cardRadius, style: .continuous)
             .strokeBorder(theme.lineColor, lineWidth: ThubanMetrics.hairline))
@@ -201,8 +202,15 @@ struct PlannerAddSemesterForm: View {
     @State private var seeded = false
     @FocusState private var yearFocused: Bool
 
-    private var exists: Bool { app.plannerTermExists(season: season, year: year) }
-    private var yearValid: Bool { (1900 ... 2200).contains(year) }
+    private var exists: Bool { parsedYear.map { app.plannerTermExists(season: season, year: $0) } ?? false }
+    /// Atlas's year input range (HTML min / max).
+    private static let yearRange = 2000 ... 2100
+    /// The year the field shows, or nil when its text is not a year in range (then Add is disabled).
+    private var parsedYear: Int? {
+        guard let value = Int(yearText.trimmingCharacters(in: .whitespaces)), Self.yearRange.contains(value) else { return nil }
+        return value
+    }
+    private var yearValid: Bool { parsedYear != nil }
 
     var body: some View {
         Group {
@@ -313,10 +321,10 @@ struct PlannerAddSemesterForm: View {
                 .frame(width: 72)
                 .accessibilityLabel("Year")
                 .onChange(of: yearText) { _, text in
-                    if let value = Int(text.trimmingCharacters(in: .whitespaces)) { year = value }
+                    if let value = parsedYear { year = value }
                 }
                 .onSubmit(add)
-            Stepper("Year", value: Binding(get: { year }, set: { year = $0; yearText = String($0) }), in: 1900 ... 2200)
+            Stepper("Year", value: Binding(get: { year }, set: { year = $0; yearText = String($0) }), in: Self.yearRange)
                 .labelsHidden()
                 .accessibilityLabel("Change year")
         }
@@ -336,11 +344,12 @@ struct PlannerAddSemesterForm: View {
         season = d.season
         year = d.year
         yearText = String(d.year)
-        current = app.currentTerm == nil
+        // Atlas starts unchecked; suggest "current" only when nothing is current and the term is today's.
+        current = app.currentTerm == nil && TermKey.make(d.season, d.year) == app.calendarTermKey
     }
 
     private func add() {
-        guard !exists, yearValid else { return }
+        guard !exists, let year = parsedYear else { return }
         app.addTerm(season: season, year: year, current: current)
         onClose()
     }

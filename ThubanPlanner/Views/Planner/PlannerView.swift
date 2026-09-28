@@ -1,3 +1,4 @@
+import AppKit
 import SwiftUI
 import ThubanPlannerCore
 
@@ -8,6 +9,10 @@ struct PlannerView: View {
     @Environment(AppModel.self) private var app
     @Environment(\.thubanTheme) private var theme
     @FocusState private var focus: PlannerFocus?
+    /// True while the page is taller than the window. With legacy (always-visible) scroll bars the scroller then
+    /// takes a gutter from the content width; the fixed-width table rows subtract it too, so rows, cards and the
+    /// pinned header share one right edge whether or not the page scrolls.
+    @State private var overflows = false
     private let state = PlannerViewState.shared
 
     var body: some View {
@@ -27,7 +32,7 @@ struct PlannerView: View {
 
     private var page: some View {
         GeometryReader { geometry in
-            let columns = PlannerColumns(width: geometry.size.width - Self.sidePadding * 2)
+            let columns = PlannerColumns(width: geometry.size.width - scrollerGutter - Self.sidePadding * 2)
             let groups = app.plannerClassGroups(filter: state.filter, search: state.search)
             ScrollViewReader { proxy in
                 ScrollView {
@@ -36,11 +41,15 @@ struct PlannerView: View {
                             .padding(.bottom, 20)
                         notices
                         groupsRow
-                            .padding(.bottom, 22)
+                            .padding(.bottom, 10)
                         Section {
                             tableBody(groups: groups, columns: columns)
                         } header: {
+                            // A page-coloured band above the card: once pinned, the header keeps a top margin
+                            // under the section bar and rows scrolling up disappear behind it.
                             PlannerClassTableHeader(state: state, columns: columns)
+                                .padding(.top, 12)
+                                .background(alignment: .top) { theme.bgColor.frame(height: 12 + ThubanMetrics.cardRadius) }
                         }
                     }
                     .padding(.horizontal, Self.sidePadding)
@@ -48,6 +57,11 @@ struct PlannerView: View {
                     .padding(.bottom, 28)
                 }
                 .scrollIndicators(.automatic)
+                .onScrollGeometryChange(for: Bool.self) { geo in
+                    geo.contentSize.height > geo.containerSize.height + 0.5
+                } action: { _, value in
+                    if value != overflows { overflows = value }
+                }
                 .focusable()
                 .focusEffectDisabled()
                 .focused($focus, equals: .table)
@@ -79,6 +93,11 @@ struct PlannerView: View {
     }
 
     private static let sidePadding: CGFloat = 28
+
+    private var scrollerGutter: CGFloat {
+        guard overflows, NSScroller.preferredScrollerStyle == .legacy else { return 0 }
+        return NSScroller.scrollerWidth(for: .regular, scrollerStyle: .legacy)
+    }
 
     // MARK: Header
 
@@ -128,8 +147,10 @@ struct PlannerView: View {
             VStack(alignment: .leading, spacing: 8) {
                 ForEach(warnings, id: \.self) { warning in
                     PlannerNotice(text: warning, tone: .neg) {
-                        Button("Show on route") { app.showRoute() }
-                            .buttonStyle(GhostButtonStyle(height: 28, tinted: false, horizontalPadding: 10))
+                        Button { app.showRoute() } label: {
+                            HStack(spacing: 6) { Icon(.route, size: 14); Text("Show on route") }
+                        }
+                        .buttonStyle(SecondaryButtonStyle(height: 28))
                     }
                 }
                 if let unknown {
@@ -191,7 +212,7 @@ struct PlannerView: View {
     private var visibleIds: [String] { app.plannerVisibleCourseIds(filter: state.filter, search: state.search) }
 
     private func move(_ delta: Int, proxy: ScrollViewProxy) -> KeyPress.Result {
-        guard focus == .table || focus == nil else { return .ignored }
+        guard focus == .table else { return .ignored }
         let ids = visibleIds
         guard !ids.isEmpty else { return .ignored }
         let next: String
@@ -206,13 +227,13 @@ struct PlannerView: View {
     }
 
     private func editSelected() -> KeyPress.Result {
-        guard focus == .table || focus == nil, let id = app.selectedCourseId else { return .ignored }
+        guard focus == .table, let id = app.selectedCourseId else { return .ignored }
         focus = .cell(id, .code)
         return .handled
     }
 
     private func removeSelected() -> KeyPress.Result {
-        guard focus == .table || focus == nil, let id = app.selectedCourseId else { return .ignored }
+        guard focus == .table, let id = app.selectedCourseId else { return .ignored }
         state.pendingRemovalCourseId = id
         return .handled
     }

@@ -8,7 +8,9 @@ import Foundation
 ///
 /// Two refinements over Atlas's SVG: when a box has several ribbons on one side their ends are spread over the box's
 /// middle band (sorted by the other end's height, so ribbons do not cross at the box), and a ribbon between two boxes of
-/// the SAME column (a same-term corequisite) is a bracket on the right-hand side instead of a backwards loop.
+/// the SAME column (a same-term corequisite) is a bracket on the right-hand side instead of a backwards loop; and a
+/// ribbon that skips one or more columns runs through the gaps between the boxes of the columns it crosses (or below
+/// their last box) instead of straight through unrelated classes (`Ribbon.waypoints`).
 public struct RouteLayout: Hashable, Sendable {
     public struct Metrics: Hashable, Sendable {
         /// Outer margin around the board.
@@ -72,6 +74,31 @@ public struct RouteLayout: Hashable, Sendable {
         public var control1: CGPoint
         public var control2: CGPoint
         public var end: CGPoint
+        /// For a ribbon that skips columns: an (entry, exit) pair per column it crosses, both at one height inside a
+        /// free lane of that column (between two boxes, or below its last box). The ribbon runs straight from entry
+        /// to exit and curves in the gutters (controls at each gutter's middle). Empty = the single bezier
+        /// `start → control1 → control2 → end`.
+        public var waypoints: [CGPoint] = []
+
+        /// The drawn path as cubic segments (straight runs are cubics with collinear controls).
+        public var segments: [(start: CGPoint, control1: CGPoint, control2: CGPoint, end: CGPoint)] {
+            guard !waypoints.isEmpty else { return [(start, control1, control2, end)] }
+            let points = [start] + waypoints + [end]
+            var out: [(start: CGPoint, control1: CGPoint, control2: CGPoint, end: CGPoint)] = []
+            for i in 0..<(points.count - 1) {
+                let p = points[i], q = points[i + 1]
+                if i % 2 == 0 {
+                    let mx = (p.x + q.x) / 2
+                    out.append((p, CGPoint(x: mx, y: p.y), CGPoint(x: mx, y: q.y), q))
+                } else {
+                    out.append((p, p, q, q))
+                }
+            }
+            return out
+        }
+
+        /// The x where the last curve's control sits (for the arrowhead direction).
+        public var arrowControl: CGPoint { segments.last?.control2 ?? control2 }
     }
 
     public var metrics: Metrics
@@ -132,7 +159,8 @@ public struct RouteLayout: Hashable, Sendable {
         let width = 2 * metrics.padding + CGFloat(terms.count) * metrics.columnWidth + CGFloat(terms.count - 1) * metrics.gutter
         let size = CGSize(width: width, height: cardBottom + metrics.padding)
 
-        let ribbons = makeRibbons(edges: schedule.edges, boxes: boxes, boxIndex: boxIndex, metrics: metrics)
+        var ribbons = makeRibbons(edges: schedule.edges, boxes: boxes, boxIndex: boxIndex, metrics: metrics)
+        routeThroughLanes(&ribbons, boxes: boxes, columns: columns, boxIndex: boxIndex)
         return RouteLayout(metrics: metrics, columns: columns, boxes: boxes, ribbons: ribbons, size: size, boxIndex: boxIndex)
     }
 
@@ -184,6 +212,72 @@ public struct RouteLayout: Hashable, Sendable {
             return Ribbon(edgeIndex: ei, from: edge.from, to: edge.to, kind: edge.kind, sameColumn: false,
                           start: CGPoint(x: x1, y: y1), control1: CGPoint(x: mx, y: y1),
                           control2: CGPoint(x: mx, y: y2), end: CGPoint(x: x2, y: y2))
+        }
+    }
+
+    /// Gives every ribbon that skips columns a lane through each column it crosses: the gap between two boxes nearest
+    /// to where a straight line would pass, or the free space below the column's last box. Ribbons sharing one gap are
+    /// spread across it in the order of their ends, so they do not cross inside it.
+    private static func routeThroughLanes(_ ribbons: inout [Ribbon], boxes: [Box], columns: [Column],
+                                          boxIndex: [String: Int]) {
+        guard columns.count > 2 else { return }
+        // Free vertical intervals per column, top to bottom.
+        var lanes: [[(range: ClosedRange<CGFloat>, below: Bool)]] = Array(repeating: [], count: columns.count)
+        var columnBoxes: [[CGRect]] = Array(repeating: [], count: columns.count)
+        for box in boxes { columnBoxes[box.columnIndex].append(box.rect) }
+        for ci in columns.indices {
+            let rects = columnBoxes[ci].sorted { $0.minY < $1.minY }
+            var free: [(range: ClosedRange<CGFloat>, below: Bool)] = []
+            for (a, b) in zip(rects, rects.dropFirst()) where b.minY - a.maxY >= 6 {
+                free.append(((a.maxY + 3)...(b.minY - 3), false))
+            }
+            let bottom = columns[ci].frame.maxY - 4
+            let lastBottom = (rects.last?.maxY ?? columns[ci].frame.minY) + 3
+            if bottom > lastBottom { free.append((lastBottom...bottom, true)) }
+            lanes[ci] = free
+        }
+        struct Pick { var ribbon: Int; var lane: Int; var y: CGFloat; var order: CGFloat }
+        var picks: [Int: [Pick]] = [:]   // key = column * 10_000 + lane (inter-box gaps only)
+        var waypointsY: [Int: [Int: CGFloat]] = [:]   // ribbon → column → y
+        for (ri, r) in ribbons.enumerated() where !r.sameColumn {
+            guard let a = boxIndex[r.from], let b = boxIndex[r.to] else { continue }
+            let ca = boxes[a].columnIndex, cb = boxes[b].columnIndex
+            guard cb - ca > 1 else { continue }
+            for ci in (ca + 1)..<cb {
+                let frame = columns[ci].frame
+                let t = (frame.midX - r.start.x) / max(1, r.end.x - r.start.x)
+                let target = r.start.y + (r.end.y - r.start.y) * t
+                var best: (lane: Int, y: CGFloat, d: CGFloat)?
+                for (li, lane) in lanes[ci].enumerated() {
+                    let y = min(lane.range.upperBound, max(lane.range.lowerBound, target))
+                    let d = abs(y - target)
+                    if best == nil || d < best!.d { best = (li, y, d) }
+                }
+                guard let best else { continue }
+                if !lanes[ci][best.lane].below {
+                    picks[ci * 10_000 + best.lane, default: []].append(Pick(ribbon: ri, lane: best.lane, y: best.y,
+                                                                          order: r.start.y + r.end.y))
+                }
+                waypointsY[ri, default: [:]][ci] = best.y
+            }
+        }
+        // Spread ribbons sharing a narrow gap evenly across it (ordered by their ends).
+        for (key, list) in picks where list.count > 1 {
+            let lane = lanes[key / 10_000][key % 10_000].range
+            let sorted = list.sorted { $0.order != $1.order ? $0.order < $1.order : $0.ribbon < $1.ribbon }
+            for (i, pick) in sorted.enumerated() {
+                let y = lane.lowerBound + (lane.upperBound - lane.lowerBound) * CGFloat(i + 1) / CGFloat(sorted.count + 1)
+                waypointsY[pick.ribbon]?[key / 10_000] = y
+            }
+        }
+        for (ri, byColumn) in waypointsY {
+            var points: [CGPoint] = []
+            for ci in byColumn.keys.sorted() {
+                let frame = columns[ci].frame, y = byColumn[ci]!
+                points.append(CGPoint(x: frame.minX, y: y))
+                points.append(CGPoint(x: frame.maxX, y: y))
+            }
+            ribbons[ri].waypoints = points
         }
     }
 

@@ -25,15 +25,15 @@ struct RouteToolbar: View {
             IconButton(.zoomOut, label: "Zoom out", size: 30, iconSize: 16) { app.routeZoom(by: 0.8) }
                 .disabled(app.routeZoom <= AppModel.routeZoomRange.lowerBound + 0.0001)
             Button { app.routeFitRequest += 1 } label: {
-                Text("\(Int((app.routeZoom * 100).rounded()))%")
+                Text("\(Int((app.routeScale * 100).rounded()))%")
                     .font(ThubanFont.mono(12, weight: .medium))
                     .foregroundStyle(theme.inkDimColor)
                     .frame(width: 44, height: 30)
                     .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
-            .help("Zoom level (100% = the whole route). Click to fit.")
-            .accessibilityLabel("Zoom \(Int((app.routeZoom * 100).rounded())) percent")
+            .help("Board scale (100% = actual size). Click to fit.")
+            .accessibilityLabel("Zoom \(Int((app.routeScale * 100).rounded())) percent")
             IconButton(.zoomIn, label: "Zoom in", size: 30, iconSize: 16) { app.routeZoom(by: 1.25) }
                 .disabled(app.routeZoom >= AppModel.routeZoomRange.upperBound - 0.0001)
             ToolbarButton("Fit", icon: .fit) { app.routeFitRequest += 1 }
@@ -51,11 +51,18 @@ private struct RouteLegendSwatch: View {
 
     var body: some View {
         HStack(spacing: 6) {
+            // A column in miniature: the term's fill with a box in the board's box colours inside, framed by the
+            // term border at full strength so every kind reads against the section bar.
             RoundedRectangle(cornerRadius: 3, style: .continuous)
                 .fill(theme.termFill(kind))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 1.5, style: .continuous)
+                        .fill(kind == .current ? theme.signalColor : (kind == .past ? theme.inkFaintColor : theme.brassInkColor))
+                        .padding(3.5)
+                )
                 .overlay(RoundedRectangle(cornerRadius: 3, style: .continuous)
-                    .strokeBorder(theme.termBorder(kind), lineWidth: 1))
-                .frame(width: 12, height: 12)
+                    .strokeBorder(kind == .current ? theme.signalColor : theme.line2Color, lineWidth: 1))
+                .frame(width: 14, height: 14)
             Text(label)
                 .font(.system(size: 12, weight: .medium))
                 .foregroundStyle(theme.inkDimColor)

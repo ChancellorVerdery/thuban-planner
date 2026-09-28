@@ -70,6 +70,8 @@ final class AppModel {
     var editRequestCourseId: String?
     /// Route: the board's zoom (1 = fitted). The toolbar's zoom buttons and the board's pinch / scroll write it.
     var routeZoom: Double = 1
+    /// Route: the board's real scale (1 = actual size), written by the board; the toolbar shows it.
+    var routeScale: Double = 1
     /// Route: bump to re-fit the board (toolbar "Fit", "Calculate route", ⌘0).
     var routeFitRequest = 0
 
@@ -77,6 +79,12 @@ final class AppModel {
 
     var importPhase: ImportPhase = .idle
     @ObservationIgnored var importTask: Task<Void, Never>?
+    /// Bumped by every import start / cancel; a task only writes `importPhase` while its run is still current.
+    @ObservationIgnored var importRun = 0
+    /// Where the current / last import reads from ("atlas:<host>" or "file:<name>"), for the failed card's wording.
+    var lastImportSource: String?
+    /// The file of the last file import (Try again reloads it).
+    @ObservationIgnored var lastImportFile: URL?
 
     @ObservationIgnored private var appearanceObservation: NSKeyValueObservation?
     @ObservationIgnored private var observers: [NSObjectProtocol] = []

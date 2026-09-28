@@ -40,7 +40,13 @@ struct RouteBoard: View {
             .onAppear { viewport = geometry.size; fit(animated: false); applyExternalZoom(animated: false) }
             .onChange(of: geometry.size) { _, size in
                 viewport = size
-                if fitted { fit(animated: false) } else { clampOffset() }
+                if fitted {
+                    fit(animated: false)
+                } else {
+                    clampOffset()
+                    // The fitted scale moved with the window: keep the toolbar's level (relative to it) true.
+                    syncZoomLevel()
+                }
             }
         }
         .onChange(of: app.routeFitRequest) { _, _ in fit(animated: true) }
@@ -60,7 +66,14 @@ struct RouteBoard: View {
 
     // MARK: Geometry
 
-    private var fitScale: CGFloat { layout.fitScale(in: viewport, maxScale: 1) }
+    /// Board scale below which box text (12–12.5 pt) drops under ~10 pt on screen.
+    private static let minReadableScale: CGFloat = 0.8
+
+    /// The "fitted" scale: the whole board when that stays readable; otherwise the smallest readable scale, and the
+    /// board scrolls (starting at the current term). Zooming out further still shows the whole board.
+    private var fitScale: CGFloat {
+        max(Self.minReadableScale, layout.fitScale(in: viewport, maxScale: 1))
+    }
 
     private func boardPoint(_ p: CGPoint) -> CGPoint {
         CGPoint(x: (p.x - offset.width) / scale, y: (p.y - offset.height) / scale)
@@ -74,7 +87,14 @@ struct RouteBoard: View {
     private func fittedTransform() -> (CGFloat, CGSize) {
         let s = fitScale
         let w = layout.size.width * s, h = layout.size.height * s
-        return (s, CGSize(width: max(0, (viewport.width - w) / 2), height: max(0, min(24, (viewport.height - h) / 2))))
+        var x = max(0, (viewport.width - w) / 2)
+        if w > viewport.width {
+            // Wider than the window: start at the current term (or the first planned one) so "now" and the road
+            // ahead are on screen; past terms are a scroll to the left.
+            let anchor = layout.columns.first { $0.term.kind == .current } ?? layout.columns.first { $0.term.kind == .future }
+            if let anchor { x = min(0, max(viewport.width - w, -(anchor.frame.minX - layout.metrics.padding) * s)) }
+        }
+        return (s, CGSize(width: x, height: max(0, min(24, (viewport.height - h) / 2))))
     }
 
     private func fit(animated: Bool) {
@@ -88,9 +108,10 @@ struct RouteBoard: View {
         fitted = true
         writtenZoom = 1
         if app.routeZoom != 1 { app.routeZoom = 1 }
+        if abs(app.routeScale - Double(s)) > 0.0001 { app.routeScale = Double(s) }
     }
 
-    /// Zooms by `factor` around `anchor` (view points), clamped to 0.25–2.5 × the fitted scale.
+    /// Zooms by `factor` around `anchor` (view points), clamped to `AppModel.routeZoomRange` × the fitted scale.
     private func zoom(by factor: CGFloat, around anchor: CGPoint, animated: Bool = false) {
         let base = fitScale
         guard base > 0, scale > 0 else { return }
@@ -107,6 +128,17 @@ struct RouteBoard: View {
         }
         fitted = abs(target - base) < 0.0001 && o == fittedTransform().1
         let z = Double(target / base)
+        writtenZoom = z
+        if abs(app.routeZoom - z) > 0.0001 { app.routeZoom = z }
+        if abs(app.routeScale - Double(target)) > 0.0001 { app.routeScale = Double(target) }
+    }
+
+    /// Re-derives `routeZoom` (relative to the fitted scale) from the current scale.
+    private func syncZoomLevel() {
+        let base = fitScale
+        guard base > 0, scale > 0 else { return }
+        let range = AppModel.routeZoomRange
+        let z = min(range.upperBound, max(range.lowerBound, Double(scale / base)))
         writtenZoom = z
         if abs(app.routeZoom - z) > 0.0001 { app.routeZoom = z }
     }

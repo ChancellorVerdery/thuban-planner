@@ -115,6 +115,10 @@ final class RouteInputNSView: NSView {
         if event.modifierFlags.contains(.command) {
             let dy = event.hasPreciseScrollingDeltas ? event.scrollingDeltaY : event.scrollingDeltaY * 8
             handlers.zoom(exp(dy * 0.01), p)
+        } else if !event.hasPreciseScrollingDeltas && !event.modifierFlags.contains(.shift) && event.scrollingDeltaY != 0 {
+            // A notched mouse wheel zooms around the pointer, as in Atlas (≈ 1.14× per notch); ⇧-wheel pans sideways.
+            // Trackpad scrolling (precise deltas) keeps panning.
+            handlers.zoom(pow(1.14, max(-4, min(4, event.scrollingDeltaY))), p)
         } else {
             var dx = event.scrollingDeltaX, dy = event.scrollingDeltaY
             if !event.hasPreciseScrollingDeltas { dx *= 10; dy *= 10 }

@@ -39,6 +39,12 @@ private struct SettingsNav: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
+            Text("Settings")
+                .font(ThubanFont.display(26))
+                .foregroundStyle(theme.inkColor)
+                .padding(.horizontal, 8)
+                .padding(.bottom, 16)
+                .accessibilityAddTraits(.isHeader)
             ForEach(SettingsPane.allCases) { pane in
                 SettingsNavRow(pane: pane, isSelected: pane == app.settingsPane) { app.settingsPane = pane }
             }

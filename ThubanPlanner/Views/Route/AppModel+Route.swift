@@ -4,7 +4,7 @@ import ThubanPlannerCore
 /// Read-only Route helpers (OWNER: Engineer B). Derived from `data` / `schedule`; no caches, no writes.
 extension AppModel {
     /// Zoom limits for `routeZoom` (1 = fitted).
-    static let routeZoomRange: ClosedRange<Double> = 0.25...2.5
+    static let routeZoomRange: ClosedRange<Double> = 0.25...6
 
     /// "planned Spring 2027" / "taken Fall 2024" / "in progress Fall 2026" / "can’t be placed".
     func routeStatusPhrase(_ courseId: String) -> String {
@@ -26,7 +26,9 @@ extension AppModel {
     /// The header title: "Finishing Spring 2028", or "Your route" when nothing is left to plan / the board is empty.
     var routeTitle: String {
         guard let grad = gradTermLabel, !toTake.isEmpty || !schedule.columns.isEmpty else { return "Your route" }
-        return toTake.isEmpty ? "Finished \(grad)" : "Finishing \(grad)"
+        if toTake.isEmpty { return "Finished \(grad)" }
+        let unplaced = schedule.unplaceable.count
+        return unplaced == 0 ? "Finishing \(grad)" : "Finishing \(grad) · \(unplaced) class\(unplaced == 1 ? "" : "es") unplaced"
     }
 
     /// Classes the scheduler could not place, in plan order.

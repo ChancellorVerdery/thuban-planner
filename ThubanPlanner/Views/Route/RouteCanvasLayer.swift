@@ -86,7 +86,9 @@ struct RouteCanvasLayer: View, Animatable {
                 if emphasis, (pass == 0) == onChain { continue }
                 var path = Path()
                 path.move(to: ribbon.start)
-                path.addCurve(to: ribbon.end, control1: ribbon.control1, control2: ribbon.control2)
+                for segment in ribbon.segments {
+                    path.addCurve(to: segment.end, control1: segment.control1, control2: segment.control2)
+                }
                 let color: Color
                 var style = theme.ribbonStyle(ribbon.kind, scale: hair)
                 if emphasis && onChain {
@@ -99,7 +101,7 @@ struct RouteCanvasLayer: View, Animatable {
                 }
                 ctx.stroke(path, with: .color(color), style: style)
                 // A small arrowhead where the ribbon meets the class that needs it.
-                let dx = ribbon.end.x - ribbon.control2.x
+                let dx = ribbon.end.x - ribbon.arrowControl.x
                 let dir: CGFloat = dx >= 0 ? 1 : -1
                 let head = 5 * min(1.4, max(0.9, hair * 1.1))
                 var arrow = Path()
@@ -121,11 +123,20 @@ struct RouteCanvasLayer: View, Animatable {
             let r = box.rect
             let isFocus = box.courseId == focusId || box.courseId == selectedId
             let dimmed = chain.map { !$0.courseIds.contains(box.courseId) } ?? false
-            var c = ctx
-            if dimmed { c.opacity = 0.32 }
-
             let shape = Path(roundedRect: r, cornerRadius: 7, style: .continuous)
-            c.fill(shape, with: .color(isFocus ? palette.accentTint : palette.boxFill(box.kind)))
+            // The fill is always opaque, so ribbons running beneath never show through a box (faded or not). A faded
+            // box blends its fill into the column card and fades only its border and text.
+            var c = ctx
+            if dimmed {
+                ctx.fill(shape, with: .color(palette.columnFill(box.kind)))
+                var tint = ctx
+                tint.opacity = 0.5
+                tint.fill(shape, with: .color(palette.boxFill(box.kind)))
+                c.opacity = palette.fadedOpacity
+            } else {
+                ctx.fill(shape, with: .color(palette.opaqueBase))
+                c.fill(shape, with: .color(isFocus ? palette.accentTint : palette.boxFill(box.kind)))
+            }
             c.stroke(shape, with: .color(isFocus ? palette.accent : palette.boxBorder(box.kind)),
                      lineWidth: isFocus ? 1.5 * hair : hair)
             if box.kind == .current && !isFocus {
@@ -168,6 +179,10 @@ struct RouteCanvasLayer: View, Animatable {
 /// Theme colours resolved once per render (the token accessors parse hex strings).
 struct RoutePalette {
     let ink, inkDim, inkFaint, accent, accentTint, brassInk, signal, signalText: Color
+    /// An opaque colour laid under every box fill.
+    let opaqueBase: Color
+    /// Border / text opacity of a box off the emphasized chain (higher in dark mode, where dim ink sinks into the bg).
+    let fadedOpacity: Double
     private let columnFills: [TermKind: Color]
     private let columnBorders: [TermKind: Color]
     private let boxFills: [TermKind: Color]
@@ -185,6 +200,8 @@ struct RoutePalette {
         brassInk = theme.brassInkColor
         signal = theme.signalColor
         signalText = theme.signalTextColor
+        opaqueBase = theme.bgColor
+        fadedOpacity = theme.isDark ? 0.5 : 0.36
         let kinds: [TermKind] = [.past, .current, .future]
         columnFills = Dictionary(uniqueKeysWithValues: kinds.map { ($0, theme.routeColumnFill($0)) })
         columnBorders = Dictionary(uniqueKeysWithValues: kinds.map { ($0, theme.routeColumnBorder($0)) })

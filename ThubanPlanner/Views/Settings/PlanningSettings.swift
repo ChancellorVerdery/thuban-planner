@@ -47,7 +47,12 @@ struct PlanningSettings: View {
             }
         }
         .onAppear(perform: syncDrafts)
-        .onChange(of: app.settings) { _, _ in syncDrafts() }
+        // Only the draft whose stored value changed follows it, so a cap being typed survives a strategy click or the
+        // other cap's stepper.
+        .onChange(of: app.settings) { old, new in
+            if old.maxCredits != new.maxCredits { maxDraft = JS.numberString(new.maxCredits) }
+            if old.summerMax != new.summerMax { summerDraft = JS.numberString(new.summerMax) }
+        }
     }
 
     private func capRow(_ label: String, detail: String, draft: Binding<String>, range: ClosedRange<Double>, stored: Double,
@@ -120,6 +125,9 @@ struct SettingsCreditField: View {
                 .focused($focused)
                 .onSubmit(apply)
                 .onChange(of: focused) { _, isFocused in if !isFocused { apply() } }
+                // Leaving Settings (or quitting) while the field is still first responder never reports focus loss.
+                .onDisappear(perform: apply)
+                .onReceive(NotificationCenter.default.publisher(for: NSApplication.willTerminateNotification)) { _ in apply() }
                 .thubanField(invalid: parsed == nil, mono: true, height: 32)
                 .frame(width: 64)
                 .accessibilityLabel(label)
@@ -194,7 +202,7 @@ struct SettingsStrategyRow: View {
         case .soonestOptionalSummer:
             return "Plans fall and spring first, and uses a summer only when it moves the finish earlier."
         case .even:
-            return "Skips summers and spreads the credits evenly over as few fall and spring terms as it takes."
+            return "Spreads the credits evenly over the same number of fall and spring terms; uses summers only if the plan can’t finish without them."
         }
     }
 }

@@ -11,8 +11,8 @@ struct ImportSettings: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 28) {
-            SettingsPaneHeader(eyebrow: eyebrow, title: "Bring your plan over from Atlas",
-                               caption: "Read-only: Atlas is never changed. Nothing here is replaced until you have seen the counts.")
+            SettingsPaneHeader(eyebrow: eyebrow, title: "Import",
+                               caption: "Bring your plan over from Atlas. Read-only: Atlas is never changed, and nothing here is replaced until you have seen the counts.")
             SettingsImportCard()
             SettingsImportConnection()
         }
@@ -112,10 +112,11 @@ struct SettingsImportCard: View {
         case .done(_, let backup):
             VStack(alignment: .leading, spacing: 12) {
                 topRow(title: "Imported", titleColor: theme.posTextColor,
-                       detail: backup.map { "previous plan saved as \($0.lastPathComponent)" } ?? "nothing was here to back up", mono: true, oneLine: true) {
+                       detail: backup.map(backupLine) ?? "Nothing was here to back up.", oneLine: true) {
                     if let backup {
                         Button("Show backup") { NSWorkspace.shared.activateFileViewerSelecting([backup]) }
                             .buttonStyle(GhostButtonStyle(height: 32, horizontalPadding: 10))
+                            .help(backup.lastPathComponent)
                     }
                     Button("Done") { app.cancelImport() }.buttonStyle(SecondaryButtonStyle(height: 32))
                     Button("Open Planner") {
@@ -128,14 +129,34 @@ struct SettingsImportCard: View {
                 ProgressBar(value: 1, tint: theme.posColor)
             }
         case .failed(let message):
-            topRow(title: "Atlas could not be read", titleColor: theme.negTextColor, detail: message) {
-                Button("Import a file…") { app.chooseImportFile() }.buttonStyle(SecondaryButtonStyle(height: 32))
-                Button("Try again") { app.fetchAtlasPreview() }
-                    .buttonStyle(PrimaryButtonStyle(height: 32))
-                    .disabled(!app.settingsImportConnectionIsValid)
-                    .keyboardShortcut(.defaultAction)
+            if let source = app.lastImportSource, source.hasPrefix("file:") {
+                topRow(title: "The file could not be imported", titleColor: theme.negTextColor,
+                       detail: "\(String(source.dropFirst("file:".count))): \(message)") {
+                    Button("Check Atlas instead") { app.fetchAtlasPreview() }
+                        .buttonStyle(SecondaryButtonStyle(height: 32))
+                        .disabled(!app.settingsImportConnectionIsValid)
+                    Button("Choose another file…") { app.chooseImportFile() }
+                        .buttonStyle(PrimaryButtonStyle(height: 32))
+                        .keyboardShortcut(.defaultAction)
+                }
+            } else {
+                topRow(title: "Atlas could not be read", titleColor: theme.negTextColor, detail: message) {
+                    Button("Import a file…") { app.chooseImportFile() }.buttonStyle(SecondaryButtonStyle(height: 32))
+                    Button("Try again") { app.fetchAtlasPreview() }
+                        .buttonStyle(PrimaryButtonStyle(height: 32))
+                        .disabled(!app.settingsImportConnectionIsValid)
+                        .keyboardShortcut(.defaultAction)
+                }
             }
         }
+    }
+
+    /// "Backup: Before import · Mon Sep 28, 6:12 PM" (the file name is on Show backup's tooltip).
+    private func backupLine(_ url: URL) -> String {
+        let info = app.backups().first { $0.url.lastPathComponent == url.lastPathComponent }
+        let label = SettingsFormat.backupLabel(info?.label ?? "before-import")
+        let date = (try? url.resourceValues(forKeys: [.contentModificationDateKey]).contentModificationDate) ?? info?.created
+        return "Backup: \(label)" + (date.map { " · \(SettingsFormat.dateTime($0))" } ?? "")
     }
 
     private func topRow<Actions: View>(title: String, titleColor: Color? = nil, detail: String, mono: Bool = false, oneLine: Bool = false,
@@ -237,6 +258,9 @@ struct SettingsImportCard: View {
         case .done:
             return "Your classes, semesters, switched-off summers and planning settings are on this Mac now. Atlas was not changed."
         case .failed:
+            if app.lastImportSource?.hasPrefix("file:") == true {
+                return "Choose a course-planner document saved from Atlas (JSON, or the psql output of the import query)."
+            }
             return "Check that “ssh \(app.preferences.atlasHost)” works in Terminal without a password prompt, or import a saved Atlas JSON file."
         case .idle, .fetching, .applying:
             return nil
@@ -282,7 +306,7 @@ private struct SettingsImportRow: View {
                 .help(row.detail)
                 .frame(maxWidth: .infinity, alignment: .leading)
             Text(row.value)
-                .font(ThubanFont.mono(13))
+                .font(ThubanFont.body(13, weight: .medium))
                 .foregroundStyle(row.state == .pending || row.state == .empty ? theme.inkFaintColor : theme.inkColor)
                 .monospacedDigit()
                 .frame(width: 90, alignment: .trailing)
@@ -319,7 +343,7 @@ private struct SettingsImportMark: View {
                     }
                 }
             case .pending:
-                Circle().strokeBorder(theme.line2Color, style: StrokeStyle(lineWidth: 1, dash: [2, 2]))
+                Circle().strokeBorder(theme.inkFaintColor, style: StrokeStyle(lineWidth: 1, dash: [2, 2]))
             case .empty:
                 Circle().fill(theme.panel2Color)
                     .overlay(Rectangle().fill(theme.inkFaintColor).frame(width: 8, height: 1.5))

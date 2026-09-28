@@ -164,6 +164,9 @@ struct ClassDetailSheet: View {
         HStack(spacing: 10) {
             Button {
                 app.selectedCourseId = course.id
+                // The Planner consumes the request: widens a filter / clears a search that hides the row, scrolls to
+                // it and focuses its Code field.
+                app.editRequestCourseId = course.id
                 app.section = .planner
                 app.presentedCourseId = nil
                 dismiss()
@@ -172,11 +175,11 @@ struct ClassDetailSheet: View {
             }
             .buttonStyle(.thubanSecondary)
             .help("Show this class in the Planner's table")
-            if app.section != .route, app.routeTerm(of: course.id) != nil {
+            if app.routeTerm(of: course.id) != nil {
                 Button {
                     app.selectedCourseId = course.id
                     app.presentedCourseId = nil
-                    app.showRoute()
+                    if app.section != .route { app.showRoute() }
                     dismiss()
                 } label: {
                     HStack(spacing: 7) { Icon(.route, size: 15); Text("Show on route") }
@@ -250,7 +253,8 @@ private struct ClassDetailRequirementRow: View {
                 HStack(spacing: 10) {
                     VStack(alignment: .leading, spacing: 4) {
                         HStack(spacing: 8) {
-                            Text(course.displayCode)
+                            // The ref as written in the class's list (Atlas shows it verbatim), not the match's code.
+                            Text(requirement.ref)
                                 .font(ThubanFont.mono(12.5, weight: .semibold))
                                 .foregroundStyle(theme.inkColor)
                                 .lineLimit(1)

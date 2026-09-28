@@ -56,6 +56,7 @@ extension AppModel {
 
     /// Step 1 (file): reads a saved Atlas JSON document (same shape the SQL returns) and moves to `.preview`.
     func loadImportFile(_ url: URL) {
+        lastImportFile = url
         startImport(source: "file:\(url.lastPathComponent)") {
             try AtlasImporter.document(fromFile: url)
         }
@@ -87,6 +88,7 @@ extension AppModel {
 
     /// Cancels a running fetch, or dismisses a preview / result.
     func cancelImport() {
+        importRun += 1
         importTask?.cancel()
         importTask = nil
         importPhase = .idle
@@ -100,22 +102,27 @@ extension AppModel {
 
     private func startImport(source: String, load: @escaping @Sendable () async throws -> AtlasDocument) {
         importTask?.cancel()
+        importRun += 1
+        let run = importRun
+        lastImportSource = source
         importPhase = .fetching
         let calendar = self.calendar
         importTask = Task { @MainActor [weak self] in
+            // A cancelled or superseded run never touches the phase of the run that replaced it.
+            @MainActor func isCurrent() -> Bool { self?.importRun == run }
             do {
                 let document = try await load()
                 try Task.checkCancellation()
                 let converted = try AtlasImporter.convert(document, source: source, now: Date(), calendar: calendar)
-                guard let self else { return }
+                guard let self, isCurrent() else { return }
                 self.importPhase = .preview(ImportPreview(
                     summary: converted.summary, data: converted.data, source: source,
                     replacesExisting: !self.data.isEmpty,
                     localCourses: self.data.courses.count, localTerms: self.data.terms.count))
             } catch is CancellationError {
-                self?.importPhase = .idle
+                if isCurrent() { self?.importPhase = .idle }
             } catch {
-                self?.importPhase = .failed(error.localizedDescription)
+                if isCurrent() { self?.importPhase = .failed(error.localizedDescription) }
             }
         }
     }

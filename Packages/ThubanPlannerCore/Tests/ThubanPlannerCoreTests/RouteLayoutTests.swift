@@ -124,6 +124,29 @@ final class RouteLayoutTests: XCTestCase {
         XCTAssertLessThan(r.control1.x, layout.columns[0].frame.maxX + m.gutter, "the bracket stays in the gutter")
     }
 
+    func testRibbonSkippingColumnsRunsThroughGapsNotBoxes() {
+        let s = Schedule(board: [T("fall-2024", .past, ["a"]), T("spring-2025", .past, ["m1", "m2", "m3"]),
+                                 T("fall-2025", .past, ["n1", "n2"]), T("spring-2026", .future, ["b"])],
+                         edges: [RouteEdge(from: "a", to: "b", kind: .prereq), RouteEdge(from: "m1", to: "n1", kind: .prereq)])
+        let layout = RouteLayout.make(schedule: s, courses: ["a", "m1", "m2", "m3", "n1", "n2", "b"].map { C($0) })
+        let long = layout.ribbons[0], short = layout.ribbons[1]
+        XCTAssertTrue(short.waypoints.isEmpty, "a ribbon between neighbouring columns is one curve")
+        XCTAssertEqual(long.waypoints.count, 4, "an entry and an exit per crossed column")
+        for pair in stride(from: 0, to: long.waypoints.count, by: 2) {
+            let entry = long.waypoints[pair], exit = long.waypoints[pair + 1]
+            XCTAssertEqual(entry.y, exit.y)
+            let run = CGRect(x: entry.x, y: entry.y - 1, width: exit.x - entry.x, height: 2)
+            for box in layout.boxes where box.courseId != "a" && box.courseId != "b" {
+                XCTAssertFalse(run.intersects(box.rect), "the lane misses \(box.courseId)")
+            }
+        }
+        let segs = long.segments
+        XCTAssertEqual(segs.count, 5)
+        XCTAssertEqual(segs.first!.start, long.start)
+        XCTAssertEqual(segs.last!.end, long.end)
+        for (x, y) in zip(segs, segs.dropFirst()) { XCTAssertEqual(x.end, y.start) }
+    }
+
     func testHitTesting() {
         let s = Schedule(board: [T("fall-2025", .past, ["a", "b"]), T("spring-2026", .future, ["c"])])
         let layout = RouteLayout.make(schedule: s, courses: [C("a"), C("b"), C("c")])
