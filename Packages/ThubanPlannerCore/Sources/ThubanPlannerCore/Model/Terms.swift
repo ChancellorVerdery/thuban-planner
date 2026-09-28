@@ -79,9 +79,13 @@ public enum TermKey {
     }
 
     /// `currentTermKey(now)`: the academic term containing a date in `calendar`'s time zone — Jan–May spring,
-    /// Jun–Aug summer, Sep–Dec fall. (Atlas uses the browser's local time; pass `.current` for the same.)
+    /// Jun–Aug summer, Sep–Dec fall. (Atlas uses the browser's local time; pass `.current` for the same.) Only the
+    /// calendar's TIME ZONE is used: JavaScript's `getMonth` / `getFullYear` are always Gregorian, so a user whose
+    /// system calendar is Buddhist or Japanese still gets "fall-2026", not "fall-2569" or "fall-8".
     public static func current(now: Date = Date(), calendar: Calendar = .current) -> String {
-        let parts = calendar.dateComponents([.year, .month], from: now)
+        var gregorian = Calendar(identifier: .gregorian)
+        gregorian.timeZone = calendar.timeZone
+        let parts = gregorian.dateComponents([.year, .month], from: now)
         let month = parts.month ?? 1
         let season: Season = month <= 5 ? .spring : (month <= 8 ? .summer : .fall)
         return make(season, parts.year ?? 2000)

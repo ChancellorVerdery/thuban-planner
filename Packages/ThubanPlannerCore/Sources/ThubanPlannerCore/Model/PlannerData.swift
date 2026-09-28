@@ -56,20 +56,21 @@ public struct PlannerData: Codable, Hashable, Sendable {
     public func courses(inTerm termKey: String) -> [Course] { courses.filter { $0.term == termKey } }
 
     /// The course a requirement ref names, matching codes case- and space-insensitively; the LAST course with that
-    /// code wins (the scheduler's rule). nil for an unknown ref.
+    /// code wins (the scheduler's rule). nil for an unknown ref. Matching is JavaScript string equality (`JSKey`),
+    /// like the scheduler's `byCode` map.
     public func course(forRef ref: String) -> Course? {
-        let key = Course.normalizeRef(ref)
-        guard !key.isEmpty else { return nil }
-        return courses.last { !$0.code.isEmpty && Course.normalizeRef($0.code) == key }
+        let key = JSKey(Course.normalizeRef(ref))
+        guard !key.text.isEmpty else { return nil }
+        return courses.last { !$0.code.isEmpty && JSKey(Course.normalizeRef($0.code)) == key }
     }
 
     /// Requirement refs (prereqs + coreqs) across the plan that match no course code, de-duplicated, first-seen order.
     public var unknownRefs: [String] {
-        var seen = Set<String>()
+        var seen = Set<JSKey>()
         var out: [String] = []
         for item in courses {
             for ref in item.prereqs + item.coreqs where course(forRef: ref) == nil {
-                if seen.insert(Course.normalizeRef(ref)).inserted { out.append(ref) }
+                if seen.insert(JSKey(Course.normalizeRef(ref))).inserted { out.append(ref) }
             }
         }
         return out
@@ -211,9 +212,10 @@ public struct PlannerData: Codable, Hashable, Sendable {
         return items.map { JS.trim(JS.string($0)) }.filter { !$0.isEmpty }
     }
 
-    /// De-duplicates exact strings, first occurrence wins (decompose's `uniq`).
+    /// De-duplicates exact strings (JS `Set` semantics: code units, not canonical equivalence), first occurrence
+    /// wins (decompose's `uniq`).
     static func uniq(_ items: [String]) -> [String] {
-        var seen = Set<String>()
-        return items.filter { seen.insert($0).inserted }
+        var seen = Set<JSKey>()
+        return items.filter { seen.insert(JSKey($0)).inserted }
     }
 }

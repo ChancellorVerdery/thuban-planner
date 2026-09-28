@@ -46,7 +46,7 @@ public struct Course: Codable, Hashable, Sendable, Identifiable {
     }
 
     /// Case- and space-insensitive form used to match requirement refs (Atlas `norm`).
-    public static func normalizeRef(_ text: String) -> String { JS.trim(text).lowercased() }
+    public static func normalizeRef(_ text: String) -> String { JS.toLowerCase(JS.trim(text)) }
 }
 
 /// Route strategies (Atlas `STRATEGIES`, same keys and labels).

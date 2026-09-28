@@ -121,7 +121,23 @@ compares board, edges, unplaceable, warnings, termsToFinish, gradTerm, `upcoming
 fidelity details: the class sort is V8's TimSort (`V8Sort`) because Atlas's comparator memoizes depths lazily and in a
 requirement cycle the result depends on the comparator call order (a plain stable sort differs in half the cases);
 codes compare with `JS.localeCompare`, an exact ICU-root table for printable ASCII (checked against JavaScriptCore;
-non-ASCII falls back to Foundation's ICU compare).
+non-ASCII goes to ICU itself — `ICUCollator`, libicucore loaded with dlopen — because Foundation's compare ties
+"ﬁn"/"fin" and "φυς"/"φυσ").
+
+`DifferentialParityTests` goes further: it runs Atlas's own JavaScript IN-PROCESS (JavaScriptCore; fixtures
+`atlas-course.js`, `atlas-course-backend.js`, `v8sort.js`, byte-for-byte copies loaded by `AtlasJSHarness`) on 3,200
+seeded documents — 2,400 realistic plans (0–90 classes, DAG / cyclic, unknown refs, duplicate codes and ids, ref case /
+white-space variants, 0 / fractional / heavy credits, numeric-string and tiny caps, all strategies, 16 fixed local
+"now"s at month edges) and 800 hostile documents (every field of every JSON kind) — through decompose → Postgres →
+recompose → `loadCourse` → `scheduleDegree` / `upcomingSummers` / `planStatus`, and diffs the normalized document and
+every output field against `PlannerData(json:)` + `Scheduler`. Where comparator call order cannot matter it also
+re-runs Atlas under JavaScriptCore's native sort as an independent check of the V8 sort port.
+`JSSemanticsParityTests` checks the primitives exhaustively against the engine: number → string (20k+ doubles),
+`Number(string)`, `trim` and `toLowerCase` for every BMP code point, `localeCompare` (all ASCII pairs + 8k strings).
+Rules this pinned down: JS white space is ECMA-262's set (not Foundation's, which also strips NEL / U+200B);
+`toLowerCase` keeps Greek final sigma; numbers print like `Number::toString` ("0.000001", "123456789012345680000",
+"1e-7"); ids / codes / term keys are compared as code units (`JSKey`), not by Swift's canonical equivalence;
+`currentTermKey` is always Gregorian.
 
 ## Data flow — how a view reads and writes
 
@@ -334,7 +350,7 @@ Always undo state in `cleanup`. Look at your PNGs (Read tool) before you finish.
 ## Build / test / smoke
 
 - `DERIVED=.build/DerivedData-<you> scripts/build.sh` — ALWAYS a private DerivedData. Regenerates the project first.
-- `scripts/test.sh` — core tests (`swift test`, 93 tests incl. 400 golden cases). Add tests for core logic you add.
+- `scripts/test.sh` — core tests (`swift test`, 103 tests incl. 400 golden cases and the 3,200-case differential run against Atlas's JS). Add tests for core logic you add.
 - `scripts/golden.sh` — regenerates the golden cases from Atlas's own scheduler (macOS JavaScriptCore; no Node).
 - `DERIVED=.build/DerivedData-<you> scripts/smoke.sh .build/smoke-<you>` — builds, runs the smoke walk on a temp home
   (never your real data, never ssh), writes PNGs. It only stops the process it launched.
