@@ -294,7 +294,7 @@ The working surface: what you've taken, what's left, and a one-line answer to "w
 A zoomable Sankey-style board of the route (Atlas's "Map"), drawn natively in a `Canvas` (or shapes) — not Atlas's SVG.
 
 - **Toolbar**: legend chips (Taken · Current · Planned; prereq solid ribbon, coreq dashed) | zoom − / + (`.zoomOut` /
-  `.zoomIn`, 0.25–2.5×) · `Fit` (`.fit`, ⌘0).
+  `.zoomIn`, 0.25–6× of fitted; fitted never below 80 % scale; the label shows the real scale) · `Fit` (`.fit`, ⌘0).
 - **Header strip** above the board: serif "Finishing Spring 2028" (or "Your route"), `app.planStatus`, warnings.
 - **Columns** = `app.schedule.columns` in order (terms with classes only), fixed column width ~210 pt with a gutter;
   header per column: term label (serif 16) and `theme.termCaption(term)` ("15 cr · planned"). Column background:
