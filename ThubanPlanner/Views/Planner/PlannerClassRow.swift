@@ -369,7 +369,7 @@ struct PlannerTermMenu: View {
                 Glyph(.chevronDown, size: 10).foregroundStyle(theme.inkFaintColor)
             }
             .padding(.horizontal, 8)
-            .frame(width: 132, height: 28)
+            .frame(width: 124, height: 28)
             .background(hovering ? theme.panel2Color : .clear, in: RoundedRectangle(cornerRadius: 6, style: .continuous))
             .overlay(RoundedRectangle(cornerRadius: 6, style: .continuous)
                 .strokeBorder(hovering ? theme.line2Color : .clear, lineWidth: ThubanMetrics.hairline))

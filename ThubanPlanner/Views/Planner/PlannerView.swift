@@ -93,7 +93,7 @@ struct PlannerView: View {
                 }
                 finishTile
             }
-            .fixedSize()
+            .fixedSize(horizontal: true, vertical: true)
         }
     }
 
@@ -224,9 +224,11 @@ struct PlannerView: View {
             if !state.search.isEmpty { state.search = "" }
         }
         app.selectedCourseId = id
+        // Lazy rows far below may not exist yet: scroll once the new row is in the list, then again once laid out.
         DispatchQueue.main.async {
-            withAnimation(.easeInOut(duration: 0.2)) { proxy.scrollTo(id, anchor: .center) }
+            proxy.scrollTo(id, anchor: .center)
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.12) {
+                proxy.scrollTo(id, anchor: .center)
                 focus = .cell(id, .code)
                 if app.editRequestCourseId == id { app.editRequestCourseId = nil }
             }
@@ -243,6 +245,7 @@ struct PlannerStatCard<Content: View>: View {
     var body: some View {
         content()
             .frame(width: 176, alignment: .leading)
+            .frame(maxHeight: .infinity, alignment: .topLeading)
             .thubanPanel(padding: 14)
     }
 }

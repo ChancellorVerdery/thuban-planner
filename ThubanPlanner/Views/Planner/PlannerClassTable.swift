@@ -13,16 +13,16 @@ struct PlannerColumns: Equatable {
     let code: CGFloat = 116
     let credits: CGFloat = 46
     let summer: CGFloat = 58
-    let term: CGFloat = 132
-    let status: CGFloat = 160
+    let term: CGFloat = 124
+    let status: CGFloat = 140
     let remove: CGFloat = 28
     var title: CGFloat
     var prereqs: CGFloat
     var coreqs: CGFloat
 
     init(width: CGFloat) {
-        let fixed: CGFloat = 116 + 46 + 58 + 132 + 160 + 28
-        let flexible = max(420, width - PlannerColumns.inset * 2 - fixed - PlannerColumns.gap * 8)
+        let fixed: CGFloat = 116 + 46 + 58 + 124 + 140 + 28
+        let flexible = max(360, width - PlannerColumns.inset * 2 - fixed - PlannerColumns.gap * 8)
         title = (flexible * 0.38).rounded(.down)
         prereqs = (flexible * 0.31).rounded(.down)
         coreqs = (flexible * 0.31).rounded(.down)
