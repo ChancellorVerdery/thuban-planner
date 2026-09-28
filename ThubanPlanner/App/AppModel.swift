@@ -170,6 +170,16 @@ final class AppModel {
         save()
     }
 
+    /// SMOKE ONLY: lets a smoke scene put the first-run state on screen (`isFirstRun` is otherwise set only by `load()`,
+    /// and a smoke run always seeds `SampleData`). No-op outside a smoke run. Recipe (the Planner's empty / first-run
+    /// state with the Atlas import offer):
+    /// `app.replaceData(.empty); app.smokeSetFirstRun(true); app.preferences.importOffered = false` — cleanup:
+    /// `app.replaceData(SampleData.make(now: app.now, calendar: app.calendar))` (which also clears `isFirstRun`).
+    func smokeSetFirstRun(_ value: Bool) {
+        guard SmokeHarness.isEnabled else { return }
+        isFirstRun = value
+    }
+
     private func recomputeSchedule() {
         let fresh = Scheduler.scheduleDegree(data, now: now, calendar: calendar)
         if fresh != schedule { schedule = fresh }

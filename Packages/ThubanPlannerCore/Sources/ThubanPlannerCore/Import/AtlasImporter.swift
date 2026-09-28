@@ -151,14 +151,18 @@ public struct AtlasImporter: Sendable {
 
     /// Builds a fresh `PlannerData` from the document: the rows are recomposed into Atlas's blob and normalized
     /// exactly like `loadCourse()` / the backend's `decompose()` (see `PlannerData(json:)`). Then one repair Atlas does
-    /// not need: courses sharing an id get fresh ids (this app keys rows by id). Everything dropped or repaired is
-    /// reported in `summary.warnings`. `makeId` mints the repair ids (injectable for tests).
+    /// not need: courses sharing an id get fresh ids (this app keys rows by id). Atlas's scheduler identifies classes by
+    /// id, so rows sharing an id share "done" state there; re-minting can therefore change the route. The route is
+    /// computed both ways and, when it differs, a warning says how (`routeDifference`). Everything dropped or repaired
+    /// is reported in `summary.warnings`. `makeId` mints the repair ids (injectable for tests).
     public static func convert(_ document: AtlasDocument, source: String, now: Date = Date(), calendar: Calendar = .current,
                                makeId: () -> String = { PlannerID.make("c") }) throws -> AtlasImport {
         var warnings: [String] = []
         func warn(_ count: Int, _ one: String, _ many: String) { if count > 0 { warnings.append("\(count) \(count == 1 ? one : many)") } }
 
         var data = PlannerData(json: document.recomposed)
+        // The route exactly as Atlas computes it for these rows (duplicate ids and all), to compare after re-minting.
+        let atlasSchedule = Scheduler.scheduleDegree(data, now: now, calendar: calendar)
 
         // What normalization dropped.
         warn(document.courses.count - data.courses.count, "class had no id and was skipped", "classes had no id and were skipped")
@@ -171,19 +175,43 @@ public struct AtlasImporter: Sendable {
         var firstRowPerKey: [String: Bool] = [:] // key → current flag of the row that survives de-duplication
         for row in validTermRows {
             let key = TermKey.make(Season(rawValue: row["season"]?.stringValue ?? "") ?? .spring, JS.number(row["year"]))
-            if firstRowPerKey[key] == nil { firstRowPerKey[key] = JS.truthy(row["current"]) }
+            if firstRowPerKey[key] == nil { firstRowPerKey[key] = JS.truthy(row["current"].map(AtlasDocument.postgresBool)) }
         }
         let flaggedCurrent = firstRowPerKey.values.filter { $0 }.count
         if flaggedCurrent > 1 && data.terms.filter(\.current).count == 1 {
             warnings.append("\(flaggedCurrent) semesters were marked current; the latest one is kept")
         }
-        if case .object(let g)? = document.settings, let raw = g["disabled_terms"]?.arrayValue {
-            warn(raw.count - data.disabledTerms.count, "switched-off term was not text and was skipped", "switched-off terms were not text and were skipped")
+        let recomposed = document.recomposed
+        if let rawDisabled = recomposed["disabledTerms"] {
+            if let raw = rawDisabled.arrayValue {
+                warn(raw.count - data.disabledTerms.count, "switched-off term was not text and was skipped", "switched-off terms were not text and were skipped")
+            } else if rawDisabled != .null {
+                warnings.append("The switched-off terms could not be read and were skipped")
+            }
+        }
+        // Requirement lists that are neither arrays nor null (after Postgres text forms are converted) are dropped by
+        // loadCourse(); say so.
+        if case .array(let rows)? = recomposed["courses"] {
+            let unreadable = rows.filter { row in
+                ["prereqs", "coreqs", "preOrCo"].contains { key in
+                    guard let v = row[key] else { return false }
+                    return v != .null && v.arrayValue == nil
+                }
+            }.count
+            warn(unreadable, "class had requirements that could not be read (they were skipped)",
+                 "classes had requirements that could not be read (they were skipped)")
         }
         if document.settings == nil { warnings.append("No planner settings in Atlas; the defaults are used (15 credits, summer 9, soonest)") }
 
+        let idsBefore = data.courses.map(\.id)
         let reMinted = data.reMintDuplicateIds(makeId: makeId)
         warn(reMinted, "class shared an id with another and got a new one", "classes shared an id with another and got new ones")
+        let schedule = Scheduler.scheduleDegree(data, now: now, calendar: calendar)
+        if reMinted > 0, let difference = AtlasImporter.routeDifference(
+            atlas: atlasSchedule, imported: schedule,
+            originalId: Dictionary(zip(data.courses.map(\.id), idsBefore), uniquingKeysWith: { first, _ in first })) {
+            warnings.append(difference)
+        }
         let termKeys = Set(data.terms.map(\.key))
         let orphans = data.courses.filter { $0.term.map { !termKeys.contains($0) } ?? false }.count
         warn(orphans, "class is marked taken in a semester that isn't in your list (it still counts as done)",
@@ -192,7 +220,6 @@ public struct AtlasImporter: Sendable {
         data.importedAt = Date(timeIntervalSince1970: now.timeIntervalSince1970.rounded(.down)) // whole seconds: ISO 8601
         data.importSource = source
 
-        let schedule = Scheduler.scheduleDegree(data, now: now, calendar: calendar)
         let summary = ImportSummary(
             email: document.email,
             courses: data.courses.count,
@@ -210,5 +237,24 @@ public struct AtlasImporter: Sendable {
             termsToFinish: schedule.termsToFinish,
             warnings: warnings)
         return AtlasImport(data: data, summary: summary)
+    }
+
+    /// Plain-words difference between Atlas's route for the imported rows and the route after duplicate ids were
+    /// re-minted, or nil when they are the same. `originalId` maps each re-minted id back to the id it replaced, so
+    /// the boards are compared class for class.
+    static func routeDifference(atlas: Schedule, imported: Schedule, originalId: [String: String]) -> String? {
+        func back(_ id: String) -> String { originalId[id] ?? id }
+        let finishSame = atlas.termsToFinish == imported.termsToFinish && atlas.gradTerm == imported.gradTerm
+        let boardSame = atlas.board.map { [$0.key] + $0.courseIds } == imported.board.map { [$0.key] + $0.courseIds.map(back) }
+            && atlas.unplaceable == imported.unplaceable.map(back)
+        if finishSame && boardSame { return nil }
+        func finish(_ s: Schedule) -> String {
+            guard let grad = s.gradTerm, s.termsToFinish > 0 else { return "nothing left to schedule" }
+            return "\(TermKey.label(grad)) in \(s.termsToFinish) more term\(s.termsToFinish == 1 ? "" : "s")"
+        }
+        if !finishSame {
+            return "Because of the shared ids, this route differs from Atlas's: it finishes \(finish(imported)) instead of \(finish(atlas))"
+        }
+        return "Because of the shared ids, this route places some classes differently than Atlas's; both finish \(finish(atlas))"
     }
 }

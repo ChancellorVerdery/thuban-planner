@@ -267,4 +267,4 @@ Array.prototype.sort = function (comparefn) {
   if (typeof comparefn !== 'function') return nativeSort.call(this, comparefn)
   return v8sort(this, comparefn)
 }
-export { v8sort }
+export { v8sort, nativeSort }

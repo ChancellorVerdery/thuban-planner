@@ -52,21 +52,31 @@ public struct AtlasDocument: Decodable, Sendable, Equatable {
 
     /// The rows turned back into Atlas's `atlas.course.v1` blob — the backend mapper's `recompose(rows)`:
     /// `summer_ok` → `summerOk`, `term_key` → `term`, settings columns → camelCase, `disabled_terms` → `disabledTerms`.
-    /// Values are passed through untouched; `PlannerData(json:)` then normalizes them like `loadCourse()`.
+    /// Values are passed through untouched — except Postgres TEXT forms, which a file exported with plain psql (not the
+    /// import SQL, whose `json_build_object` always yields native JSON) may carry: a `text[]` rendered as `{a,"b c"}`
+    /// becomes a JSON array and a boolean rendered as `t` / `f` becomes a JSON boolean (`postgresArray`,
+    /// `postgresBool`). `PlannerData(json:)` then normalizes them like `loadCourse()` (whose JS coercions would
+    /// otherwise read `"f"` as true and drop `"{a,b}"`).
     public var recomposed: JSONValue {
         let courses = self.courses.map { row -> JSONValue in
             guard case .object(let r) = row else { return row }
             var o: [String: JSONValue] = [:]
             for (from, to) in [("id", "id"), ("code", "code"), ("title", "title"), ("credits", "credits"), ("prereqs", "prereqs"),
                                ("coreqs", "coreqs"), ("pre_or_co", "preOrCo"), ("summer_ok", "summerOk"), ("term_key", "term")] {
-                if let v = r[from] { o[to] = v }
+                guard let v = r[from] else { continue }
+                switch from {
+                case "prereqs", "coreqs", "pre_or_co": o[to] = AtlasDocument.postgresArray(v)
+                case "summer_ok": o[to] = AtlasDocument.postgresBool(v)
+                default: o[to] = v
+                }
             }
             return .object(o)
         }
         let terms = self.terms.map { row -> JSONValue in
             guard case .object(let r) = row else { return row }
             var o: [String: JSONValue] = [:]
-            for key in ["key", "season", "year", "current"] { if let v = r[key] { o[key] = v } }
+            for key in ["key", "season", "year"] { if let v = r[key] { o[key] = v } }
+            if let v = r["current"] { o["current"] = AtlasDocument.postgresBool(v) }
             return .object(o)
         }
         var blob: [String: JSONValue] = ["courses": .array(courses), "terms": .array(terms)]
@@ -76,9 +86,85 @@ public struct AtlasDocument: Decodable, Sendable, Equatable {
             if let v = g["summer_max"] { s["summerMax"] = AtlasDocument.unwrapJSONText(v) }
             if let v = g["strategy"] { s["strategy"] = v }
             blob["settings"] = .object(s)
-            if let v = g["disabled_terms"] { blob["disabledTerms"] = v }
+            if let v = g["disabled_terms"] { blob["disabledTerms"] = AtlasDocument.postgresArray(v) }
         }
         return .object(blob)
+    }
+
+    /// A Postgres array literal (`{}`, `{A,B}`, `{"MATH 1241",NULL,"say \"hi\""}`) as a JSON array of strings (an
+    /// unquoted NULL element becomes JSON null). Anything else — a real JSON array, null, a string that is not a
+    /// literal — is returned unchanged. Nested literals become nested arrays.
+    public static func postgresArray(_ value: JSONValue) -> JSONValue {
+        guard case .string(let text) = value else { return value }
+        let scalars = Array(text.trimmingCharacters(in: .whitespacesAndNewlines).unicodeScalars)
+        guard scalars.first == "{", scalars.last == "}" else { return value }
+        var index = 0
+        guard let parsed = parsePostgresArray(scalars, &index), index == scalars.count else { return value }
+        return parsed
+    }
+
+    /// `{ elem, elem, … }` starting at `scalars[index] == "{"`; advances `index` past the closing brace. nil = malformed.
+    private static func parsePostgresArray(_ s: [Unicode.Scalar], _ index: inout Int) -> JSONValue? {
+        guard index < s.count, s[index] == "{" else { return nil }
+        index += 1
+        var items: [JSONValue] = []
+        func skipSpace() { while index < s.count, s[index].properties.isWhitespace { index += 1 } }
+        skipSpace()
+        if index < s.count, s[index] == "}" { index += 1; return .array(items) }
+        while index < s.count {
+            skipSpace()
+            guard index < s.count else { return nil }
+            if s[index] == "{" {
+                guard let nested = parsePostgresArray(s, &index) else { return nil }
+                items.append(nested)
+            } else if s[index] == "\"" {
+                index += 1
+                var text = String.UnicodeScalarView()
+                var closed = false
+                while index < s.count {
+                    let c = s[index]
+                    index += 1
+                    if c == "\\" {
+                        guard index < s.count else { return nil }
+                        text.append(s[index]); index += 1
+                    } else if c == "\"" {
+                        closed = true; break
+                    } else {
+                        text.append(c)
+                    }
+                }
+                guard closed else { return nil }
+                items.append(.string(String(text)))
+            } else {
+                var text = String.UnicodeScalarView()
+                while index < s.count, s[index] != ",", s[index] != "}" {
+                    if s[index] == "\\" {
+                        index += 1
+                        guard index < s.count else { return nil }
+                    }
+                    text.append(s[index]); index += 1
+                }
+                let element = String(text).trimmingCharacters(in: .whitespaces)
+                items.append(element.uppercased() == "NULL" ? .null : .string(element))
+            }
+            skipSpace()
+            guard index < s.count else { return nil }
+            if s[index] == "," { index += 1; continue }
+            if s[index] == "}" { index += 1; return .array(items) }
+            return nil
+        }
+        return nil
+    }
+
+    /// A Postgres boolean in text form (`t` / `f`, as psql prints it; also `true` / `false`) as a JSON boolean.
+    /// Anything else is returned unchanged.
+    public static func postgresBool(_ value: JSONValue) -> JSONValue {
+        guard case .string(let text) = value else { return value }
+        switch text.trimmingCharacters(in: .whitespaces).lowercased() {
+        case "t", "true": return .bool(true)
+        case "f", "false": return .bool(false)
+        default: return value
+        }
     }
 
     /// jsonb arrives parsed (`18` or `"18"`); a client that stored JSON text in it (`"\"18\""`) is unwrapped once.

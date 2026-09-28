@@ -16,13 +16,20 @@ Three engineers build the UI in parallel from this document without talking to e
 |---|---|
 | **A — Planner** | `ThubanPlanner/Views/Planner/**` |
 | **B — Route map + class detail sheet** | `ThubanPlanner/Views/Route/**`, `ThubanPlanner/Views/ClassDetail/**` |
-| **C — Settings** | `ThubanPlanner/Views/Settings/**` (all panes and the settings chrome; may be restyled) |
+| **C — Settings** | `ThubanPlanner/Views/Settings/**` (all panes and the settings chrome — `SettingsGroup`, `SettingsRow`, `SettingsNote`, `SettingsPaneHeader`; may be restyled) |
 
 Everything else is **shared and frozen**: `ThubanPlanner/App/**`, `Views/Shell/**`, `Views/Components/**`,
 `Views/Theme/**`, `Shared/**`, `Packages/ThubanPlannerCore/Sources/**` (existing files), `project.yml`, `scripts/**`,
 `tools/**`. Do not edit shared files — the three branches must merge without conflicts. If you need something more:
 
 - A new helper view → your own folder, prefixed with your area (`PlannerTermChip`, `RouteRibbonLayer`, `SettingsCapField`).
+- **Naming — every symbol you add is prefixed or private.** All three areas compile into ONE module, so two branches
+  that each add `var coursesByCode` only collide after the merge. Every non-`private` / non-`fileprivate` top-level
+  type, function, constant or extension member you add carries your area prefix: types `Planner…` / `Route…` /
+  `ClassDetail…` / `Settings…`; members of an `extension AppModel` / `ResolvedTheme` / `View` / core type and free
+  functions `planner…` / `route…` / `classDetail…` / `settings…` (`app.routeCoursesByCode`,
+  `theme.plannerRowFill`, `.settingsCapFieldStyle()`). Helpers only one file uses → `private` / `fileprivate` (no
+  prefix needed). Same for new core files (`RouteLayout`, `routeBoxRects(…)`).
 - A new read-only query → an `extension AppModel` in a NEW file in YOUR folder (`Views/Route/AppModel+Route.swift`),
   built from `app.data` / `app.schedule` and the core's public API. Extensions cannot add stored properties; the shared
   UI state you may need is already on `AppModel` (below).
@@ -62,7 +69,8 @@ ThubanPlanner/
              AppIconRenderer (live dock icon), SmokeHarness, Smoke/SmokeScenes (registry, pre-wired)
   Views/Shell        ShellView: TitleBar (mark + serif "Thuban Planner", StatusChip), SectionBar (SectionTabs + the
                      section's toolbar), content switch, class detail sheet host, load / save error banner
-  Views/Components   Buttons, Chip, SegmentedPicker, ToggleChip, EmptyState, ProgressBar, Common (copied from Gym)
+  Views/Components   Buttons, Chip, SegmentedPicker, ToggleChip, EmptyState, ProgressBar, Common (copied from Gym),
+                     Fields (`ThubanToggle`, `.thubanField` / `ThubanFieldStyle` — shared by every area)
   Views/Theme        PlannerTheme (term-kind / ribbon / status colour roles shared by A and B)
   Views/Planner      PlannerView, PlannerToolbar, PlannerSmokeScenes                              (A)
   Views/Route        RouteView, RouteToolbar, RouteSmokeScenes                                    (B)
@@ -70,8 +78,8 @@ ThubanPlanner/
   Views/Settings     SettingsView (nav), SettingsToolbar, SettingsChrome, SettingsPaneHeader, PlanningSettings,
                      AppearanceSettings (working), ImportSettings, DataSettings, AboutSettings, SettingsSmokeScenes (C)
   Resources          Assets.xcassets (AppIcon from scripts/make_app_icon.sh), entitlements (no sandbox)
-scripts/   build.sh, test.sh, smoke.sh, install.sh, regen.sh, make_app_icon.sh(+.swift), golden.sh
-tools/golden/  gen.mjs + atlas-course.js (Atlas's course.js, unmodified) + v8sort.js + sortcheck.mjs
+scripts/   build.sh, test.sh, smoke.sh, install.sh, regen.sh, make_app_icon.sh(+.swift), golden.sh, v8check.sh
+tools/golden/  gen.mjs + atlas-course.js (Atlas's course.js, unmodified) + v8sort.js + sortcheck.mjs + v8trace.mjs (V8-only check)
 ```
 
 Each placeholder (`PlannerView`, `RouteToolbar`, `ClassDetailSheet`, `PlanningSettings`, …) carries a TODO. Replace
@@ -99,7 +107,10 @@ re-normalizes after every write, exactly like Atlas reloads after every save —
 back to 15. `PlannerStore` writes atomically (0600), makes a daily backup before the first write of a day (14 kept)
 and labelled snapshots before an import / restore (20 kept) in `backups/`. `preferences.json` (theme, text size, Atlas
 host / email, last section, `importOffered`) is separate and never touched by an import. Atlas keeps duplicate course
-ids; the importer re-mints them (with a warning) because this app keys rows by id.
+ids; the importer re-mints them (with a warning) because this app keys rows by id. Atlas's scheduler identifies
+classes by id (rows sharing one share "done" state), so re-minting can change the route: the importer schedules both
+ways and, when they differ, adds a warning saying how ("…finishes Summer 2026 in 2 more terms instead of Spring 2026
+in 1 more term").
 
 ### Scheduler (core, frozen)
 
@@ -209,7 +220,10 @@ commandDescription` shows the command. Data: `app.dataFolder`, `revealDataFolder
 The importer runs `/usr/bin/ssh -o BatchMode=yes -o ConnectTimeout=10 <host> docker exec -i stack-postgres-1 psql -U
 atlas_user -d atlas -At` and feeds `AtlasImporter.sql(email:)` on stdin: `BEGIN TRANSACTION READ ONLY`, ONE
 SELECT building a JSON document from `course.settings / terms / courses` for that `auth.users.email`, `ROLLBACK`. The
-rows are recomposed into Atlas's blob and normalized like `loadCourse()` / the backend mapper's `decompose()`.
+rows are recomposed into Atlas's blob and normalized like `loadCourse()` / the backend mapper's `decompose()`. A file
+saved from plain psql output may carry Postgres TEXT forms; `AtlasDocument.recomposed` turns `text[]` literals
+(`{a,"b c",NULL}`) into arrays and `t` / `f` into booleans first, and the importer warns about requirement lists or
+switched-off terms it still cannot read.
 NEVER add anything that writes to Atlas. Tests use `FixtureRunner`. Never run the import against the live Beelink from
 a build / smoke / test script.
 
@@ -236,8 +250,10 @@ Planner roles for terms, ribbons and statuses are in `Views/Theme/PlannerTheme.s
   icon:, kind:)` + `ToolbarDivider`, `Chip(text, kind:, dot:)`, `SegmentedPicker`, `ToggleChip`, `EmptyState`,
   `SectionPlaceholder`, `ProgressBar(value:)`, `Eyebrow`, `SectionHeader`, `PageHeader(eyebrow:title:subtitle:)`,
   `StatTile`, `ListRowCard`, `Hairline`, `SearchField`, `ImportFromAtlasButton`, modifiers `.thubanPanel`,
-  `.thubanHairline`, `.thubanChip`, `.thubanField`. Settings chrome: `SettingsPaneHeader`, `SettingsGroup`,
-  `SettingsRow`, `SettingsNote`, `ThubanToggle`.
+  `.thubanHairline`, `.thubanChip`, `.thubanField(invalid:mono:height:)`, `ThubanToggle(isOn:label:)` (these two are
+  in `Views/Components/Fields.swift` — frozen, so A can use them in the class table and "+ Semester" popover without
+  depending on C's folder). Settings chrome (C's, may change — other areas must not use it): `SettingsPaneHeader`,
+  `SettingsGroup`, `SettingsRow`, `SettingsNote`.
 - Every control has an accessibility label; lists are keyboard-navigable; hit targets ≥ 28 pt; nothing reflows
   when a value changes (fixed column widths, monospaced digits).
 
@@ -344,19 +360,46 @@ extension SmokeScenes {                       // Views/Route/RouteSmokeScenes.sw
 ```
 
 `window: .main` (default) or `.sheet` (the class detail sheet: `app.presentCourse("c-sample-31")`); `settle:` seconds.
+The empty / first-run Planner (with the import offer) — `isFirstRun` is `private(set)` and a smoke run seeds sample
+data, so use the smoke-only setter:
+
+```swift
+SmokeScene(name: "planner-first-run") { app in
+    app.section = .planner
+    app.replaceData(.empty); app.smokeSetFirstRun(true); app.preferences.importOffered = false
+} cleanup: { app in app.replaceData(SampleData.make(now: app.now, calendar: app.calendar)) }
+```
+
 Always undo state in `cleanup`. Look at your PNGs (Read tool) before you finish. Sample ids are `c-sample-01 … 43`
 (01–29 taken, 30–43 to take; 38 = Senior Design II, the last class).
 
 ## Build / test / smoke
 
-- `DERIVED=.build/DerivedData-<you> scripts/build.sh` — ALWAYS a private DerivedData. Regenerates the project first.
-- `scripts/test.sh` — core tests (`swift test`, 103 tests incl. 400 golden cases and the 3,200-case differential run against Atlas's JS). Add tests for core logic you add.
+- `DERIVED=.build/DerivedData-<you> scripts/build.sh` — ALWAYS a private DerivedData, run from your own worktree
+  (see Git). Regenerates the project first.
+- `scripts/test.sh` — core tests (`swift test`, 110 tests incl. 400 golden cases and the 3,200-case differential run against Atlas's JS). Add tests for core logic you add.
 - `scripts/golden.sh` — regenerates the golden cases from Atlas's own scheduler (macOS JavaScriptCore; no Node).
+- `scripts/v8check.sh` — needs a real V8 (`node` / `deno`, or `V8_NODE=<Electron binary>`): checks the V8 sort port's
+  comparator call order against V8's own sort and regenerates the golden cases on V8's own sort, diffing them with the
+  committed file. Exits 2 when no V8 is installed (none is on the lead's Mac today; JavaScriptCore's native sort
+  independently confirms the port only where call order cannot matter).
 - `DERIVED=.build/DerivedData-<you> scripts/smoke.sh .build/smoke-<you>` — builds, runs the smoke walk on a temp home
   (never your real data, never ssh), writes PNGs. It only stops the process it launched.
 - `scripts/install.sh` — Release → `/Applications/Thuban Planner.app` (lead only, after merging).
 - `scripts/make_app_icon.sh` — regenerates the static AppIcon from `Shared/Art/AppArtSource.swift`.
 - Manual run on sample data: `THUBAN_PLANNER_HOME=/tmp/planner-demo THUBAN_PLANNER_SEED=sample "<app>/Contents/MacOS/Thuban Planner"`.
 
-Git: work on your own branch, small commits, messages ending with
+Git — **one git worktree per engineer** (a checkout holds one branch, and `scripts/build.sh` regenerates
+`ThubanPlanner.xcodeproj` in whatever directory it runs from, so sharing the main checkout would clobber branches and
+the project):
+
+```sh
+cd ~/Desktop/Claude/"Thuban Planner"
+git worktree add .claude/worktrees/planner -b planner main   # A (route / settings for B / C)
+cd .claude/worktrees/planner
+DERIVED=.build/DerivedData-planner scripts/build.sh          # run every script from YOUR worktree
+```
+
+`.claude/worktrees/` and `.build/` are gitignored; each worktree has its own `.build/` and generated project. Never
+check out another branch in the main checkout. Small commits on your branch, messages ending with
 `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`. Do not merge to main and do not install.

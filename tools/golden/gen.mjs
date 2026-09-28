@@ -8,8 +8,12 @@
 // v8sort.js replaces Array.prototype.sort with V8's TimSort so the comparator call order (which decides memoized
 // depths inside requirement cycles) is Chrome/Electron's, not JavaScriptCore's. upcomingSummers / planStatus are
 // copied verbatim from atlas-ui/src/page/courseui.js (not exported there), with `now` passed in.
-import './v8sort.js'
+import { nativeSort } from './v8sort.js'
 import { scheduleDegree, parseTerm, nextTermKey, currentTermKey, termRank, termLabel, termKey } from './atlas-course.js'
+// GOLDEN_NATIVE_SORT=1 (scripts/v8check.sh under a real V8: Node / Deno / Electron-as-Node) regenerates with the
+// engine's OWN sort, so the output can be diffed against the committed golden file made with the V8 port.
+const env = globalThis.process?.env ?? globalThis.Deno?.env?.toObject?.() ?? {}
+if (env.GOLDEN_NATIVE_SORT === '1') Array.prototype.sort = nativeSort
 
 function upcomingSummers(s, now) {
   const start = s.terms.length ? s.terms[s.terms.length - 1].key : currentTermKey(now)
@@ -110,4 +114,5 @@ const out = cases.map((c) => {
   const schedule = scheduleDegree(s, new Date(c.now))
   return { ...c, expected: { schedule, summers: upcomingSummers(s, new Date(c.now)), status: planStatus(s, schedule) } }
 })
+const print = globalThis.print ?? console.log
 print(JSON.stringify({ generator: 'tools/golden/gen.mjs', source: 'atlas-ui/src/page/course.js', cases: out }))
