@@ -1,0 +1,53 @@
+name: ThubanPlanner
+options:
+  bundleIdPrefix: org.thuban
+  deploymentTarget:
+    macOS: "15.0"
+  createIntermediateGroups: true
+  generateEmptyDirectories: true
+packages:
+  ThubanPlannerCore:
+    path: Packages/ThubanPlannerCore
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+    SWIFT_STRICT_CONCURRENCY: minimal
+    MARKETING_VERSION: "0.1.0"
+    CURRENT_PROJECT_VERSION: "1"
+targets:
+  ThubanPlanner:
+    type: application
+    platform: macOS
+    sources:
+      - path: ThubanPlanner/App
+      - path: ThubanPlanner/Views
+      - path: Shared
+      - path: ThubanPlanner/Resources/Assets.xcassets
+    dependencies:
+      - package: ThubanPlannerCore
+    info:
+      path: ThubanPlanner/Resources/Info.plist
+      properties:
+        CFBundleName: Thuban Planner
+        CFBundleDisplayName: Thuban Planner
+        CFBundleIdentifier: org.thuban.planner
+        CFBundleShortVersionString: "$(MARKETING_VERSION)"
+        CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
+        LSMinimumSystemVersion: "15.0"
+        LSApplicationCategoryType: public.app-category.education
+        NSHumanReadableCopyright: "© 2026 Chancellor Verdery"
+        NSPrincipalClass: NSApplication
+        NSSupportsAutomaticTermination: false
+        NSSupportsSuddenTermination: false
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: org.thuban.planner
+        PRODUCT_NAME: Thuban Planner
+        # Ad-hoc signed, no sandbox (the Atlas import runs /usr/bin/ssh), no Keychain, no iCloud.
+        CODE_SIGN_STYLE: Manual
+        CODE_SIGN_IDENTITY: "-"
+        DEVELOPMENT_TEAM: ""
+        CODE_SIGN_ENTITLEMENTS: ThubanPlanner/Resources/ThubanPlanner.entitlements
+        ENABLE_HARDENED_RUNTIME: false
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        SWIFT_EMIT_LOC_STRINGS: false
