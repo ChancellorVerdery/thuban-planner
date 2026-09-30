@@ -50,6 +50,10 @@ enum SmokeHarness {
                 switch scene.window {
                 case .main: target = window
                 case .sheet: target = try await waitFor(timeout: 5) { window.attachedSheet }
+                case .popover:
+                    target = try await waitFor(timeout: 5) {
+                        NSApp.windows.first { $0 !== window && $0.isVisible && String(describing: type(of: $0)).contains("Popover") }
+                    }
                 }
                 try capture(target, name: String(format: "%02d-%@", 30 + index, scene.name), in: directory)
                 await scene.cleanup(app)

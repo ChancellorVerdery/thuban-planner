@@ -8,6 +8,8 @@ struct SmokeScene {
         case main
         /// The sheet attached to the main window (the class detail sheet).
         case sheet
+        /// An open popover's own window (e.g. the Schedule sort menu).
+        case popover
     }
 
     var name: String

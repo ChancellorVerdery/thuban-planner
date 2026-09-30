@@ -28,6 +28,15 @@ struct ScheduleCourseRow: Identifiable, Hashable {
     var openCount: Int { sections?.filter(\.hasOpenSeat).count ?? 0 }
 }
 
+/// The class detail sheet's subject: one section of one course in the current timetable.
+struct ScheduleClassDetailItem: Identifiable, Hashable {
+    var section: BannerSection
+    /// Canonical course code (the row it belongs to; colour).
+    var course: String
+
+    var id: String { section.crn }
+}
+
 enum SchedulePhase: Equatable {
     case idle, loading
     case failed(String)
@@ -76,6 +85,15 @@ final class ScheduleModel {
     var blockMode = false
     /// Sidebar: the course whose sections are expanded.
     var expandedCourse: String?
+    /// The class detail sheet (nil = closed).
+    var detail: ScheduleClassDetailItem?
+    /// The sort popover is open.
+    var sortMenuOpen = false
+
+    /// Rate My Professors lookups and cache.
+    let ratings: ScheduleRatings
+    /// CRN → professor rating for the term's loaded sections (from the RMP cache).
+    private(set) var ratingTable = TimetableRatings.empty
 
     private(set) var rows: [ScheduleCourseRow] = []
     private(set) var result: TimetableResult = .empty
@@ -85,6 +103,8 @@ final class ScheduleModel {
     init(store: TimetableStore = TimetableStore(), offline: Bool = false) {
         self.store = store
         self.offline = offline
+        ratings = ScheduleRatings(store: RMPCacheStore(directory: store.directory), offline: offline)
+        ratings.onChange = { [weak self] in self?.ratingsChanged() }
     }
 
     // MARK: Lifecycle
@@ -393,8 +413,65 @@ final class ScheduleModel {
                                            excludedCRNs: Set(s.excludedCRNs), pinnedCRN: row.pinnedCRN))
         }
         missingCourses = missing
-        let fresh = TimetableGenerator.generate(courses: courses, blocks: s.blocks, filters: s.filters, sort: s.sort)
+        ratingTable = buildRatingTable()
+        let fresh = TimetableGenerator.generate(courses: courses, blocks: s.blocks, filters: s.filters, sorts: s.sorts, ratings: ratingTable)
         if fresh != result { result = fresh }
+        if s.sorts.contains(.highestRated) { lookUpAllProfessors() }
+    }
+
+    // MARK: Professor ratings
+
+    /// Every section of the term's loaded courses (for the rating table and bulk lookups).
+    private var allSections: [BannerSection] {
+        rows.flatMap { row in (row.sections ?? []) + row.linkedSets.values.flatMap { $0.flatMap { $0 } } }
+    }
+
+    private func buildRatingTable() -> TimetableRatings {
+        TimetableRatings.build(sections: allSections) { [ratings] name, section in ratings.match(name, subject: section.subject) }
+    }
+
+    /// New RMP answers: rebuild the table and, when the rating sort is on, re-sort (keeping the timetable on screen).
+    private func ratingsChanged() {
+        let table = buildRatingTable()
+        guard table != ratingTable else { return }
+        ratingTable = table
+        guard state.sorts.contains(.highestRated), !result.options.isEmpty else { return }
+        let shownId = currentOption?.id
+        var resorted = result
+        resorted.options = TimetableGenerator.sorted(result.options, by: state.sorts, ratings: table)
+        result = resorted
+        // On the best timetable, stay on the (new) best; after browsing, keep the one on screen.
+        if selectedIndex > 0, let shownId, let index = resorted.options.firstIndex(where: { $0.id == shownId }), index != selectedIndex {
+            updateState(regenerate: false) { $0.selectedIndex = index }
+        }
+    }
+
+    /// Looks up every distinct instructor of the term's loaded sections (cache first; sequential, paced). Only
+    /// called for the "Highest professor rating" sort or the explicit "Look up professor ratings" button.
+    func lookUpAllProfessors() {
+        ratings.requestAll(allSections.flatMap(\.instructors))
+    }
+
+    /// The current timetable's professor score (credit-weighted), when any of its courses is rated.
+    var currentRatingScore: TimetableRatings.Score? { currentOption.flatMap { ratingTable.score($0) } }
+
+    // MARK: Class detail
+
+    func showDetail(_ section: BannerSection, course: String) {
+        detail = ScheduleClassDetailItem(section: section, course: course)
+    }
+
+    /// The usual date range of a course's meetings this term (most common start / end) — meeting dates that differ
+    /// are shown in the detail.
+    func typicalDates(course: String) -> (start: Int?, end: Int?) {
+        let meetings = rows.first { $0.code == course }?.sections?.flatMap(\.meetings) ?? []
+        var counts: [String: (Int?, Int?, Int)] = [:]
+        for m in meetings {
+            let key = "\(m.startDate ?? 0)-\(m.endDate ?? 0)"
+            counts[key] = (m.startDate, m.endDate, (counts[key]?.2 ?? 0) + 1)
+        }
+        guard let best = counts.values.max(by: { $0.2 != $1.2 ? $0.2 < $1.2 : ($0.0 ?? 0) > ($1.0 ?? 0) }) else { return (nil, nil) }
+        return (best.0, best.1)
     }
 
     var optionCount: Int { result.options.count }
@@ -413,7 +490,38 @@ final class ScheduleModel {
     func nextOption() { showOption(selectedIndex + 1) }
     func previousOption() { showOption(selectedIndex - 1) }
 
-    func setSort(_ sort: TimetableSort) { updateState { $0.sort = sort; $0.selectedIndex = 0 } }
+    func setSort(_ sort: TimetableSort) { setSorts([sort]) }
+
+    /// Replaces the sort priority list (normalized: no duplicates, never empty).
+    func setSorts(_ sorts: [TimetableSort]) {
+        let list = TimetableSort.normalizedList(sorts)
+        guard list != state.sorts else { return }
+        updateState { $0.sorts = list; $0.selectedIndex = 0 }
+    }
+
+    /// Checking a criterion appends it to the priority list; unchecking removes it (never the last one).
+    func toggleSort(_ sort: TimetableSort) {
+        var list = state.sorts
+        if let i = list.firstIndex(of: sort) {
+            guard list.count > 1 else { return }
+            list.remove(at: i)
+        } else {
+            list.append(sort)
+        }
+        setSorts(list)
+    }
+
+    /// Moves an active criterion up (-1) or down (+1) in the priority list.
+    func moveSort(_ sort: TimetableSort, by offset: Int) {
+        var list = state.sorts
+        guard let i = list.firstIndex(of: sort) else { return }
+        let j = i + offset
+        guard list.indices.contains(j) else { return }
+        list.swapAt(i, j)
+        setSorts(list)
+    }
+
+    func resetSorts() { setSorts(TimetableSort.defaultList) }
 
     func setFilters(_ change: (inout TimetableFilters) -> Void) {
         updateState { s in change(&s.filters); s.selectedIndex = 0 }
@@ -500,6 +608,18 @@ final class ScheduleModel {
                 UserDefaults.standard.set(true, forKey: key)
             }
         }
+    }
+
+    /// SMOKE ONLY: opens the class detail for the current timetable's first class with these instructors (and, when
+    /// `examMeeting`, a second meeting on its own dates).
+    func smokeShowDetail(instructors: [String], examMeeting: Bool = false) {
+        guard offline, let pick = currentOption?.picks.first, var section = pick.choice.sections.first else { return }
+        section.instructors = instructors
+        if examMeeting, let end = section.meetings.first?.endDate {
+            section.meetings.append(BannerMeeting(days: [.saturday], begin: 9 * 60, end: 11 * 60 + 30, startDate: end - 3, endDate: end - 3,
+                                                  building: "EPIC", buildingDescription: "EPIC Building", room: "G256", meetingType: "Final Exam"))
+        }
+        showDetail(section, course: pick.course)
     }
 
     /// SMOKE ONLY: drops the term's cached sections for one course (a "no sections" state) or restores the sample.

@@ -34,6 +34,11 @@ struct ScheduleView: View {
             model.activate()
             gridFocused = true
         }
+        .sheet(item: Binding(get: { model.detail }, set: { model.detail = $0 })) { item in
+            ScheduleClassDetailSheet(item: item)
+                .environment(app)
+                .environment(\.thubanTheme, theme)
+        }
     }
 
     @ViewBuilder
@@ -137,6 +142,7 @@ private struct ScheduleHeader: View {
         // One credit value per course (a linked lab would double count).
         let credits = option.picks.reduce(0.0) { $0 + ($1.choice.sections.first?.credits ?? 0) }
         parts.append("\(app.creditsText(credits)) credits")
+        if let score = model.currentRatingScore { parts.append(String(format: "%.1f prof rating", score.value)) }
         let m = option.metrics
         parts.append("\(m.classDays) class day\(m.classDays == 1 ? "" : "s")")
         parts.append("\(m.classSessions) session\(m.classSessions == 1 ? "" : "s") a week")
@@ -157,35 +163,19 @@ private struct ScheduleHeader: View {
 
     private func navigation(_ model: ScheduleModel) -> some View {
         HStack(spacing: 6) {
-            Menu {
-                ForEach(TimetableSort.allCases) { sort in
-                    Button {
-                        model.setSort(sort)
-                    } label: {
-                        if sort == model.state.sort { Label(sort.label, systemImage: "checkmark") } else { Text(sort.label) }
-                    }
+            if let p = model.ratings.progress {
+                HStack(spacing: 6) {
+                    ProgressView().controlSize(.mini)
+                    Text("Rating professors \(p.done) / \(p.total)")
+                        .font(ThubanFont.body(12))
+                        .foregroundStyle(theme.inkDimColor)
+                        .monospacedDigit()
                 }
-            } label: {
-                HStack(spacing: 7) {
-                    Icon(.sliders, size: 15)
-                    Text(model.state.sort.label)
-                    Icon(.chevronDown, size: 12)
-                }
-                .font(.system(size: 13, weight: .semibold))
-                .foregroundStyle(theme.inkColor)
-                .padding(.horizontal, 12)
-                .frame(height: 32)
-                .background(theme.panelColor, in: RoundedRectangle(cornerRadius: ThubanMetrics.controlRadius, style: .continuous))
-                .overlay(RoundedRectangle(cornerRadius: ThubanMetrics.controlRadius, style: .continuous)
-                    .strokeBorder(theme.line2Color, lineWidth: ThubanMetrics.hairline))
-                .contentShape(Rectangle())
+                .padding(.trailing, 4)
+                .accessibilityElement(children: .combine)
             }
-            .menuStyle(.button)
-            .buttonStyle(.plain)
-            .menuIndicator(.hidden)
-            .fixedSize()
-            .accessibilityLabel("Sort schedules: \(model.state.sort.label)")
-            .padding(.trailing, 6)
+            ScheduleSortControl()
+                .padding(.trailing, 6)
 
             IconButton(.chevronLeft, label: "Previous schedule (←)", size: 32, iconSize: 16) { model.previousOption() }
                 .disabled(model.optionCount < 2)
@@ -222,18 +212,29 @@ private struct ScheduleCRNStrip: View {
                     HStack(spacing: 6) {
                         ForEach(option.picks, id: \.course) { pick in
                             ForEach(pick.choice.sections) { section in
-                                chip(section, colors: theme.scheduleCourseColors(model.colorIndex(of: pick.course)))
+                                Button { model.showDetail(section, course: pick.course) } label: {
+                                    chip(section, colors: theme.scheduleCourseColors(model.colorIndex(of: pick.course)))
+                                }
+                                .buttonStyle(.plain)
                             }
                         }
                     }
                 }
                 if !untimed.isEmpty {
-                    Text("Online / TBA: " + untimed.map { "\($0.courseCode) \($0.sequenceNumber)" }.joined(separator: ", "))
-                        .font(ThubanFont.body(12))
-                        .foregroundStyle(theme.inkDimColor)
-                        .lineLimit(1)
-                        .fixedSize()
-                        .help("These sections have no set meeting time, so they are not on the grid.")
+                    HStack(spacing: 4) {
+                        Text("Online / TBA:")
+                            .font(ThubanFont.body(12))
+                            .foregroundStyle(theme.inkDimColor)
+                        ForEach(untimed) { section in
+                            Button("\(section.courseCode) \(section.sequenceNumber)") {
+                                model.showDetail(section, course: option.picks.first { $0.choice.crns.contains(section.crn) }?.course ?? section.courseCode)
+                            }
+                            .buttonStyle(GhostButtonStyle(height: 24, tinted: true, horizontalPadding: 5))
+                            .font(ThubanFont.body(12, weight: .semibold))
+                            .help("\(section.title) — no set meeting time, so it isn’t on the grid. Click for details.")
+                        }
+                    }
+                    .fixedSize()
                 }
                 Button {
                     model.copyCRNs()
@@ -265,8 +266,10 @@ private struct ScheduleCRNStrip: View {
         .padding(.horizontal, 9)
         .frame(height: 26)
         .background(theme.panel2Color, in: RoundedRectangle(cornerRadius: ThubanMetrics.chipRadius, style: .continuous))
-        .textSelection(.enabled)
-        .help("\(section.courseCode) \(section.sequenceNumber) · \(section.title) · CRN \(section.crn)")
+        .contentShape(Rectangle())
+        .help("\(section.courseCode) \(section.sequenceNumber) · \(section.title) · CRN \(section.crn) — click for details")
+        .accessibilityElement(children: .combine)
+        .accessibilityHint("Shows class details and professor ratings")
     }
 }
 

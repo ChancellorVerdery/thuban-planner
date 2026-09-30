@@ -140,13 +140,20 @@ private struct ScheduleSectionRow: View {
                     .font(ThubanFont.body(11.5))
                     .foregroundStyle(theme.inkDimColor)
                     .fixedSize(horizontal: false, vertical: true)
-                let who = section.instructors.first ?? (section.instructionalMethod == "Face-to-Face Instruction" ? nil : section.instructionalMethod)
+                let who = section.instructors.first.map { RMPPersonName.parse($0)?.displayName ?? $0 }
+                    ?? (section.instructionalMethod == "Face-to-Face Instruction" ? nil : section.instructionalMethod)
                 if let who {
-                    Text(who).font(ThubanFont.body(11)).foregroundStyle(theme.inkFaintColor).lineLimit(1)
+                    HStack(spacing: 6) {
+                        Text(who).font(ThubanFont.body(11)).foregroundStyle(theme.inkFaintColor).lineLimit(1)
+                        ratingBadge
+                    }
                 }
             }
             .foregroundStyle(theme.inkColor)
             .opacity(included ? 1 : 0.5)
+            .contentShape(Rectangle())
+            .onTapGesture { model.showDetail(section, course: row.code) }
+            .help("Click for class details and professor ratings")
             Button {
                 model.setPin(row, crn: pinned ? nil : section.crn)
             } label: {
@@ -163,6 +170,24 @@ private struct ScheduleSectionRow: View {
         .padding(.horizontal, 10)
         .padding(.vertical, 5)
         .background(pinned ? theme.accentTintColor : .clear)
+    }
+
+    /// The primary instructor's Rate My Professors rating — from the cache only (never triggers a lookup).
+    @ViewBuilder
+    private var ratingBadge: some View {
+        if let primary = section.instructors.first,
+           case .found(let rating)? = app.scheduleTab.ratings.match(primary, subject: section.subject), let avg = rating.avgRating {
+            HStack(spacing: 3) {
+                Image(systemName: "star.fill").font(.system(size: 8, weight: .semibold))
+                Text(String(format: "%.1f", avg)).font(ThubanFont.mono(10.5, weight: .semibold))
+            }
+            .foregroundStyle(avg >= 4 ? theme.posTextColor : (avg >= 3 ? theme.brassInkColor : theme.negTextColor))
+            .padding(.horizontal, 5)
+            .frame(height: 16)
+            .background(theme.panel2Color, in: RoundedRectangle(cornerRadius: 4, style: .continuous))
+            .help(String(format: "Rate My Professors: %.1f / 5 from %d ratings", avg, rating.numRatings))
+            .accessibilityLabel(String(format: "Rated %.1f out of 5 on Rate My Professors", avg))
+        }
     }
 
     private var seats: some View {

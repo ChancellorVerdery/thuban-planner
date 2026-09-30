@@ -56,13 +56,18 @@ Packages/ThubanPlannerCore/ SwiftPM library + tests (`swift test`)
   Registration/ Schedule tab core: BannerTerms (term codes ↔ keys, course-code parsing), BannerSections (sections,
              meetings, conflicts, clock), BannerPage (meta tags, sign-in-redirect / HTML detection),
              BannerRequestGuard (read-only allow / deny lists), BannerClient (public class search over
-             URLSession), Timetable (generator), TimetableStore (schedule.json + schedule-cache.json)
+             URLSession), Timetable (generator, sorts incl. multi-criteria), TimetableRatings (professor-rating sort
+             input), TimetableStore (schedule.json + schedule-cache.json)
+  RateMyProfessors/ RMPModels (UNCC school pages, RMPTeacher, RMPRating, RMPMatch), RMPNames (Banner name parsing),
+             RMPMatcher (+ RMPDepartments), RMPClient (+ RMPRequestGuard, transport, response decoding), RMPCache
+             (rmp-cache.json)
   Store/     PlannerStore (planner.json, atomic writes, 14 daily backups, 20 labelled snapshots), Preferences,
              AppPaths (THUBAN_PLANNER_HOME), JSONFile
   Import/    AtlasImporter (SQL, ssh command, fetch, convert, ImportSummary), AtlasDocument (tolerant rows +
              recompose), CommandRunner / ProcessRunner (tests use FixtureRunner)
   Sample/    SampleData (a mechanical-engineering degree for smoke / THUBAN_PLANNER_SEED=sample), BannerSampleData
-             (deterministic terms / sections for the offline Schedule smoke scenes)
+             (deterministic terms / sections, fictional instructors, for the offline Schedule smoke scenes), RMPSampleData
+             (fictional RMP profiles for those instructors)
   Theme/     Copied from Thuban Gym — ColorScheme, SchemePresets, ThemeSelection, ThemeResolver, ResolvedTheme …
   Tests/     Fixtures/golden-schedule.json (400 cases from Atlas's own scheduler), atlas-psql-output.txt, atlas-legacy.json,
              banner/ (real getTerms / searchResults / linkedSections captures, a reconstructed plan, the term page head)
@@ -84,6 +89,7 @@ ThubanPlanner/
   Views/Route        RouteView, RouteToolbar, RouteSmokeScenes                                    (B)
   Views/ClassDetail  ClassDetailSheet, ClassDetailSmokeScenes                                     (B)
   Views/Schedule     ScheduleView, ScheduleToolbar, ScheduleSidebar, ScheduleCourseCard, ScheduleWeekGrid,
+                     ScheduleClassDetailSheet, ScheduleRatingCard, ScheduleSortControl,
                      ScheduleTheme (course colours), ScheduleSmokeScenes
   Views/Settings     SettingsView (nav), SettingsToolbar, SettingsChrome, SettingsPaneHeader, PlanningSettings,
                      AppearanceSettings (working), ImportSettings, DataSettings, AboutSettings, SettingsSmokeScenes (C)
@@ -370,8 +376,51 @@ registers in Banner themselves.
   backtracking with forward checking, capped at 10,000 ("showing the first 10,000"). Zero results explain themselves:
   a course with no sections, a course whose sections were all filtered (with counts per reason), a pair of courses
   that always clash, or "no combination fits". Sorts: fewest class days, fewest class sessions (timed meetings a
-  week: MWF = 3, TR = 2; then days, gaps), latest start, earliest finish, least time between classes, most open seats
-  — ties broken by the option id, so output is deterministic.
+  week: MWF = 3, TR = 2; then days, gaps), highest professor rating, latest start, earliest finish, least time
+  between classes, most open seats — ties broken by the option id, so output is deterministic.
+- **Combined sorts**: `TimetableTermState.sorts` is an ordered priority list (never empty, no duplicates; default
+  [fewestDays]; an old file's single `sort` loads as [that]; `sort` is still written for older builds). Timetables
+  compare by each criterion's own key in order (`primaryKey`: days / sessions / scored-then-−score / −start, −avg
+  start / end, avg end / gaps / −seats), then the first criterion's usual tie-breaks, then the option id. A
+  one-element list orders exactly like the single sort. UI: `ScheduleSortControl` — header button "Fewest days →
+  Highest rating" (full list in the tooltip, accent-tinted when combined) opening a popover with a checkbox per
+  criterion (check appends, uncheck removes, never the last), numbers 1…n, move up / down, Reset to default,
+  "Look up ratings".
+- **Highest professor rating**: score = Σ(rating × credits) / Σ credits over the courses whose chosen section has a
+  rated professor (`TimetableRatings`: CRN → the primary instructor's combined RMP rating; several rated
+  instructors → numRatings-weighted mean; a linked set uses its first section's credits once). Not on RMP, 0
+  ratings, ambiguous, unassigned → the course counts neither rating nor credits; a timetable with no rated course
+  sorts after every scored one (ties: days, gaps, id). The generator stays pure — `ScheduleModel` builds the table
+  from the RMP cache. With this sort anywhere in the list (or "Look up ratings"), every distinct instructor of the
+  term's loaded sections is looked up (cache first, one at a time, ~0.6 s between requests; header shows "Rating
+  professors 7 / 23"); results re-sort as they arrive (on #1 you stay on the new #1; after browsing, the timetable
+  on screen is kept). The header summary shows "4.3 prof rating" whenever the current timetable has a score.
+- **Class detail + Rate My Professors**: clicking a meeting block (not in Block-times mode), an Online / TBA entry
+  or a CRN chip — or a section's text in the sidebar — sets `scheduleTab.detail` and opens
+  `ScheduleClassDetailSheet` (640 × 700 sheet: taller than a popover allows, matches the app's other detail sheet,
+  capturable by the smoke run). It shows code, title, section, CRN (click to copy), credits, type, method, campus,
+  seats, waitlist; every meeting (days, time, "Building Room" / Online / TBA, dates when they differ from the
+  course's usual range); each instructor ("Last, First" shown as "First Last"; "Instructor not assigned yet") with a
+  `ScheduleRatingCard`: rating x.x / 5, count, difficulty, would-take-again, per-profile breakdown when combined
+  ("Combined from 2 UNC Charlotte pages, weighted by number of ratings"), profile links (NSWorkspace), "no ratings
+  yet", ambiguous (candidates + links, no score), "No Rate My Professors page at UNC Charlotte" (+ RMP search link),
+  error with Try again. Lookups start when the sheet opens (cache first). Esc / Done close. The sidebar's section
+  rows show the primary instructor's rating as a small badge — cache only, never a lookup.
+- **Rate My Professors (core `RateMyProfessors/`)**: RMP's public GraphQL (`POST https://www.ratemyprofessors.com/
+  graphql`, header `Authorization: Basic dGVzdDp0ZXN0`, `newSearch.teachers(query: {text, schoolID})`). UNC
+  Charlotte has TWO RMP pages (found 2026-09-30): 1253 "University of North Carolina at Charlotte" (`U2Nob29sLTEyNTM=`,
+  every professor) and 19352 "University of North Carolina at Charotte" (`U2Nob29sLTE5MzUy`, empty today) — both are
+  searched, nothing else ever is. `RMPRequestGuard`: HTTPS POST to that path only, no query string, JSON body with a
+  read-only `query` (anything containing "mutation" refused), `variables.query.schoolID` must be a UNCC page;
+  ephemeral session, no cookies, redirects refused, 15 s timeouts. RMP's search matches whole names (not
+  substrings), so a name is searched by its family name, plus each part of a hyphenated / multi-word one.
+  Matching (`RMPMatcher`, normalized — case / diacritics / punctuation ignored): strong = exact family + exact given;
+  good = exact family + nickname / prefix given ("Chris"/"Christopher", "Richard"/"Ritchie") or hyphen-partial
+  family + exact given; weak = exact family + initial. All strong profiles (plus compatible good ones) are one person
+  and combined — across both pages and RMP's duplicate profiles on one page. Otherwise good, then weak, profiles are
+  grouped into people; one → found, several → the one whose RMP department fits the course subject
+  (`RMPDepartments`), else ambiguous. `RMPRating`: avgRating / avgDifficulty = Σ(x × n) / Σ n over profiles with
+  ratings; would-take-again weighted the same, skipping −1; total = Σ n.
 - **No sign-in**: nothing in the app signs in, opens a web view, or reads any browser's cookies. Earlier builds had a
   WebKit sign-in; on first activation `ScheduleModel` once removes any uncc.edu website data it left
   (`didForgetBannerSignIn` in UserDefaults). Old schedule.json / cache keys (source, planSequence, unpinnedPlanCourses,
@@ -388,13 +437,19 @@ registers in Banner themselves.
   Banner (Try again), no classes, finding sections, couldn't load sections, "Why
   nothing fits" card over the grid. Course colours: `ScheduleTheme` (accent, pos, neg, accent turned round the wheel,
   accentDeep, signal — theme tokens only).
-- **Files**: `schedule.json` (per Banner term code: added / removed classes, excluded CRNs, pins, blocks, filters,
+- **Files**: `rmp-cache.json` (per normalized instructor name: the candidate UNCC profiles; fresh 7 days, "not on
+  RMP" 2 days, pruned after 60; stale entries still shown; safe to delete). `schedule.json` (per Banner term code: added / removed classes, excluded CRNs, pins, blocks, filters,
   sort, last schedule index; `lastTermCode`) and `schedule-cache.json` (terms, sections; safe to delete), both next to planner.json (THUBAN_PLANNER_HOME honoured), atomic, 0600.
 - **Tests**: `BannerTests` (term codes, real-fixture decoding incl. null times / several meetings / negative seats /
   double spaces, request guard, page helpers, client flow on a fake transport, store round trip + old-file
   tolerance), `TimetableTests` (conflicts, date ranges, blocks, online, filters, pins,
-  linked sets, zero-result reasons, cap, determinism, sorting, 6 × 20 performance). Live, public, read-only check:
-  `THUBAN_PLANNER_LIVE_BANNER=1 scripts/test.sh` (term list + one MEGR 2144 search).
+  linked sets, zero-result reasons, cap, determinism, sorting, 6 × 20 performance), `TimetableRatingTests` (credit
+  weighting, exclusions, unscored last, combined sorts in both orders, single-list parity, old / new sort decoding),
+  `RateMyProfessorsTests` (name parsing, matching: exact / nickname / initial / hyphenated / duplicates / two pages /
+  ambiguous / none / other school, weighted average incl. 0 ratings and −1, guard, client flow on a fake transport,
+  cache round trip + freshness; fixtures in `Fixtures/rmp/`, one marked synthetic). Live, public, read-only checks:
+  `THUBAN_PLANNER_LIVE_BANNER=1 scripts/test.sh` (term list + one MEGR 2144 search);
+  `THUBAN_PLANNER_LIVE_RMP=1 scripts/test.sh` (three PHYS instructors on both UNCC RMP pages, ~10 requests).
 
 ### Settings (C) — `Views/Settings` (section ⌘4 / ⌘,)
 
@@ -432,7 +487,7 @@ extension SmokeScenes {                       // Views/Route/RouteSmokeScenes.sw
 }
 ```
 
-`window: .main` (default) or `.sheet` (the class detail sheet: `app.presentCourse("c-sample-31")`); `settle:` seconds.
+`window: .main` (default), `.popover` (an open popover's window, e.g. the Schedule sort menu) or `.sheet` (the class detail sheet: `app.presentCourse("c-sample-31")`); `settle:` seconds.
 The empty / first-run Planner (with the import offer) — `isFirstRun` is `private(set)` and a smoke run seeds sample
 data, so use the smoke-only setter:
 
@@ -450,7 +505,7 @@ Always undo state in `cleanup`. Look at your PNGs (Read tool) before you finish.
 
 - `DERIVED=.build/DerivedData-<you> scripts/build.sh` — ALWAYS a private DerivedData, run from your own worktree
   (see Git). Regenerates the project first.
-- `scripts/test.sh` — core tests (`swift test`, 186 tests (one live test skipped) incl. 400 golden cases and the 3,200-case differential run against Atlas's JS). Add tests for core logic you add.
+- `scripts/test.sh` — core tests (`swift test`, 205 tests (two live tests skipped) incl. 400 golden cases and the 3,200-case differential run against Atlas's JS). Add tests for core logic you add.
 - `scripts/golden.sh` — regenerates the golden cases from Atlas's own scheduler (macOS JavaScriptCore; no Node).
 - `scripts/v8check.sh` — needs a real V8 (`node` / `deno`, or `V8_NODE=<Electron binary>`): checks the V8 sort port's
   comparator call order against V8's own sort and regenerates the golden cases on V8's own sort, diffing them with the

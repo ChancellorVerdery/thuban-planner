@@ -63,6 +63,75 @@ extension SmokeScenes {
                 app.setThemeSelection(ThemeSelection(mode: .light, schemeId: SchemePresets.defaultId, custom: nil))
                 app.scheduleTab.smokeSet(blockMode: false) { $0.blocks = [] }
             },
+            SmokeScene(name: "schedule-class-detail-combined", window: .sheet, settle: 1.4) { app in
+                app.section = .schedule
+                app.scheduleTab.ratings.smokeFill(["Dana Whitfield"])
+                app.scheduleTab.smokeShowDetail(instructors: ["Dana Whitfield"], examMeeting: true)
+            } cleanup: { app in
+                app.scheduleTab.detail = nil
+            },
+            SmokeScene(name: "schedule-class-detail-single", window: .sheet, settle: 1.4) { app in
+                app.section = .schedule
+                app.scheduleTab.smokeShowDetail(instructors: ["Marcus Oyelaran", "Owen Lindqvist"])
+            } cleanup: { app in
+                app.scheduleTab.detail = nil
+            },
+            SmokeScene(name: "schedule-class-detail-not-found", window: .sheet, settle: 1.4) { app in
+                app.section = .schedule
+                app.scheduleTab.smokeShowDetail(instructors: ["Priya Raman"])
+            } cleanup: { app in
+                app.scheduleTab.detail = nil
+            },
+            SmokeScene(name: "schedule-class-detail-ambiguous", window: .sheet, settle: 1.4) { app in
+                app.section = .schedule
+                app.scheduleTab.smokeShowDetail(instructors: ["Chen, L."])
+            } cleanup: { app in
+                app.scheduleTab.detail = nil
+            },
+            SmokeScene(name: "schedule-class-detail-no-instructor", window: .sheet, settle: 1.4) { app in
+                app.section = .schedule
+                app.scheduleTab.smokeShowDetail(instructors: [])
+            } cleanup: { app in
+                app.scheduleTab.detail = nil
+            },
+            SmokeScene(name: "schedule-class-detail-offline", window: .sheet, settle: 1.4) { app in
+                app.section = .schedule
+                app.scheduleTab.ratings.smokeReset(failing: ["Grace Okafor"])
+                app.scheduleTab.smokeShowDetail(instructors: ["Grace Okafor"])
+            } cleanup: { app in
+                app.scheduleTab.detail = nil
+                app.scheduleTab.ratings.smokeReset()
+            },
+            SmokeScene(name: "schedule-class-detail-dark", window: .sheet, settle: 1.6) { app in
+                app.section = .schedule
+                app.setThemeSelection(ThemeSelection(mode: .dark, schemeId: SchemePresets.defaultId, custom: nil))
+                app.scheduleTab.ratings.smokeFill(["Dana Whitfield"])
+                app.scheduleTab.smokeShowDetail(instructors: ["Dana Whitfield"], examMeeting: true)
+            } cleanup: { app in
+                app.scheduleTab.detail = nil
+                app.setThemeSelection(ThemeSelection(mode: .light, schemeId: SchemePresets.defaultId, custom: nil))
+            },
+            SmokeScene(name: "schedule-sort-highest-rating", settle: 2.2) { app in
+                app.section = .schedule
+                app.scheduleTab.ratings.smokeReset()
+                app.scheduleTab.smokeSet { $0.sorts = [.highestRated]; $0.selectedIndex = 0 }
+                app.scheduleTab.expandedCourse = app.scheduleTab.rows.first?.code
+            } cleanup: { app in
+                app.scheduleTab.expandedCourse = nil
+            },
+            SmokeScene(name: "schedule-sort-combined", settle: 1.4) { app in
+                app.section = .schedule
+                app.scheduleTab.smokeSet { $0.sorts = [.fewestDays, .highestRated, .leastGaps]; $0.selectedIndex = 0 }
+            },
+            SmokeScene(name: "schedule-sort-menu", window: .popover, settle: 1.4) { app in
+                app.section = .schedule
+                app.scheduleTab.smokeSet { $0.sorts = [.fewestDays, .highestRated, .leastGaps]; $0.selectedIndex = 0 }
+                app.scheduleTab.sortMenuOpen = true
+            } cleanup: { app in
+                app.scheduleTab.sortMenuOpen = false
+                app.scheduleTab.smokeSet { $0.sorts = TimetableSort.defaultList; $0.selectedIndex = 0 }
+                app.scheduleTab.ratings.smokeReset()
+            },
         ]
     }
 }

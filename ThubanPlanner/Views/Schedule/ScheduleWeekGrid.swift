@@ -56,9 +56,14 @@ struct ScheduleWeekGrid: View {
                         if let index = days.firstIndex(of: item.day), let b = item.meeting.begin, let e = item.meeting.end {
                             let base = rect(day: index, start: b, end: e, range: range, dayWidth: dayWidth, hourHeight: hourHeight)
                             let sub = (base.width) / CGFloat(item.columns)
-                            ScheduleMeetingBlock(section: item.section, meeting: item.meeting,
-                                                 colors: theme.scheduleCourseColors(app.scheduleTab.colorIndex(of: item.course)),
-                                                 height: base.height - 2, narrow: sub < 90)
+                            Button {
+                                app.scheduleTab.showDetail(item.section, course: item.course)
+                            } label: {
+                                ScheduleMeetingBlock(section: item.section, meeting: item.meeting,
+                                                     colors: theme.scheduleCourseColors(app.scheduleTab.colorIndex(of: item.course)),
+                                                     height: base.height - 2, narrow: sub < 90)
+                            }
+                            .buttonStyle(ScheduleMeetingButtonStyle())
                                 .frame(width: max(0, sub - 2), height: max(0, base.height - 2))
                                 .offset(x: base.minX + sub * CGFloat(item.column) + 1, y: base.minY + 1)
                                 .opacity(blockMode ? 0.35 : 1)
@@ -255,6 +260,26 @@ struct ScheduleWeekGrid: View {
     }
 }
 
+/// Press / hover feedback for a meeting block (it opens the class detail).
+private struct ScheduleMeetingButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View { HoverBody(configuration: configuration) }
+
+    private struct HoverBody: View {
+        @Environment(\.thubanTheme) private var theme
+        var configuration: Configuration
+        @State private var hovering = false
+
+        var body: some View {
+            configuration.label
+                .overlay(RoundedRectangle(cornerRadius: 6, style: .continuous)
+                    .strokeBorder(theme.inkDimColor.opacity(hovering || configuration.isPressed ? 0.55 : 0), lineWidth: 1))
+                .brightness(configuration.isPressed ? -0.04 : 0)
+                .contentShape(Rectangle())
+                .onHover { hovering = $0 }
+        }
+    }
+}
+
 /// One class meeting on the grid: course-colour fill with a stripe; code + section, room, time.
 private struct ScheduleMeetingBlock: View {
     @Environment(\.thubanTheme) private var theme
@@ -297,9 +322,11 @@ private struct ScheduleMeetingBlock: View {
         }
         .background(colors.fill)
         .clipShape(RoundedRectangle(cornerRadius: 6, style: .continuous))
-        .help(tooltip)
+        .help(tooltip + "\nClick for details and professor ratings")
         .accessibilityElement(children: .ignore)
         .accessibilityLabel(tooltip)
+        .accessibilityHint("Shows class details and Rate My Professors ratings")
+        .accessibilityAddTraits(.isButton)
     }
 
     private var tooltip: String {
