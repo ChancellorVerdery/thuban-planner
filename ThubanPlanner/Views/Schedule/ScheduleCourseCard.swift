@@ -157,7 +157,7 @@ private struct ScheduleSectionRow: View {
                     .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
-            .help(pinned ? (row.planCRN == section.crn ? "Pinned by your Banner plan — click to unpin" : "Unpin") : "Pin: always use this section")
+            .help(pinned ? "Unpin" : "Pin: always use this section")
             .accessibilityLabel(pinned ? "Unpin section \(section.sequenceNumber)" : "Pin section \(section.sequenceNumber)")
         }
         .padding(.horizontal, 10)

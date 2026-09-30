@@ -177,7 +177,6 @@ final class BannerRequestGuardTests: XCTestCase {
                      "PLAN/SUBMITPLAN", "plan/sub%6DitPlan"] {
             XCTAssertFalse(BannerRequestGuard.check(method: "GET", url: url(b + path)).isAllowed, path)
             XCTAssertFalse(BannerRequestGuard.check(method: "POST", url: url(b + path)).isAllowed, path)
-            XCTAssertFalse(BannerRequestGuard.checkBrowser(url: url(b + path)).isAllowed, path)
         }
     }
 
@@ -192,20 +191,6 @@ final class BannerRequestGuardTests: XCTestCase {
         XCTAssertFalse(BannerRequestGuard.check(method: "GET", url: url("https://selfservice.uncc.edu.evil.com/StudentRegistrationSsb/ssb/x")).isAllowed)
     }
 
-    func testBrowserAllowsSignIn() {
-        XCTAssertTrue(BannerRequestGuard.checkBrowser(url: url("https://webauth.uncc.edu/idp/profile/cas/login?TARGET=https%3A%2F%2Fselfservice.uncc.edu%2FStudentRegistrationSsb%2Flogin%2Fcas")).isAllowed)
-        XCTAssertTrue(BannerRequestGuard.checkBrowser(url: url(b + "term/termSelection?mode=plan")).isAllowed)
-    }
-
-    func testContentRuleListIsValidJSON() throws {
-        let data = Data(BannerRequestGuard.contentRuleListJSON.utf8)
-        let rules = try XCTUnwrap(JSONSerialization.jsonObject(with: data) as? [[String: Any]])
-        XCTAssertEqual(rules.count, BannerRequestGuard.deniedFragments.count)
-        let filters = rules.compactMap { ($0["trigger"] as? [String: Any])?["url-filter"] as? String }
-        XCTAssertTrue(filters.contains(".*submitplan.*"))
-        XCTAssertTrue(filters.contains(".*classregistration/submit.*"))
-    }
-
     func testSignInURLDetection() {
         XCTAssertTrue(BannerPage.isSignInURL(url("https://webauth.uncc.edu/idp/profile/cas/login")))
         XCTAssertTrue(BannerPage.isSignInURL(url(b + "registration/registration")))
@@ -215,81 +200,7 @@ final class BannerRequestGuardTests: XCTestCase {
     }
 }
 
-final class BannerPlanTests: XCTestCase {
-    func testReconstructedFixture() throws {
-        let root = try JSONValue.parse(TestSupport.fixture("banner/plan-example.json"))
-        let bootstraps = try XCTUnwrap(root["window.bootstraps (embedded in plan/selectPlan HTML page)"])
-        let plans = BannerPlanParser.plans(from: bootstraps)
-        XCTAssertEqual(plans.count, 1)
-        let plan = plans[0]
-        XCTAssertEqual(plan.displayName, "My Spring Plan")
-        XCTAssertTrue(plan.preferred)
-        XCTAssertEqual(plan.totalCredits, 15)
-        XCTAssertEqual(plan.courses, [BannerPlanCourse(term: "202710", subject: "MEGR", courseNumber: "2144", title: "Intro to Solid Mechanics",
-                                                       crn: nil, section: nil, credits: 3, isRegistered: false)])
-        XCTAssertEqual(plan.courses(inTerm: "202710").count, 1)
-        XCTAssertEqual(plan.courses(inTerm: "202680").count, 0)
-    }
-
-    func testTolerantVariantsAndOrdering() throws {
-        let json = """
-        {"plans":[
-          {"sequenceNumber":"2","description":"Backup","preferredIndicator":"N","planCourses":[
-             {"term":"202710","subjectCourse":"PHYS2101","courseReferenceNumber":"","creditHours":"3"},
-             {"term":"202710","subject":"megr","courseNumber":"2144","courseReferenceNumber":20263,"section":"001"},
-             {"term":"202710","subject":"MEGR","courseNumber":"2144","courseReferenceNumber":null},
-             {"subject":"ENGR","courseNumber":"3295","isRegistered":"Y"},
-             {"nonsense":true}, 7
-          ]},
-          {"sequenceNumber":1,"description":"","preferredIndicator":true,"planCourses":[]}
-        ],
-        "selectedPlan":{"planHeader":{"sequenceNumber":1,"planCourses":[{"term":"202710","subject":"MATH","courseNumber":"2164"}]}}}
-        """
-        let plans = try BannerPlanParser.parse(bootstrapsJSON: Data(json.utf8))
-        XCTAssertEqual(plans.map(\.sequenceNumber), [1, 2]) // preferred first
-        XCTAssertEqual(plans[0].displayName, "Plan 1")
-        XCTAssertEqual(plans[0].courses.map(\.courseCode), ["MATH 2164"]) // filled from selectedPlan.planHeader
-        let backup = plans[1]
-        XCTAssertEqual(backup.courses.count, 4)
-        XCTAssertEqual(backup.courses[0].courseCode, "PHYS 2101")
-        XCTAssertNil(backup.courses[0].crn) // "" → course-level
-        XCTAssertEqual(backup.courses[1].crn, "20263")
-        XCTAssertEqual(backup.courses[1].courseCode, "MEGR 2144")
-        XCTAssertTrue(backup.courses[3].isRegistered)
-        // One entry per code for a term; the CRN item wins; a term-less item counts for every term.
-        let spring = backup.courses(inTerm: "202710")
-        XCTAssertEqual(spring.map(\.courseCode), ["PHYS 2101", "MEGR 2144", "ENGR 3295"])
-        XCTAssertEqual(spring[1].crn, "20263")
-    }
-
-    func testEmptyAndNullBootstraps() throws {
-        XCTAssertEqual(try BannerPlanParser.parse(bootstrapsJSON: Data("null".utf8)), [])
-        XCTAssertEqual(try BannerPlanParser.parse(bootstrapsJSON: Data("{\"usingDates\":false}".utf8)), [])
-        XCTAssertThrowsError(try BannerPlanParser.parse(bootstrapsJSON: Data("<html>".utf8)))
-    }
-
-    func testHTMLFallback() throws {
-        let html = """
-        <html><head><script>
-          window.bootstraps = {
-             mode: 'plan', planCount: 1,
-             plans: [{sequenceNumber: 3, description: 'Fall "A" plan', preferredIndicator: true,
-                      planCourses: [{term: '202680', subject: 'PHYS', courseNumber: '2102', courseTitle: 'Physics {II}', courseReferenceNumber: undefined},]}],
-          };
-          window.appContext = '/x'
-        </script></head></html>
-        """
-        let plans = try BannerPlanParser.parse(html: html)
-        XCTAssertEqual(plans.count, 1)
-        XCTAssertEqual(plans[0].description, "Fall \"A\" plan")
-        XCTAssertEqual(plans[0].courses.first?.title, "Physics {II}")
-        XCTAssertNil(plans[0].courses.first?.crn)
-        // The real term-selection page has a bootstraps literal with no plans.
-        let real = String(decoding: try TestSupport.fixture("banner/termSelection-head.html"), as: UTF8.self)
-        XCTAssertEqual(try BannerPlanParser.parse(html: real), [])
-        XCTAssertEqual(try BannerPlanParser.parse(html: "<html></html>"), [])
-    }
-
+final class BannerPageTests: XCTestCase {
     func testMetaReading() throws {
         let html = String(decoding: try TestSupport.fixture("banner/termSelection-head.html"), as: UTF8.self)
         XCTAssertEqual(BannerPage.meta("synchronizerToken", in: html)?.count, 36)
@@ -417,8 +328,8 @@ final class TimetableStoreTests: XCTestCase {
         defer { try? FileManager.default.removeItem(at: dir) }
         let store = TimetableStore(directory: dir)
         XCTAssertEqual(try store.loadDocument(), .empty)
-        var state = TimetableTermState(source: .bannerPlan, planSequence: 2, addedCourses: ["MATH 2164"], removedCourses: ["PHIL 3527"],
-                                       excludedCRNs: ["20263"], pins: ["MEGR 2144": "21125"], unpinnedPlanCourses: ["PHYS 2101"],
+        var state = TimetableTermState(addedCourses: ["MATH 2164"], removedCourses: ["PHIL 3527"],
+                                       excludedCRNs: ["20263"], pins: ["MEGR 2144": "21125"],
                                        blocks: [TimetableBlock(id: "b1", day: .tuesday, start: 12 * 60, end: 13 * 60, label: "Work")],
                                        filters: TimetableFilters(openSeatsOnly: true, hideFullOrWaitlisted: false, allowOnline: false, campuses: ["Main Campus"]),
                                        sort: .leastGaps, selectedIndex: 4)
@@ -433,8 +344,6 @@ final class TimetableStoreTests: XCTestCase {
         cache.terms = [BannerTerm(code: "202710", description: "Spring 2027", viewOnly: true)]
         let sections = try BannerSearchPage.decode(TestSupport.fixture("banner/searchResults-MEGR2144.json")).sections
         cache.store(.init(fetchedAt: Date(timeIntervalSince1970: 1_800_000_000), sections: sections), term: "202710", course: "megr2144")
-        cache.plans["202710"] = .init(fetchedAt: Date(timeIntervalSince1970: 1_800_000_000),
-                                      plans: [BannerPlan(sequenceNumber: 1, description: "P", courses: [])], studentName: "S")
         try store.saveCache(cache)
         let loaded = store.loadCache()
         XCTAssertEqual(loaded, cache)
@@ -444,10 +353,13 @@ final class TimetableStoreTests: XCTestCase {
     }
 
     func testTolerantDecoding() throws {
-        let json = #"{"terms":{"202710":{"source":"nope","blocks":[{"id":"x","day":2,"start":600,"end":660,"label":"L"}],"filters":{"openSeatsOnly":true},"selectedIndex":-3}},"lastTermCode":5}"#
+        // Files written while the tab still had a Banner-plan source (source / planSequence / unpinnedPlanCourses, and
+        // plans in the cache) load fine; those keys are ignored.
+        let json = #"{"terms":{"202710":{"source":"bannerPlan","planSequence":2,"unpinnedPlanCourses":["X 1"],"blocks":[{"id":"x","day":2,"start":600,"end":660,"label":"L"}],"filters":{"openSeatsOnly":true},"selectedIndex":-3}},"lastTermCode":5}"#
         let doc = try JSONDecoder().decode(TimetableDocument.self, from: Data(json.utf8))
         let state = doc.state("202710")
-        XCTAssertEqual(state.source, .route)
+        let oldCache = #"{"version":1,"terms":[],"sections":{},"plans":{"202710":{"fetchedAt":0,"plans":[],"studentName":"S"}}}"#
+        XCTAssertEqual(try JSONDecoder().decode(BannerCache.self, from: Data(oldCache.utf8)), BannerCache())
         XCTAssertEqual(state.blocks.first?.day, .tuesday)
         XCTAssertTrue(state.filters.openSeatsOnly)
         XCTAssertTrue(state.filters.allowOnline)

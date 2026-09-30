@@ -53,15 +53,6 @@ struct ThubanPlannerApp: App {
                 Button("Refresh Sections") { appModel.scheduleTab.refreshAllSections() }
                     .keyboardShortcut("r", modifiers: [.command, .shift])
                     .disabled(appModel.section != .schedule || appModel.scheduleTab.rows.isEmpty)
-                Divider()
-                if appModel.scheduleTab.auth.isSignedIn {
-                    Button("Sign Out of Banner") { appModel.scheduleTab.signOut() }
-                } else {
-                    Button("Sign In to Banner…") {
-                        appModel.section = .schedule
-                        appModel.scheduleTab.showSignIn = true
-                    }
-                }
             }
             CommandMenu("Route") {
                 Button("Calculate Route") { appModel.showRoute() }

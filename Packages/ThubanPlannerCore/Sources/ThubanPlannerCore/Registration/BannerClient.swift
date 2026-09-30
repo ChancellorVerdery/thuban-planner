@@ -4,7 +4,7 @@ import Foundation
 public enum BannerError: Error, LocalizedError, Equatable, Sendable {
     /// A request was refused by `BannerRequestGuard` before it left the app.
     case blocked(String)
-    /// Banner sent us to a sign-in page (or HTML where JSON was expected).
+    /// Banner sent a sign-in page (or HTML where JSON was expected) instead of the public class search.
     case signedOut
     case network(String)
     case http(Int)
@@ -13,7 +13,7 @@ public enum BannerError: Error, LocalizedError, Equatable, Sendable {
     public var errorDescription: String? {
         switch self {
         case .blocked(let message): return message
-        case .signedOut: return "Your UNC Charlotte session has ended. Sign in again."
+        case .signedOut: return "Banner sent a sign-in page instead of class data. Try Refresh in a minute."
         case .network(let message): return "Couldn’t reach Banner: \(message)"
         case .http(let status): return "Banner answered with an error (HTTP \(status))."
         case .unreadable(let message): return message

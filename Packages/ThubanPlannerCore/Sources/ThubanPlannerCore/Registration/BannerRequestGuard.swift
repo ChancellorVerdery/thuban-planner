@@ -1,9 +1,8 @@
 import Foundation
 
-/// The Schedule tab is STRICTLY READ-ONLY against Banner: it never registers, never changes a plan, never saves a
-/// term. Every request the app makes itself goes through `check(method:url:)` (allowlist + denylist), and every
-/// navigation / fetch / XHR inside the sign-in and reader web views is checked against the denylist
-/// (`checkBrowser`) and blocked by a content rule list compiled from `contentRuleListJSON`.
+/// The Schedule tab is STRICTLY READ-ONLY against Banner and never signs in: it only reads the public class search.
+/// Every request goes through `check(method:url:)` (allowlist + a denylist of every write endpoint, kept as defence
+/// in depth).
 public enum BannerRequestGuard {
     public enum Verdict: Equatable, Sendable {
         case allow
@@ -54,22 +53,5 @@ public enum BannerRequestGuard {
         default:
             return .deny("Blocked a \(method.uppercased()) request.")
         }
-    }
-
-    /// For the web views (the user's own sign-in and the plan reader): everything is allowed EXCEPT the denied writes.
-    public static func checkBrowser(url: URL) -> Verdict {
-        if let fragment = deniedFragment(in: url) { return .deny("Blocked a request that could change your registration or plan (\(fragment)).") }
-        return .allow
-    }
-
-    /// WebKit content rules (`WKContentRuleListStore`) that block every denied fragment for all resource types,
-    /// including fetch / XHR ("raw") and documents.
-    public static var contentRuleListJSON: String {
-        let rules = deniedFragments.map { fragment -> String in
-            // Fragments are plain lower-case letters and "/", which WebKit's url-filter takes literally.
-            let pattern = fragment.filter { $0.isLetter || $0 == "/" }
-            return #"{"trigger":{"url-filter":".*"# + pattern + #".*","url-filter-is-case-sensitive":false},"action":{"type":"block"}}"#
-        }
-        return "[" + rules.joined(separator: ",") + "]"
     }
 }

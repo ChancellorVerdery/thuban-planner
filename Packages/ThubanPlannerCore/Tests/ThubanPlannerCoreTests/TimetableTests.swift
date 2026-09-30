@@ -227,6 +227,20 @@ final class TimetableGeneratorTests: XCTestCase {
         XCTAssertEqual(m.earliestStart, 13 * 60)
         XCTAssertEqual(m.latestEnd, 18 * 60 + 15)
         XCTAssertEqual(m.openSeats, 70)
+        XCTAssertEqual(m.classSessions, 4)
+    }
+
+    func testFewestSessionsDiffersFromFewestDays() {
+        // X: MWF (3 sessions) or TR (2); Y: one long Monday meeting (1) or TR evenings (2).
+        let x = TT.course("X 1000", [TT.section("X 1000", "x1", "001", TT.meeting("MWF", "0800", "0850")),
+                                     TT.section("X 1000", "x2", "002", TT.meeting("TR", "1300", "1415"))])
+        let y = TT.course("Y 1000", [TT.section("Y 1000", "y1", "001", TT.meeting("M", "1400", "1650")),
+                                     TT.section("Y 1000", "y2", "002", TT.meeting("TR", "1700", "1815"))])
+        func first(_ sort: TimetableSort) -> TimetableOption { TimetableGenerator.generate(courses: [x, y], sort: sort).options[0] }
+        XCTAssertEqual(first(.fewestDays).crns, ["x2", "y2"]) // 2 days, 4 sessions
+        XCTAssertEqual(first(.fewestSessions).crns, ["x2", "y1"]) // 3 sessions over 3 days
+        XCTAssertEqual(first(.fewestSessions).metrics.classSessions, 3)
+        XCTAssertEqual(TimetableSort.fewestSessions.label, "Fewest class sessions")
     }
 
     func testMetricsIgnoreNegativeSeatsAndUntimed() {

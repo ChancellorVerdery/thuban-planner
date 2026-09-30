@@ -7,11 +7,11 @@ extension SmokeScenes {
         [
             SmokeScene(name: "schedule-route") { app in
                 app.section = .schedule
-                app.scheduleTab.smokeSet(auth: .signedOut) { $0.source = .route; $0.selectedIndex = 0 }
+                app.scheduleTab.smokeSet { $0.selectedIndex = 0 }
             },
             SmokeScene(name: "schedule-expanded-course") { app in
                 app.section = .schedule
-                app.scheduleTab.smokeSet(auth: .signedIn(name: "Sample Student")) { $0.source = .route; $0.selectedIndex = 2 }
+                app.scheduleTab.smokeSet { $0.selectedIndex = 2 }
                 app.scheduleTab.expandedCourse = app.scheduleTab.rows.first?.code
             } cleanup: { app in
                 app.scheduleTab.expandedCourse = nil
@@ -45,28 +45,10 @@ extension SmokeScenes {
             } cleanup: { app in
                 app.scheduleTab.smokeSet { $0.filters = TimetableFilters(); $0.blocks = [] }
             },
-            SmokeScene(name: "schedule-banner-plan") { app in
-                app.section = .schedule
-                app.scheduleTab.smokeSet(auth: .signedIn(name: "Sample Student")) { $0.source = .bannerPlan; $0.selectedIndex = 0 }
-            },
-            SmokeScene(name: "schedule-signed-out") { app in
-                app.section = .schedule
-                app.scheduleTab.smokeSet(auth: .signedOut) { $0.source = .bannerPlan }
-                app.scheduleTab.smokeHidePlans(true)
-            } cleanup: { app in
-                app.scheduleTab.smokeHidePlans(false)
-                app.scheduleTab.smokeSet { $0.source = .route }
-            },
-            SmokeScene(name: "schedule-sign-in-sheet", window: .sheet) { app in
-                app.section = .schedule
-                app.scheduleTab.showSignIn = true
-            } cleanup: { app in
-                app.scheduleTab.showSignIn = false
-            },
             SmokeScene(name: "schedule-dark", settle: 1.5) { app in
                 app.section = .schedule
                 app.setThemeSelection(ThemeSelection(mode: .dark, schemeId: SchemePresets.defaultId, custom: nil))
-                app.scheduleTab.smokeSet(auth: .signedIn(name: "Sample Student")) { $0.source = .route; $0.selectedIndex = 1 }
+                app.scheduleTab.smokeSet { $0.selectedIndex = 1 }
             } cleanup: { app in
                 app.setThemeSelection(ThemeSelection(mode: .light, schemeId: SchemePresets.defaultId, custom: nil))
                 app.scheduleTab.smokeSet { $0.selectedIndex = 0 }

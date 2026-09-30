@@ -63,13 +63,14 @@ public struct TimetableFilters: Codable, Hashable, Sendable {
 
 /// How the list of timetables is ordered.
 public enum TimetableSort: String, Codable, CaseIterable, Sendable, Identifiable {
-    case fewestDays, latestStart, earliestFinish, leastGaps, mostSeats
+    case fewestDays, fewestSessions, latestStart, earliestFinish, leastGaps, mostSeats
 
     public var id: String { rawValue }
 
     public var label: String {
         switch self {
         case .fewestDays: return "Fewest class days"
+        case .fewestSessions: return "Fewest class sessions"
         case .latestStart: return "Latest start"
         case .earliestFinish: return "Earliest finish"
         case .leastGaps: return "Least time between classes"
@@ -226,12 +227,16 @@ public struct TimetableMetrics: Hashable, Sendable {
     public var gapMinutes: Int
     /// Open seats summed over the timetable's sections (negative seats count as 0).
     public var openSeats: Int
+    /// Timed class meetings in a week: one per meeting per weekday it meets (MWF = 3, TR = 2; online / TBA = 0).
+    public var classSessions: Int = 0
 
     public static func of(_ sections: [BannerSection]) -> TimetableMetrics {
         var byDay: [BannerWeekday: [(Int, Int)]] = [:]
+        var sessions = 0
         for section in sections {
             for meeting in section.timedMeetings {
                 guard let b = meeting.begin, let e = meeting.end else { continue }
+                sessions += meeting.days.count
                 for day in meeting.days { byDay[day, default: []].append((b, e)) }
             }
         }
@@ -253,7 +258,7 @@ public struct TimetableMetrics: Hashable, Sendable {
         }
         return TimetableMetrics(classDays: byDay.count, earliestStart: earliest, latestEnd: latest, sumOfDayStarts: sumStarts,
                                 sumOfDayEnds: sumEnds, gapMinutes: gaps,
-                                openSeats: sections.reduce(0) { $0 + max(0, $1.seatsAvailable) })
+                                openSeats: sections.reduce(0) { $0 + max(0, $1.seatsAvailable) }, classSessions: sessions)
     }
 }
 
@@ -410,6 +415,7 @@ public enum TimetableGenerator {
         let avgEnd = m.classDays > 0 ? m.sumOfDayEnds / m.classDays : 0
         switch sort {
         case .fewestDays: return [m.classDays, m.gapMinutes, -start, end]
+        case .fewestSessions: return [m.classSessions, m.classDays, m.gapMinutes, -start, end]
         case .latestStart: return [-start, -avgStart, m.classDays, m.gapMinutes]
         case .earliestFinish: return [end, avgEnd, m.classDays, m.gapMinutes]
         case .leastGaps: return [m.gapMinutes, m.classDays, -start, end]

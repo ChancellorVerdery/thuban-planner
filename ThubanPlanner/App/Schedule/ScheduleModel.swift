@@ -3,19 +3,18 @@ import Foundation
 import Observation
 import ThubanPlannerCore
 import os
+import WebKit
 
 /// A course row in the Schedule sidebar: where it came from, its (effective) pin, and what Banner said about it.
 struct ScheduleCourseRow: Identifiable, Hashable {
-    enum Origin: Hashable { case plan, route, added }
+    enum Origin: Hashable { case route, added }
 
     /// Canonical "MEGR 2144".
     var code: String
     var title: String
     var credits: Double?
     var origin: Origin
-    /// The CRN the Banner plan names for this course (nil = course-level plan item).
-    var planCRN: String?
-    /// The pin in force (the user's own, else the plan's unless unpinned).
+    /// The user's pin for this course.
     var pinnedCRN: String?
     /// nil = not fetched yet.
     var sections: [BannerSection]?
@@ -29,32 +28,17 @@ struct ScheduleCourseRow: Identifiable, Hashable {
     var openCount: Int { sections?.filter(\.hasOpenSeat).count ?? 0 }
 }
 
-/// Where the Schedule tab is with Banner sign-in.
-enum ScheduleAuth: Equatable {
-    /// Not checked yet (cookies exist from an earlier sign-in).
-    case unknown
-    case checking
-    case signedOut
-    /// Was signed in; the session ended.
-    case expired
-    case signedIn(name: String?)
-
-    var isSignedIn: Bool { if case .signedIn = self { return true }; return false }
-}
-
 enum SchedulePhase: Equatable {
     case idle, loading
     case failed(String)
 }
 
-/// The Schedule tab's state: the Banner term, where the courses come from (the Banner plan or Thuban's route),
+/// The Schedule tab's state: the Banner term, the courses (Thuban's route for that term plus any added by code),
 /// their sections (fetched one course at a time, cached), the user's exclusions / pins / blocked times / filters /
 /// sort (schedule.json), and the generated timetables. Views read it as `app.scheduleTab`.
 ///
-/// Banner access: the PUBLIC class search goes through `BannerClient` (URLSession, an anonymous ephemeral session —
-/// never the user's cookies); anything that needs the student's sign-in (Plan Ahead, the student's name) runs inside
-/// WebKit on the app's own persistent website data store (`BannerPlanReader`, `ScheduleSignInSheet`). Every request
-/// is checked by `BannerRequestGuard`; the tab is strictly read-only.
+/// Banner access: ONLY the public class search (no sign-in, ever), through `BannerClient` on an anonymous ephemeral
+/// URLSession. Every request is checked by `BannerRequestGuard`; the tab is strictly read-only.
 @MainActor
 @Observable
 final class ScheduleModel {
@@ -68,7 +52,6 @@ final class ScheduleModel {
     @ObservationIgnored weak var app: AppModel?
     @ObservationIgnored let store: TimetableStore
     @ObservationIgnored var client = BannerClient()
-    @ObservationIgnored private var reader: BannerPlanReader?
     @ObservationIgnored private var fetchTask: Task<Void, Never>?
     @ObservationIgnored private var fetchQueue: [String] = []
 
@@ -83,10 +66,6 @@ final class ScheduleModel {
 
     private(set) var termsPhase: SchedulePhase = .idle
     private(set) var selectedTermCode: String?
-
-    var auth: ScheduleAuth = .signedOut
-    private(set) var planPhase: SchedulePhase = .idle
-    var showSignIn = false
 
     private(set) var fetching: Set<String> = []
     private(set) var sectionErrors: [String: String] = [:]
@@ -110,7 +89,7 @@ final class ScheduleModel {
 
     // MARK: Lifecycle
 
-    /// First time the tab shows: read schedule.json + the cache, the term list, the session state.
+    /// First time the tab shows: read schedule.json + the cache, then the term list.
     func activate() {
         guard !isActivated else { return }
         isActivated = true
@@ -125,15 +104,7 @@ final class ScheduleModel {
             seedOfflineSample()
             return
         }
-        if !cache.plans.isEmpty { auth = .unknown }
-        Task { [weak self] in
-            guard let self else { return }
-            if await BannerWebKit.hasUNCCCookies() {
-                if self.auth == .signedOut { self.auth = .unknown }
-            } else {
-                self.auth = .signedOut
-            }
-        }
+        Self.forgetOldBannerSignIn()
         loadTerms()
     }
 
@@ -203,7 +174,6 @@ final class ScheduleModel {
         expandedCourse = nil
         if remember { updateDocument { $0.lastTermCode = code } }
         refreshRows()
-        if state.source == .bannerPlan, cache.plans[code] == nil, auth != .signedOut { loadPlan() }
         fetchMissingSections()
     }
 
@@ -245,89 +215,6 @@ final class ScheduleModel {
         }
     }
 
-    // MARK: Source and plan
-
-    func setSource(_ source: TimetableSource) {
-        updateState { $0.source = source; $0.selectedIndex = 0 }
-        if source == .bannerPlan, let code = selectedTermCode, cache.plans[code] == nil, auth != .signedOut { loadPlan() }
-        fetchMissingSections()
-    }
-
-    var plans: [BannerPlan] { selectedTermCode.flatMap { cache.plans[$0]?.plans } ?? [] }
-    var plansFetchedAt: Date? { selectedTermCode.flatMap { cache.plans[$0]?.fetchedAt } }
-
-    /// The plan in use: the chosen one, else the preferred (plans are sorted preferred first).
-    var currentPlan: BannerPlan? {
-        let all = plans
-        if let seq = state.planSequence, let plan = all.first(where: { $0.sequenceNumber == seq }) { return plan }
-        return all.first
-    }
-
-    func selectPlan(_ sequence: Int) {
-        updateState { $0.planSequence = sequence; $0.selectedIndex = 0 }
-        fetchMissingSections()
-    }
-
-    /// Reads the student's plans for the selected term in the hidden web view (needs sign-in).
-    func loadPlan() {
-        guard let code = selectedTermCode else { return }
-        if offline { return }
-        planPhase = .loading
-        if !auth.isSignedIn { auth = .checking }
-        Task { [weak self] in
-            guard let self else { return }
-            let reader = self.reader ?? BannerPlanReader()
-            self.reader = reader
-            do {
-                let output = try await reader.readPlans(termCode: code)
-                var entry = BannerCache.PlanEntry(fetchedAt: Date(), plans: output.plans, studentName: output.studentName)
-                if entry.studentName == nil { entry.studentName = self.studentName }
-                self.cache.plans[code] = entry
-                self.saveCache()
-                self.auth = .signedIn(name: entry.studentName)
-                self.planPhase = .idle
-                self.refreshRows()
-                self.fetchMissingSections()
-            } catch BannerError.signedOut {
-                let had = await BannerWebKit.hasUNCCCookies()
-                self.auth = had || self.cache.plans[code] != nil ? .expired : .signedOut
-                self.planPhase = .failed(BannerError.signedOut.localizedDescription)
-            } catch {
-                if self.auth == .checking { self.auth = .unknown }
-                self.planPhase = .failed(error.localizedDescription)
-            }
-        }
-    }
-
-    /// The student's name from the latest plan read (or the sign-in sheet).
-    var studentName: String? {
-        if case .signedIn(let name?) = auth { return name }
-        return cache.plans.values.max(by: { $0.fetchedAt < $1.fetchedAt })?.studentName
-    }
-
-    /// Called by the sign-in sheet when a signed-in Banner page loaded.
-    func didSignIn(name: String?) {
-        auth = .signedIn(name: name ?? studentName)
-    }
-
-    /// The sheet closed after signing in: read the plan now.
-    func afterSignInSheet() {
-        if auth.isSignedIn || auth == .unknown, state.source == .bannerPlan { loadPlan() }
-    }
-
-    func signOut() {
-        Task { [weak self] in
-            await BannerWebKit.signOut()
-            guard let self else { return }
-            self.reader = nil
-            self.auth = .signedOut
-            self.cache.plans = [:]
-            self.saveCache()
-            self.planPhase = .idle
-            self.refreshRows()
-        }
-    }
-
     // MARK: Courses
 
     /// Rebuilds the course rows for the selected term and regenerates the timetables.
@@ -335,25 +222,18 @@ final class ScheduleModel {
         guard let code = selectedTermCode else { rows = []; regenerate(); return }
         let s = state
         var list: [ScheduleCourseRow] = []
-        func add(_ raw: String, title: String, credits: Double?, origin: ScheduleCourseRow.Origin, planCRN: String? = nil) {
+        func add(_ raw: String, title: String, credits: Double?, origin: ScheduleCourseRow.Origin) {
             guard let canonical = BannerText.canonicalCourseCode(raw) else { return }
             guard !s.removedCourses.contains(canonical), !list.contains(where: { $0.code == canonical }) else { return }
             let entry = cache.sections(term: code, course: canonical)
-            let pin = s.pins[canonical] ?? (s.unpinnedPlanCourses.contains(canonical) ? nil : planCRN)
+            let pin = s.pins[canonical]
             let fetchedTitle = entry?.sections.first?.title
             list.append(ScheduleCourseRow(code: canonical, title: title.isEmpty ? (fetchedTitle ?? "") : title,
-                                          credits: credits ?? entry?.sections.first?.credits, origin: origin, planCRN: planCRN,
+                                          credits: credits ?? entry?.sections.first?.credits, origin: origin,
                                           pinnedCRN: pin, sections: entry?.sections, linkedSets: entry?.linkedSets ?? [:],
                                           fetchedAt: entry?.fetchedAt, isFetching: fetching.contains(canonical), error: sectionErrors[canonical]))
         }
-        switch s.source {
-        case .route:
-            for course in routeCourses(termCode: code) { add(course.code, title: course.title, credits: course.credits, origin: .route) }
-        case .bannerPlan:
-            for course in currentPlan?.courses(inTerm: code) ?? [] {
-                add(course.courseCode, title: course.title, credits: course.credits, origin: .plan, planCRN: course.crn)
-            }
-        }
+        for course in routeCourses(termCode: code) { add(course.code, title: course.title, credits: course.credits, origin: .route) }
         for extra in s.addedCourses {
             let entry = cache.sections(term: code, course: extra)
             add(extra, title: entry?.sections.first?.title ?? "", credits: nil, origin: .added)
@@ -418,16 +298,14 @@ final class ScheduleModel {
         }
     }
 
-    /// Pins a section (nil unpins; unpinning a plan's CRN remembers that).
+    /// Pins a section (nil unpins).
     func setPin(_ row: ScheduleCourseRow, crn: String?) {
         updateState { s in
             if let crn {
                 s.pins[row.code] = crn
                 s.excludedCRNs.removeAll { $0 == crn }
-                s.unpinnedPlanCourses.removeAll { $0 == row.code }
             } else {
                 s.pins[row.code] = nil
-                if row.planCRN != nil, !s.unpinnedPlanCourses.contains(row.code) { s.unpinnedPlanCourses.append(row.code) }
             }
             s.selectedIndex = 0
         }
@@ -449,7 +327,6 @@ final class ScheduleModel {
         guard let code = selectedTermCode else { return }
         networkError = nil
         enqueue(rows.map(\.code), term: code)
-        if state.source == .bannerPlan, auth != .signedOut { loadPlan() }
     }
 
     func retryCourse(_ course: String) {
@@ -599,41 +476,30 @@ final class ScheduleModel {
                             term: term.code, course: course.code)
             }
         }
-        if let code = BannerTermCode.code(forTermKey: next) {
-            let courses = routeCourses(termCode: code).prefix(4).enumerated().map { i, c in
-                BannerPlanCourse(term: code, subject: BannerText.splitCourseCode(c.code)?.subject ?? "",
-                                 courseNumber: BannerText.splitCourseCode(c.code)?.number ?? "", title: c.title,
-                                 crn: i == 0 ? cache.sections(term: code, course: c.code)?.sections.first?.crn : nil, credits: c.credits)
-            }
-            cache.plans[code] = .init(fetchedAt: Date(), plans: [BannerPlan(sequenceNumber: 1, description: "Spring plan", preferred: true,
-                                                                            totalCredits: 12, courses: Array(courses))],
-                                      studentName: "Sample Student")
-        }
         selectedTermCode = nil
         selectTerm(BannerTermCode.code(forTermKey: next) ?? cache.terms[0].code, remember: false)
     }
 
     /// SMOKE ONLY: replaces the in-memory state wholesale (never saved: `offline` is on in a smoke run).
-    func smokeSet(auth: ScheduleAuth? = nil, blockMode: Bool? = nil, _ change: ((inout TimetableTermState) -> Void)? = nil) {
+    func smokeSet(blockMode: Bool? = nil, _ change: ((inout TimetableTermState) -> Void)? = nil) {
         guard offline else { return }
-        if let auth { self.auth = auth }
         if let blockMode { self.blockMode = blockMode }
         if let change { updateState(change) }
     }
 
-    @ObservationIgnored private var smokeStashedPlans: [String: BannerCache.PlanEntry]?
-
-    /// SMOKE ONLY: hides the sample Banner plan (the signed-out state) and brings it back.
-    func smokeHidePlans(_ hide: Bool) {
-        guard offline else { return }
-        if hide {
-            smokeStashedPlans = cache.plans
-            cache.plans = [:]
-        } else if let stashed = smokeStashedPlans {
-            cache.plans = stashed
-            smokeStashedPlans = nil
+    /// Earlier builds could sign in to UNC Charlotte in an embedded browser. Sign-in is gone; once, wipe any
+    /// cookies / site data that browser kept for uncc.edu.
+    private static func forgetOldBannerSignIn() {
+        let key = "didForgetBannerSignIn"
+        guard !UserDefaults.standard.bool(forKey: key) else { return }
+        let store = WKWebsiteDataStore.default()
+        let types = WKWebsiteDataStore.allWebsiteDataTypes()
+        store.fetchDataRecords(ofTypes: types) { records in
+            let uncc = records.filter { $0.displayName.lowercased().contains("uncc.edu") }
+            store.removeData(ofTypes: types, for: uncc) {
+                UserDefaults.standard.set(true, forKey: key)
+            }
         }
-        refreshRows()
     }
 
     /// SMOKE ONLY: drops the term's cached sections for one course (a "no sections" state) or restores the sample.

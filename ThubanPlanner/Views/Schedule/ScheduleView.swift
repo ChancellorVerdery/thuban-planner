@@ -34,14 +34,6 @@ struct ScheduleView: View {
             model.activate()
             gridFocused = true
         }
-        .sheet(isPresented: Binding(get: { model.showSignIn }, set: { model.showSignIn = $0 }),
-               onDismiss: { model.afterSignInSheet() }) {
-            ScheduleSignInSheet()
-                .environment(app)
-                .environment(\.thubanTheme, app.theme)
-                .environment(\.thubanTextScale, app.preferences.textSize.scale)
-                .preferredColorScheme(app.theme.isDark ? .dark : .light)
-        }
     }
 
     @ViewBuilder
@@ -55,11 +47,6 @@ struct ScheduleView: View {
                     Button("Try again") { model.loadTerms(force: true) }.buttonStyle(.thubanPrimary)
                 }
             }
-        } else if model.state.source == .bannerPlan, model.plans.isEmpty, model.planPhase == .loading || model.auth == .checking {
-            ScheduleProgress(text: "Reading your Banner plan…")
-        } else if model.state.source == .bannerPlan, model.plans.isEmpty, model.state.addedCourses.isEmpty,
-                  model.auth == .signedOut || model.auth == .expired || model.auth == .unknown {
-            ScheduleSignInPrompt()
         } else if model.rows.isEmpty {
             ScheduleNoCourses()
         } else if model.result.options.isEmpty, model.result.problems.isEmpty, !model.missingCourses.isEmpty,
@@ -97,7 +84,7 @@ private struct ScheduleHeader: View {
         let model = app.scheduleTab
         HStack(alignment: .center, spacing: 20) {
             VStack(alignment: .leading, spacing: 5) {
-                Eyebrow("\(model.selectedTermLabel) · \(model.state.source.label)")
+                Eyebrow("\(model.selectedTermLabel) · Thuban route")
                 Text(title(model))
                     .font(ThubanFont.display(28))
                     .kerning(-0.28)
@@ -142,9 +129,7 @@ private struct ScheduleHeader: View {
         guard let option = model.currentOption else {
             let n = model.rows.count
             if n == 0 {
-                return model.state.source == .bannerPlan && model.plans.isEmpty
-                    ? "Your Banner plan’s classes appear here once you’re signed in."
-                    : "Add classes in the sidebar to build schedules."
+                return "Add classes in the sidebar to build schedules."
             }
             return "\(n) class\(n == 1 ? "" : "es") · \(model.result.problems.isEmpty ? "waiting for sections" : "see why below")"
         }
@@ -154,6 +139,7 @@ private struct ScheduleHeader: View {
         parts.append("\(app.creditsText(credits)) credits")
         let m = option.metrics
         parts.append("\(m.classDays) class day\(m.classDays == 1 ? "" : "s")")
+        parts.append("\(m.classSessions) session\(m.classSessions == 1 ? "" : "s") a week")
         if let start = m.earliestStart, let end = m.latestEnd {
             parts.append("\(BannerClock.label(start)) – \(BannerClock.label(end))")
         }
@@ -302,50 +288,16 @@ private struct ScheduleProgress: View {
     }
 }
 
-private struct ScheduleSignInPrompt: View {
-    @Environment(AppModel.self) private var app
-
-    var body: some View {
-        let model = app.scheduleTab
-        let expired = model.auth == .expired
-        EmptyState(icon: .schedule,
-                   title: expired ? "Your Banner session ended" : "Sign in to read your Banner plan",
-                   message: expired
-                       ? "Sign in again to read your Plan Ahead classes for \(model.selectedTermLabel)."
-                       : "Your plan is read from UNC Charlotte’s Plan Ahead. You sign in on UNC Charlotte’s own page — Thuban Planner never sees your password and never registers or changes anything.") {
-            HStack(spacing: 10) {
-                Button { model.showSignIn = true } label: {
-                    Text(expired ? "Sign in again" : "Sign in to Banner")
-                }
-                .buttonStyle(.thubanPrimary)
-                Button { model.setSource(.route) } label: {
-                    HStack(spacing: 7) { Icon(.route, size: 15); Text("Use Thuban route") }
-                }
-                .buttonStyle(.thubanSecondary)
-            }
-        }
-    }
-}
-
 private struct ScheduleNoCourses: View {
     @Environment(AppModel.self) private var app
 
     var body: some View {
         let model = app.scheduleTab
-        let fromPlan = model.state.source == .bannerPlan
         EmptyState(icon: .schedule, title: "No classes for \(model.selectedTermLabel)",
-                   message: fromPlan
-                       ? "Your Banner plan has no classes in this term. Add one by code in the sidebar, pick another plan or term, or use Thuban’s route."
-                       : "Thuban’s route has no classes in this term. Add one by code in the sidebar, or pick another term.") {
+                   message: "Thuban’s route has no classes in this term. Add one by code in the sidebar, or pick another term.") {
             HStack(spacing: 10) {
                 if !model.state.removedCourses.isEmpty {
                     Button("Restore removed classes") { model.restoreRemovedCourses() }.buttonStyle(.thubanSecondary)
-                }
-                if fromPlan {
-                    Button { model.setSource(.route) } label: {
-                        HStack(spacing: 7) { Icon(.route, size: 15); Text("Use Thuban route") }
-                    }
-                    .buttonStyle(.thubanSecondary)
                 }
             }
         }

@@ -54,8 +54,8 @@ Packages/ThubanPlannerCore/ SwiftPM library + tests (`swift test`)
              upcomingSummers, planStatus)
   Support/   JS (JavaScript Number/String/truthiness/Math.round/localeCompare semantics), JSONValue, V8Sort (V8 TimSort)
   Registration/ Schedule tab core: BannerTerms (term codes ↔ keys, course-code parsing), BannerSections (sections,
-             meetings, conflicts, clock), BannerPlan (Plan Ahead `bootstraps` parser, meta / sign-in helpers),
-             BannerRequestGuard (read-only allow / deny lists, WebKit content rules), BannerClient (class search over
+             meetings, conflicts, clock), BannerPage (meta tags, sign-in-redirect / HTML detection),
+             BannerRequestGuard (read-only allow / deny lists), BannerClient (public class search over
              URLSession), Timetable (generator), TimetableStore (schedule.json + schedule-cache.json)
   Store/     PlannerStore (planner.json, atomic writes, 14 daily backups, 20 labelled snapshots), Preferences,
              AppPaths (THUBAN_PLANNER_HOME), JSONFile
@@ -71,9 +71,8 @@ Shared/
   Art/       AppArt + AppArtSource (the mark: ~/Desktop/Claude/Thuban Icons/final/planner.svg), Icon (line icons)
 ThubanPlanner/
   App/       ThubanPlannerApp (window, menus: New Class ⌘N, Go ⌘1–⌘4, Settings ⌘,, Route ▸ Calculate ⌘R / Fit ⌘0,
-             Schedule ▸ Previous / Next ⌘[ ⌘], Block Times ⌘B, Copy CRNs ⇧⌘C, Refresh Sections ⇧⌘R, Sign In / Out),
-             Schedule/ (ScheduleModel — the tab's own @Observable model, `app.scheduleTab`; BannerWebSession — WebKit
-             sign-in store, navigation guard, hidden Plan Ahead reader),
+             Schedule ▸ Previous / Next ⌘[ ⌘], Block Times ⌘B, Copy CRNs ⇧⌘C, Refresh Sections ⇧⌘R),
+             Schedule/ (ScheduleModel — the tab's own @Observable model, `app.scheduleTab`),
              AppModel (+Queries, +Mutations, +Import), Routes (AppSection, SettingsPane, ThubanScheme),
              AppIconRenderer (live dock icon), SmokeHarness, Smoke/SmokeScenes (registry, pre-wired)
   Views/Shell        ShellView: TitleBar (mark + serif "Thuban Planner", StatusChip), SectionBar (SectionTabs + the
@@ -85,7 +84,7 @@ ThubanPlanner/
   Views/Route        RouteView, RouteToolbar, RouteSmokeScenes                                    (B)
   Views/ClassDetail  ClassDetailSheet, ClassDetailSmokeScenes                                     (B)
   Views/Schedule     ScheduleView, ScheduleToolbar, ScheduleSidebar, ScheduleCourseCard, ScheduleWeekGrid,
-                     ScheduleSignInSheet, ScheduleTheme (course colours), ScheduleSmokeScenes
+                     ScheduleTheme (course colours), ScheduleSmokeScenes
   Views/Settings     SettingsView (nav), SettingsToolbar, SettingsChrome, SettingsPaneHeader, PlanningSettings,
                      AppearanceSettings (working), ImportSettings, DataSettings, AboutSettings, SettingsSmokeScenes (C)
   Resources          Assets.xcassets (AppIcon from scripts/make_app_icon.sh), entitlements (no sandbox)
@@ -348,14 +347,13 @@ Planner" (switches to Planner, selects the row, dismisses) and Done (default). E
 ### Schedule — `Views/Schedule`, `App/Schedule`, core `Registration/` (section ⌘3)
 
 Builds every weekly timetable for a UNC Charlotte term from the classes planned for it. STRICTLY READ-ONLY against
-Banner: it never registers, never adds / removes / changes plan items, never saves a term; the user copies the CRNs
-and registers in Banner themselves.
+Banner and it NEVER SIGNS IN (sign-in and the Plan Ahead reader were removed 2026-09-30 at the user's request): it
+only reads UNC Charlotte's public class search. It never registers or saves a term; the user copies the CRNs and
+registers in Banner themselves.
 
 - **Model**: `app.scheduleTab` (`ScheduleModel`, `@MainActor @Observable`, owned by `AppModel`; activated the first time
-  the tab shows). Rows (`ScheduleCourseRow`) come from the selected source — `.bannerPlan` (the Plan Ahead plan: the
-  preferred plan first, a plan menu when there are several; a plan item with a CRN pins that section until the user
-  unpins it) or `.route` (the classes `app.schedule` places in the term) — minus removed, plus added codes
-  ("MEGR 2144"). Each row shows code, title, credits, sections found and open.
+  the tab shows). Rows (`ScheduleCourseRow`) are the classes `app.schedule` (the route) places in the term, minus
+  removed, plus added codes ("MEGR 2144"). Each row shows code, title, credits, sections found and open.
 - **Terms**: `classSearch/getTerms` (cached 12 h); the picker shows the newest six plus the calendar term; default =
   the last term used, else the next term the route plans, else the calendar term. `BannerTermCode`: YYYY + 10 spring /
   60 summer (50 / 70 read as summer) / 80 fall ↔ "spring-2027"; " (View Only)" is stripped.
@@ -371,40 +369,32 @@ and registers in Banner themselves.
   pins; weekly blocks (`TimetableBlock`) remove any section meeting inside one. Most-constrained-course-first
   backtracking with forward checking, capped at 10,000 ("showing the first 10,000"). Zero results explain themselves:
   a course with no sections, a course whose sections were all filtered (with counts per reason), a pair of courses
-  that always clash, or "no combination fits". Sorts: fewest class days, latest start, earliest finish, least time
-  between classes, most open seats — ties broken by the option id, so output is deterministic.
-- **Sign-in / "the user's cookies"**: the app NEVER reads Chrome's (or any browser's) cookie store and never sees or
-  stores a password (no Keychain). "Sign in" opens `ScheduleSignInSheet`: UNC Charlotte's own SSO page in a WKWebView on
-  `WKWebsiteDataStore.default()` (persistent, the app's own). Everything that needs the sign-in runs INSIDE WebKit on
-  that store — `BannerPlanReader`, a hidden web view: open `term/termSelection?mode=plan` (a webauth page = signed
-  out), POST `term/search?mode=plan` from the page with its own token (`callAsyncJavaScript` fetch, credentials
-  included), open the `fwdURL` / `plan/selectPlan`, read `JSON.stringify(window.bootstraps)` (HTML fallback) and
-  `<meta name="fullName">`. The PUBLIC class search deliberately does NOT use the sign-in: `URLSessionBannerTransport`
-  is an ephemeral session with its own cookie jar (least privilege). "Sign out" deletes every uncc.edu cookie and data
-  record. States: signed out, checking, signed in as <name>, signed in earlier (unknown), session ended (expired).
+  that always clash, or "no combination fits". Sorts: fewest class days, fewest class sessions (timed meetings a
+  week: MWF = 3, TR = 2; then days, gaps), latest start, earliest finish, least time between classes, most open seats
+  — ties broken by the option id, so output is deterministic.
+- **No sign-in**: nothing in the app signs in, opens a web view, or reads any browser's cookies. Earlier builds had a
+  WebKit sign-in; on first activation `ScheduleModel` once removes any uncc.edu website data it left
+  (`didForgetBannerSignIn` in UserDefaults). Old schedule.json / cache keys (source, planSequence, unpinnedPlanCourses,
+  plans) are ignored on load.
 - **Read-only enforcement**: `BannerRequestGuard.check` (app-made requests: HTTPS selfservice.uncc.edu
   /StudentRegistrationSsb/ only, GET, POST only to `term/search` and `classSearch/resetDataForm`) and the deny list
   (submitPlan, addPlanItem, deletePlan, makePreferred, savePlanNote, markApproved, saveTerm, classRegistration/submit,
-  addRegistrationItem, addCRNRegistrationItems, register) applied to every URLSession request and redirect, every web
-  view navigation (`BannerNavigationGuard`; POST navigations to Banner also need the allow list) and every fetch / XHR /
-  resource via a compiled `WKContentRuleList`.
-- **Screen**: 340 pt sidebar (semester menu, Banner account card, source segmented control + plan, class cards that
+  addRegistrationItem, addCRNRegistrationItems, register) applied to every URLSession request and redirect.
+- **Screen**: 340 pt sidebar (semester menu, class cards that
   expand to sections with include checkboxes and a pin, "Add a class", filters) | header ("Schedule 3 of 128", credits
   · days · span · gaps, sort menu, ◀ ▶ and ←/→) | week grid (Mon–Fri, weekends when used; 7 AM–10 PM widened as needed,
   30-minute rules; course-coloured meetings, hatched blocks) | CRN strip + Copy CRNs. "Block times" (toolbar, ⌘B):
   drag to add a block (15-minute snap), click one to rename / retime / delete. States: loading terms, can't reach
-  Banner (Try again), sign-in prompt / session ended, no classes, finding sections, couldn't load sections, "Why
+  Banner (Try again), no classes, finding sections, couldn't load sections, "Why
   nothing fits" card over the grid. Course colours: `ScheduleTheme` (accent, pos, neg, accent turned round the wheel,
   accentDeep, signal — theme tokens only).
-- **Files**: `schedule.json` (per Banner term code: source, plan, added / removed classes, excluded CRNs, pins,
-  unpinned plan pins, blocks, filters, sort, last schedule index; `lastTermCode`) and `schedule-cache.json` (terms,
-  sections, plans; safe to delete), both next to planner.json (THUBAN_PLANNER_HOME honoured), atomic, 0600.
+- **Files**: `schedule.json` (per Banner term code: added / removed classes, excluded CRNs, pins, blocks, filters,
+  sort, last schedule index; `lastTermCode`) and `schedule-cache.json` (terms, sections; safe to delete), both next to planner.json (THUBAN_PLANNER_HOME honoured), atomic, 0600.
 - **Tests**: `BannerTests` (term codes, real-fixture decoding incl. null times / several meetings / negative seats /
-  double spaces, request guard, plan parsing on the reconstructed fixture + tolerant variants + HTML fallback, client
-  flow on a fake transport, store round trip), `TimetableTests` (conflicts, date ranges, blocks, online, filters, pins,
+  double spaces, request guard, page helpers, client flow on a fake transport, store round trip + old-file
+  tolerance), `TimetableTests` (conflicts, date ranges, blocks, online, filters, pins,
   linked sets, zero-result reasons, cap, determinism, sorting, 6 × 20 performance). Live, public, read-only check:
-  `THUBAN_PLANNER_LIVE_BANNER=1 scripts/test.sh` (term list + one MEGR 2144 search; never signs in). Plan Ahead
-  reading is verified against fixtures only (it needs a real student sign-in).
+  `THUBAN_PLANNER_LIVE_BANNER=1 scripts/test.sh` (term list + one MEGR 2144 search).
 
 ### Settings (C) — `Views/Settings` (section ⌘4 / ⌘,)
 
