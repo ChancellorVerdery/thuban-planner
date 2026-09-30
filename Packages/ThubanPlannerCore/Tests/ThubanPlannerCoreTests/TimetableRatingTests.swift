@@ -38,7 +38,15 @@ final class TimetableRatingTests: XCTestCase {
         }
         XCTAssertEqual(table.bySection["a1"], 4.5)
         XCTAssertEqual(table.bySection["a6"] ?? 0, (4.5 * 10 + 3.0 * 30) / 40, accuracy: 1e-12)
-        XCTAssertEqual(Set(table.bySection.keys), ["a1", "a6"])
+        // Not on RMP, ambiguous, 0 ratings and unassigned score 2.5; a pending lookup stays out until it resolves.
+        XCTAssertEqual(table.bySection["a2"], 2.5)
+        XCTAssertEqual(table.bySection["a3"], 2.5)
+        XCTAssertEqual(table.bySection["a4"], 2.5)
+        XCTAssertEqual(table.bySection["a5"], 2.5)
+        XCTAssertNil(table.bySection["a7"])
+        XCTAssertEqual(Set(table.bySection.keys), ["a1", "a2", "a3", "a4", "a5", "a6"])
+        let tba = TimetableRatings.build(sections: [section("A 1", "t1", instructors: ["TBA"], TT.meeting("MWF", "0800", "0850"))]) { _, _ in nil }
+        XCTAssertEqual(tba.bySection["t1"], TimetableRatings.unratedScore)
     }
 
     func testScoreWeightsByCreditsAndSkipsUnrated() {

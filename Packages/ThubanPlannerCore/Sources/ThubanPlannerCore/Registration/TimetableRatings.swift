@@ -22,17 +22,32 @@ public struct TimetableRatings: Hashable, Sendable {
         return rated.reduce(0.0) { $0 + ($1.avgRating ?? 0) * Double($1.numRatings) } / Double(total)
     }
 
+    /// The score used for a section whose professor has no rating (not on RMP, 0 ratings, ambiguous, or no
+    /// instructor assigned / "TBA"): the middle of the 1–5 scale. Used only for sorting; the UI still shows "no rating".
+    public static let unratedScore = 2.5
+
     /// Builds the table for `sections`: `match(instructor, section)` says what RMP knows about one instructor (nil =
-    /// not looked up yet). Only `.found` with ratings counts — not on RMP, 0 ratings, ambiguous and unassigned
-    /// instructors are left out.
+    /// not looked up yet). A section's value is its rated instructors' numRatings-weighted mean; when none is rated it is
+    /// `unratedScore` — once every named instructor has been looked up (unassigned / placeholder names count as
+    /// looked up). A section with a lookup still pending and nothing rated yet is left out until it resolves.
     public static func build(sections: [BannerSection], match: (String, BannerSection) -> RMPMatch?) -> TimetableRatings {
         var table: [String: Double] = [:]
         for section in sections where table[section.crn] == nil {
-            let found = section.instructors.compactMap { name -> RMPRating? in
-                if case .found(let rating)? = match(name, section) { return rating }
-                return nil
+            var found: [RMPRating] = []
+            var pending = false
+            for name in section.instructors {
+                guard RMPPersonName.parse(name) != nil else { continue } // "TBA", "Staff" … = unassigned
+                switch match(name, section) {
+                case .found(let rating)?: found.append(rating)
+                case .notFound?, .ambiguous?: break
+                case nil: pending = true
+                }
             }
-            if let value = sectionRating(found) { table[section.crn] = value }
+            if let value = sectionRating(found) {
+                table[section.crn] = value
+            } else if !pending {
+                table[section.crn] = unratedScore
+            }
         }
         return TimetableRatings(bySection: table)
     }

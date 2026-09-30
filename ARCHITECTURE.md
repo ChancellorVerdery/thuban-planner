@@ -389,8 +389,9 @@ registers in Banner themselves.
 - **Highest professor rating**: score = Σ(rating × credits) / Σ credits over the courses whose chosen section has a
   rated professor (`TimetableRatings`: CRN → the primary instructor's combined RMP rating; several rated
   instructors → numRatings-weighted mean; a linked set uses its first section's credits once). Not on RMP, 0
-  ratings, ambiguous, unassigned → the course counts neither rating nor credits; a timetable with no rated course
-  sorts after every scored one (ties: days, gaps, id). The generator stays pure — `ScheduleModel` builds the table
+  ratings, ambiguous, unassigned / "TBA" → scored internally as `TimetableRatings.unratedScore` = 2.5 (user's rule,
+  2026-09-30; the UI still shows "no rating"); only a section whose lookup is still pending is left out until it
+  resolves. A timetable with no scored course sorts after every scored one (ties: days, gaps, id). The generator stays pure — `ScheduleModel` builds the table
   from the RMP cache. With this sort anywhere in the list (or "Look up ratings"), every distinct instructor of the
   term's loaded sections is looked up (cache first, one at a time, ~0.6 s between requests; header shows "Rating
   professors 7 / 23"); results re-sort as they arrive (on #1 you stay on the new #1; after browsing, the timetable
