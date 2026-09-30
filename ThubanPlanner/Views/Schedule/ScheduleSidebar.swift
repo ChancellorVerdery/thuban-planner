@@ -2,7 +2,8 @@ import SwiftUI
 import ThubanPlannerCore
 
 /// Left column: term, the classes (each expandable to its sections
-/// with include toggles and a pin), "add a class", and the filters.
+/// with include toggles and a pin), "add a class", the filters, and a small UNC Charlotte account row (sign-in is
+/// optional — only "Export to Banner…" needs it).
 struct ScheduleSidebar: View {
     @Environment(AppModel.self) private var app
     @Environment(\.thubanTheme) private var theme
@@ -19,6 +20,7 @@ struct ScheduleSidebar: View {
             .padding(.top, 20)
             .padding(.bottom, 24)
         }
+        .safeAreaInset(edge: .bottom, spacing: 0) { ScheduleAccountRow() }
         .frame(width: 340)
         .frame(maxHeight: .infinity, alignment: .top)
         .background(theme.panelColor)
@@ -89,7 +91,7 @@ struct ScheduleSidebar: View {
             SectionHeader("Classes", count: model.rows.count) {
                 if !model.fetching.isEmpty { ProgressView().controlSize(.mini) }
             }
-            Text("The classes Thuban’s route places in \(model.selectedTermLabel), plus any you add. Sections come from UNC Charlotte’s public class search — no sign-in.")
+            Text("The classes Thuban’s route places in \(model.selectedTermLabel), plus any you add. Sections come from UNC Charlotte’s public class search — no sign-in needed.")
                 .font(ThubanFont.body(12))
                 .foregroundStyle(theme.inkFaintColor)
                 .fixedSize(horizontal: false, vertical: true)
@@ -216,5 +218,65 @@ private struct ScheduleAddCourseField: View {
         let trimmed = text.trimmingCharacters(in: .whitespaces)
         guard !trimmed.isEmpty else { return }
         if let problem = app.scheduleTab.addCourse(trimmed) { error = problem } else { text = "" }
+    }
+}
+
+// MARK: - Account
+
+/// "UNC Charlotte account": Not signed in · Sign in / Signed in as X · Sign out. Unobtrusive — the tab works without
+/// it; signing in only matters for "Export to Banner…".
+private struct ScheduleAccountRow: View {
+    @Environment(AppModel.self) private var app
+    @Environment(\.thubanTheme) private var theme
+
+    var body: some View {
+        let model = app.scheduleTab
+        let signedOut = model.auth == .signedOut || model.auth == .expired
+        HStack(spacing: 8) {
+            Circle().fill(dot(model.auth)).frame(width: 7, height: 7)
+            VStack(alignment: .leading, spacing: 0) {
+                Text("UNC Charlotte account")
+                    .font(ThubanFont.body(11, weight: .medium))
+                    .foregroundStyle(theme.inkFaintColor)
+                Text(status(model.auth))
+                    .font(ThubanFont.body(12.5))
+                    .foregroundStyle(theme.inkDimColor)
+                    .lineLimit(1)
+                    .truncationMode(.tail)
+            }
+            Spacer(minLength: 6)
+            Button(signedOut ? "Sign in" : "Sign out") {
+                if signedOut { model.signIn() } else { model.signOut() }
+            }
+            .buttonStyle(GhostButtonStyle(height: 26, tinted: true, horizontalPadding: 6))
+            .font(ThubanFont.body(12, weight: .semibold))
+            .help(signedOut
+                  ? "Sign in on UNC Charlotte’s own page — only needed for Export to Banner. Your password never reaches Thuban Planner."
+                  : "Removes your UNC Charlotte sign-in from Thuban Planner.")
+        }
+        .padding(.horizontal, 18)
+        .frame(height: 48)
+        .background(theme.panelColor)
+        .thubanHairline(.top, color: theme.lineColor)
+        .accessibilityElement(children: .contain)
+    }
+
+    private func status(_ auth: ScheduleAuth) -> String {
+        switch auth {
+        case .signedIn(let name?): return "Signed in as \(name)"
+        case .signedIn(nil): return "Signed in"
+        case .unknown: return "Signed in earlier"
+        case .expired: return "Sign-in ended"
+        case .signedOut: return "Not signed in"
+        }
+    }
+
+    private func dot(_ auth: ScheduleAuth) -> Color {
+        switch auth {
+        case .signedIn: return theme.posColor
+        case .unknown: return theme.accentColor
+        case .expired: return theme.negColor
+        case .signedOut: return theme.inkFaintColor
+        }
     }
 }

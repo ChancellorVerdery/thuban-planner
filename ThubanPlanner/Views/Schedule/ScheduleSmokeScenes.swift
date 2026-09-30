@@ -132,6 +132,78 @@ extension SmokeScenes {
                 app.scheduleTab.smokeSet { $0.sorts = TimetableSort.defaultList; $0.selectedIndex = 0 }
                 app.scheduleTab.ratings.smokeReset()
             },
+            SmokeScene(name: "schedule-account-signed-out") { app in
+                app.section = .schedule
+                app.scheduleTab.smokeSetAuth(.signedOut)
+                app.scheduleTab.smokeSet { $0.selectedIndex = 0 }
+            },
+            SmokeScene(name: "schedule-sign-in-sheet", window: .sheet, settle: 1.4) { app in
+                app.section = .schedule
+                app.scheduleTab.smokeSetAuth(.signedOut)
+                app.scheduleTab.exportAfterSignIn = true
+                app.scheduleTab.showSignIn = true
+            } cleanup: { app in
+                app.scheduleTab.exportAfterSignIn = false
+                app.scheduleTab.showSignIn = false
+            },
+            SmokeScene(name: "schedule-export-confirm", window: .sheet, settle: 1.4) { app in
+                app.section = .schedule
+                app.scheduleTab.smokeSet { $0.selectedIndex = 2 }
+                app.scheduleTab.smokeShowExport(.ready)
+            } cleanup: { app in
+                app.scheduleTab.exportDraft = nil
+            },
+            SmokeScene(name: "schedule-export-working", window: .sheet, settle: 1.4) { app in
+                app.section = .schedule
+                app.scheduleTab.smokeShowExport(.ready)
+                let second = app.scheduleTab.exportDraft?.items.dropFirst().first
+                app.scheduleTab.updateDraft { $0.phase = .working("Adding \(second?.courseCode ?? "a class") (2 of \($0.items.count))…") }
+            } cleanup: { app in
+                app.scheduleTab.exportDraft = nil
+            },
+            SmokeScene(name: "schedule-export-success", window: .sheet, settle: 1.4) { app in
+                app.section = .schedule
+                app.scheduleTab.smokeShowExport(.ready)
+                if let d = app.scheduleTab.exportDraft {
+                    app.scheduleTab.updateDraft { $0.phase = .done(BannerExportOutcome(planName: d.name, sequenceNumber: 3, classCount: d.items.count,
+                                                                                         verified: true, note: nil, dryRun: false)) }
+                }
+            } cleanup: { app in
+                app.scheduleTab.exportDraft = nil
+            },
+            SmokeScene(name: "schedule-export-failure", window: .sheet, settle: 1.4) { app in
+                app.section = .schedule
+                app.scheduleTab.smokeShowExport(.ready)
+                if let first = app.scheduleTab.exportDraft?.items.first {
+                    app.scheduleTab.updateDraft { $0.phase = .failed("Banner didn’t accept \(first.courseCode) \(first.section). CRN \(first.crn): This section is not available for planning. No plan was saved.",
+                                                                     wroteNothing: true) }
+                }
+            } cleanup: { app in
+                app.scheduleTab.exportDraft = nil
+            },
+            SmokeScene(name: "schedule-export-max-plans", window: .sheet, settle: 1.4) { app in
+                app.section = .schedule
+                app.scheduleTab.smokeShowExport(.full(count: 5, max: 5),
+                                                preflight: BannerExportPreflight(studentName: "Sample Student", planCount: 5, maxPlans: 5))
+            } cleanup: { app in
+                app.scheduleTab.exportDraft = nil
+            },
+            SmokeScene(name: "schedule-export-confirm-dark", window: .sheet, settle: 1.6) { app in
+                app.section = .schedule
+                app.setThemeSelection(ThemeSelection(mode: .dark, schemeId: SchemePresets.defaultId, custom: nil))
+                app.scheduleTab.smokeShowExport(.ready)
+            } cleanup: { app in
+                app.scheduleTab.exportDraft = nil
+                app.setThemeSelection(ThemeSelection(mode: .light, schemeId: SchemePresets.defaultId, custom: nil))
+            },
+            SmokeScene(name: "schedule-account-signed-in-dark", settle: 1.5) { app in
+                app.section = .schedule
+                app.setThemeSelection(ThemeSelection(mode: .dark, schemeId: SchemePresets.defaultId, custom: nil))
+                app.scheduleTab.smokeSetAuth(.signedIn(name: "Sample Student"))
+            } cleanup: { app in
+                app.scheduleTab.smokeSetAuth(.signedOut)
+                app.setThemeSelection(ThemeSelection(mode: .light, schemeId: SchemePresets.defaultId, custom: nil))
+            },
         ]
     }
 }

@@ -55,7 +55,9 @@ Packages/ThubanPlannerCore/ SwiftPM library + tests (`swift test`)
   Support/   JS (JavaScript Number/String/truthiness/Math.round/localeCompare semantics), JSONValue, V8Sort (V8 TimSort)
   Registration/ Schedule tab core: BannerTerms (term codes ↔ keys, course-code parsing), BannerSections (sections,
              meetings, conflicts, clock), BannerPage (meta tags, sign-in-redirect / HTML detection),
-             BannerRequestGuard (read-only allow / deny lists), BannerClient (public class search over
+             BannerRequestGuard (allow / deny lists, BannerExportAuthorization, content rules, page fence),
+             BannerPlan (Plan Ahead bootstraps parser), BannerPlanExport (export items, name, request bodies,
+             responses, verification, BannerPlanPageInfo), BannerClient (public class search over
              URLSession), Timetable (generator, sorts incl. multi-criteria), TimetableRatings (professor-rating sort
              input), TimetableStore (schedule.json + schedule-cache.json)
   RateMyProfessors/ RMPModels (UNCC school pages, RMPTeacher, RMPRating, RMPMatch), RMPNames (Banner name parsing),
@@ -76,8 +78,10 @@ Shared/
   Art/       AppArt + AppArtSource (the mark: ~/Desktop/Claude/Thuban Icons/final/planner.svg), Icon (line icons)
 ThubanPlanner/
   App/       ThubanPlannerApp (window, menus: New Class ⌘N, Go ⌘1–⌘4, Settings ⌘,, Route ▸ Calculate ⌘R / Fit ⌘0,
-             Schedule ▸ Previous / Next ⌘[ ⌘], Block Times ⌘B, Copy CRNs ⇧⌘C, Refresh Sections ⇧⌘R),
-             Schedule/ (ScheduleModel — the tab's own @Observable model, `app.scheduleTab`),
+             Schedule ▸ Previous / Next ⌘[ ⌘], Block Times ⌘B, Copy CRNs ⇧⌘C, Export to Banner… ⇧⌘E, Refresh
+             Sections ⇧⌘R), Schedule/ (ScheduleModel — the tab's own @Observable model, `app.scheduleTab`;
+             ScheduleModel+Export — sign-in state and the export flow; BannerWebSession — WebKit store, guards,
+             BannerPlanExporter),
              AppModel (+Queries, +Mutations, +Import), Routes (AppSection, SettingsPane, ThubanScheme),
              AppIconRenderer (live dock icon), SmokeHarness, Smoke/SmokeScenes (registry, pre-wired)
   Views/Shell        ShellView: TitleBar (mark + serif "Thuban Planner", StatusChip), SectionBar (SectionTabs + the
@@ -89,7 +93,8 @@ ThubanPlanner/
   Views/Route        RouteView, RouteToolbar, RouteSmokeScenes                                    (B)
   Views/ClassDetail  ClassDetailSheet, ClassDetailSmokeScenes                                     (B)
   Views/Schedule     ScheduleView, ScheduleToolbar, ScheduleSidebar, ScheduleCourseCard, ScheduleWeekGrid,
-                     ScheduleClassDetailSheet, ScheduleRatingCard, ScheduleSortControl,
+                     ScheduleClassDetailSheet, ScheduleRatingCard, ScheduleSortControl, ScheduleSignInSheet,
+                     ScheduleExportSheet,
                      ScheduleTheme (course colours), ScheduleSmokeScenes
   Views/Settings     SettingsView (nav), SettingsToolbar, SettingsChrome, SettingsPaneHeader, PlanningSettings,
                      AppearanceSettings (working), ImportSettings, DataSettings, AboutSettings, SettingsSmokeScenes (C)
@@ -352,10 +357,13 @@ Planner" (switches to Planner, selects the row, dismisses) and Done (default). E
 
 ### Schedule — `Views/Schedule`, `App/Schedule`, core `Registration/` (section ⌘3)
 
-Builds every weekly timetable for a UNC Charlotte term from the classes planned for it. STRICTLY READ-ONLY against
-Banner and it NEVER SIGNS IN (sign-in and the Plan Ahead reader were removed 2026-09-30 at the user's request): it
-only reads UNC Charlotte's public class search. It never registers or saves a term; the user copies the CRNs and
-registers in Banner themselves.
+Builds every weekly timetable for a UNC Charlotte term from the classes planned for it, from UNC Charlotte's PUBLIC
+class search (no sign-in needed). One optional write, only on the user's explicit confirmation: "Export to Banner…"
+creates a NEW Plan Ahead plan from the timetable on screen, in a session the user signed in to themselves on UNC
+Charlotte's own page. It never registers, never saves a term, never changes or deletes an existing plan; the user
+registers in Banner themselves. (History: a read-only sign-in + Plan Ahead reader shipped in 4df99f3, was removed in
+e0fa079 at the user's request, and sign-in came back 2026-09-30 for export only — the "Banner plan" course source did
+not come back.)
 
 - **Model**: `app.scheduleTab` (`ScheduleModel`, `@MainActor @Observable`, owned by `AppModel`; activated the first time
   the tab shows). Rows (`ScheduleCourseRow`) are the classes `app.schedule` (the route) places in the term, minus
@@ -422,18 +430,70 @@ registers in Banner themselves.
   grouped into people; one → found, several → the one whose RMP department fits the course subject
   (`RMPDepartments`), else ambiguous. `RMPRating`: avgRating / avgDifficulty = Σ(x × n) / Σ n over profiles with
   ratings; would-take-again weighted the same, skipping −1; total = Σ n.
-- **No sign-in**: nothing in the app signs in, opens a web view, or reads any browser's cookies. Earlier builds had a
-  WebKit sign-in; on first activation `ScheduleModel` once removes any uncc.edu website data it left
-  (`didForgetBannerSignIn` in UserDefaults). Old schedule.json / cache keys (source, planSequence, unpinnedPlanCourses,
-  plans) are ignored on load.
-- **Read-only enforcement**: `BannerRequestGuard.check` (app-made requests: HTTPS selfservice.uncc.edu
-  /StudentRegistrationSsb/ only, GET, POST only to `term/search` and `classSearch/resetDataForm`) and the deny list
-  (submitPlan, addPlanItem, deletePlan, makePreferred, savePlanNote, markApproved, saveTerm, classRegistration/submit,
-  addRegistrationItem, addCRNRegistrationItems, register) applied to every URLSession request and redirect.
+- **Sign-in (optional; `App/Schedule/BannerWebSession.swift`, `Views/Schedule/ScheduleSignInSheet.swift`)**: the app
+  never signs in by itself. The sheet opens only when the user clicks "Sign in" in the sidebar's account footer
+  ("UNC Charlotte account · Not signed in · Sign in" / "Signed in as X · Sign out" / "Signed in earlier" / "Sign-in
+  ended") or starts an export while signed out. It is an embedded WKWebView on `WKWebsiteDataStore.default()` showing
+  `term/termSelection?mode=plan` → UNC Charlotte's own CAS / Shibboleth page (webauth.uncc.edu); the app never sees or
+  stores the password (no Keychain) and never reads another browser's cookies. Signed in = back on selfservice
+  StudentRegistrationSsb (not a sign-in URL) with a non-empty `<meta name="fullName">`, or after passing a sign-in
+  page in this sheet. Activation only checks locally whether uncc.edu cookies exist ("Signed in earlier"). Sign out
+  deletes every uncc.edu cookie and website-data record. The old one-time `forgetOldBannerSignIn` cleanup is DELETED
+  (it can never wipe a new sign-in); its `didForgetBannerSignIn` default is simply ignored.
+- **Export to Banner… (`ScheduleModel+Export.swift`, `Views/Schedule/ScheduleExportSheet.swift`, core
+  `BannerPlanExport`)**: CRN strip button + Schedule ▸ Export to Banner… (⇧⌘E), enabled when a timetable is shown.
+  Signed out → sign-in sheet first ("Continue to export"). Then the 680 × 720 confirmation sheet: editable plan name
+  (default "Thuban · Spring 2027 · Schedule 3", count / limit), term + Banner code + schedule number, every section
+  (code, section, title, times, credits, CRN; a linked set adds each CRN, credits once per course), and the notes
+  "Creates a NEW plan in Plan Ahead. Does not register you or change existing plans." + "You have 2 of 5 plans…"
+  (read while the sheet shows "Checking your Plan Ahead plans…" — read-only). At Banner's limit (planCount >=
+  maxPlans; UNC Charlotte documents 5 a term) the sheet says so and export is impossible ("delete a plan in Banner").
+  Only "Create plan" writes: it mints a `BannerExportAuthorization` for exactly that term + CRNs and runs the hidden
+  exporter; progress per step; then success ("Plan “…” created with 5 classes", checked against Banner, "Open Plan
+  Ahead" → default browser) or a precise failure with Banner's message, saying whether anything was written ("Try
+  again" only when nothing was). A running write can't be dismissed.
+- **Export request sequence (`BannerPlanExporter`, hidden WKWebView, same store)**: (1) GET term/termSelection?mode=plan
+  (sign-in page → signed out → sign-in sheet); (2) POST term/search?mode=plan `term=<code>&studyPath=…` (read-only);
+  (3) GET plan/selectPlan → `window.bootstraps` planCount / maxPlans / existing sequence numbers (stop if full);
+  (4) GET plan/plan → must be a NEW empty plan (`selectedPlan.planHeader.sequenceNumber` empty, no planCourses —
+  otherwise stop, nothing sent); `#saveButton[data-plan-save-endpoint]` + "/batch" and `#addPlanItem[data-endpoint]`
+  must be the expected URLs when present; `#txt_planDesc` maxlength (if any) checks the name; (5) per CRN POST
+  plan/addPlanItem `term=…&courseReferenceNumber=…&section=section` (form, as the page's jQuery sends it) → `{success,
+  model}`; any rejection stops with "No plan was saved"; (6) ONE POST plan/submitPlan/batch, `application/json`,
+  `{"create":[<each model + headerDescription:name, headerComment:null>],"update":[],"destroy":[]}`; answer `{success,
+  data:{planHeader:{sequenceNumber}, create:[{messages:[{type}]}]}}` or `{success:false, message:[{message,type}]}`;
+  (7) GET plan/selectPlan and verify a plan (by the returned sequence, else a new plan with that name) has exactly the
+  CRNs. Requests are built and guarded in Swift, sent with `fetch` (credentials, `X-Synchronizer-Token` from the page's
+  meta, `X-Requested-With: XMLHttpRequest`) via `callAsyncJavaScript` in a private content world ("thuban-export").
+  Dry run: `THUBAN_PLANNER_EXPORT_DRY_RUN=1` skips sign-in and all network, logs every planned request (os_log
+  org.thuban.planner + stdout) and shows a "Dry run finished" state. The smoke run (offline) behaves like a dry run.
+- **What is from source vs guessed**: FROM UNC CHARLOTTE'S JS (planView-mf.js, bannerWeb-mf-22d3cf2a…js): the
+  addPlanItem form body and response handling; new plan = collection id "pnew" when planHeader.sequenceNumber is
+  empty; the name dialog sets headerDescription / headerComment on every dirty model; `Collection.save` batch =
+  POST `<save endpoint>/batch` JSON {create, update, destroy} and its response handling; the synchronizer-token
+  prefilter; planCount / maxPlans disabling "Create a New Plan". FROM lwgw/UCR-Course-Scheduler term_plan.py (a working
+  Banner 9 client elsewhere): the URLs plan/addPlanItem and plan/submitPlan/batch, opening plan/plan after
+  term/search, create-only batches. GUESSED / UNVERIFIED: that GET plan/plan opens a new plan at UNC Charlotte (guarded
+  by the new-empty check); whether addPlanItem models carry an id (they are sent as `create` like the UCR script); the
+  name limit (fallback 60 unless the page has a maxlength); success / error shapes beyond the JS handlers (synthetic
+  fixtures). NOTHING of the write path has run against UNC Charlotte — the user's first export is the real test.
+- **Enforcement (`BannerRequestGuard`)**: registration is denied everywhere, always — classregistration/,
+  addRegistrationItem, addCRNRegistrationItems, submitRegistration, "register", saveTerm; existing-plan writes are
+  denied everywhere, always — deletePlan, makePreferred, savePlanNote, markApproved. addPlanItem and submitPlan are
+  denied by default and allowed ONLY with a live `BannerExportAuthorization`: POST, no query, exact paths, one
+  addPlanItem per confirmed CRN (form keys term / courseReferenceNumber / section=section, confirmed term), then one
+  batch after every add, with empty update / destroy and create items = exactly the confirmed CRNs (term, when
+  present, the confirmed one); revoked when the export ends. App-made read requests: HTTPS selfservice.uncc.edu
+  /StudentRegistrationSsb/ only, GET, POST only to term/search and classSearch/resetDataForm. Web views: navigations
+  to any denied fragment are cancelled (`checkBrowser`); the sign-in view's content rules block every denied
+  fragment; the export view's rules block registration + existing-plan writes and a document-start page-world fence
+  script makes Banner's own fetch / XHR to any denied endpoint fail, while the exporter's guarded fetches run in their
+  own content world. Fragments are matched case-insensitively on the raw and percent-decoded URL.
+- Old schedule.json / cache keys (source, planSequence, unpinnedPlanCourses, plans) are ignored on load.
 - **Screen**: 340 pt sidebar (semester menu, class cards that
-  expand to sections with include checkboxes and a pin, "Add a class", filters) | header ("Schedule 3 of 128", credits
+  expand to sections with include checkboxes and a pin, "Add a class", filters; a pinned "UNC Charlotte account" footer) | header ("Schedule 3 of 128", credits
   · days · span · gaps, sort menu, ◀ ▶ and ←/→) | week grid (Mon–Fri, weekends when used; 7 AM–10 PM widened as needed,
-  30-minute rules; course-coloured meetings, hatched blocks) | CRN strip + Copy CRNs. "Block times" (toolbar, ⌘B):
+  30-minute rules; course-coloured meetings, hatched blocks) | CRN strip + Copy CRNs + Export to Banner…. "Block times" (toolbar, ⌘B):
   drag to add a block (15-minute snap), click one to rename / retime / delete. States: loading terms, can't reach
   Banner (Try again), no classes, finding sections, couldn't load sections, "Why
   nothing fits" card over the grid. Course colours: `ScheduleTheme` (accent, pos, neg, accent turned round the wheel,
@@ -448,7 +508,14 @@ registers in Banner themselves.
   weighting, exclusions, unscored last, combined sorts in both orders, single-list parity, old / new sort decoding),
   `RateMyProfessorsTests` (name parsing, matching: exact / nickname / initial / hyphenated / duplicates / two pages /
   ambiguous / none / other school, weighted average incl. 0 ratings and −1, guard, client flow on a fake transport,
-  cache round trip + freshness; fixtures in `Fixtures/rmp/`, one marked synthetic). Live, public, read-only checks:
+  cache round trip + freshness; fixtures in `Fixtures/rmp/`, one marked synthetic), `BannerPlanTests` (bootstraps
+  parser: reconstructed fixture, tolerant variants, HTML fallback), `BannerPlanExportTests` (items / credits /
+  times from a timetable incl. a linked set, default name + limits, exact addPlanItem and batch bodies, dry-run plan
+  passing one authorization, response parsing incl. errors / HTML, plan-page info + maxPlans, verification) and
+  `BannerExportGuardTests` (writes denied without authorization; registration and existing-plan writes never, even
+  with one; scope: CRN, term, fields, once per CRN, batch only after all adds, create-only, once; revoked; content
+  rule lists and fence). Response fixtures `banner/addPlanItem-success.json` / `submitPlan-success.json` are marked
+  SYNTHETIC. Live, public, read-only checks:
   `THUBAN_PLANNER_LIVE_BANNER=1 scripts/test.sh` (term list + one MEGR 2144 search);
   `THUBAN_PLANNER_LIVE_RMP=1 scripts/test.sh` (three PHYS instructors on both UNCC RMP pages, ~10 requests).
 
@@ -506,7 +573,7 @@ Always undo state in `cleanup`. Look at your PNGs (Read tool) before you finish.
 
 - `DERIVED=.build/DerivedData-<you> scripts/build.sh` — ALWAYS a private DerivedData, run from your own worktree
   (see Git). Regenerates the project first.
-- `scripts/test.sh` — core tests (`swift test`, 205 tests (two live tests skipped) incl. 400 golden cases and the 3,200-case differential run against Atlas's JS). Add tests for core logic you add.
+- `scripts/test.sh` — core tests (`swift test`, 225 tests (two live tests skipped) incl. 400 golden cases and the 3,200-case differential run against Atlas's JS). Add tests for core logic you add.
 - `scripts/golden.sh` — regenerates the golden cases from Atlas's own scheduler (macOS JavaScriptCore; no Node).
 - `scripts/v8check.sh` — needs a real V8 (`node` / `deno`, or `V8_NODE=<Electron binary>`): checks the V8 sort port's
   comparator call order against V8's own sort and regenerates the golden cases on V8's own sort, diffing them with the

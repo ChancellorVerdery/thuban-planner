@@ -3,7 +3,6 @@ import Foundation
 import Observation
 import ThubanPlannerCore
 import os
-import WebKit
 
 /// A course row in the Schedule sidebar: where it came from, its (effective) pin, and what Banner said about it.
 struct ScheduleCourseRow: Identifiable, Hashable {
@@ -46,8 +45,10 @@ enum SchedulePhase: Equatable {
 /// their sections (fetched one course at a time, cached), the user's exclusions / pins / blocked times / filters /
 /// sort (schedule.json), and the generated timetables. Views read it as `app.scheduleTab`.
 ///
-/// Banner access: ONLY the public class search (no sign-in, ever), through `BannerClient` on an anonymous ephemeral
-/// URLSession. Every request is checked by `BannerRequestGuard`; the tab is strictly read-only.
+/// Banner access: the class search is the PUBLIC one (no sign-in), through `BannerClient` on an anonymous ephemeral
+/// URLSession. Signing in is optional and only for "Export to Banner…" (ScheduleModel+Export): the user signs in on
+/// UNC Charlotte's own page in a WebKit sheet, and the export — after the user confirms — creates ONE new Plan Ahead
+/// plan in that session. Every request is checked by `BannerRequestGuard`; registration is never possible.
 @MainActor
 @Observable
 final class ScheduleModel {
@@ -90,6 +91,18 @@ final class ScheduleModel {
     /// The sort popover is open.
     var sortMenuOpen = false
 
+    // Sign-in and export (see ScheduleModel+Export.swift).
+    /// UNC Charlotte sign-in state (the app's own WebKit store; never a password, never another browser's cookies).
+    var auth: ScheduleAuth = .signedOut
+    /// The sign-in sheet is open.
+    var showSignIn = false
+    /// The export sheet's state (nil = closed).
+    var exportDraft: ScheduleExportDraft?
+    /// Open the export once the sign-in sheet closes signed in.
+    @ObservationIgnored var exportAfterSignIn = false
+    @ObservationIgnored var exporter: BannerPlanExporter?
+    @ObservationIgnored var exportTask: Task<Void, Never>?
+
     /// Rate My Professors lookups and cache.
     let ratings: ScheduleRatings
     /// CRN → professor rating for the term's loaded sections (from the RMP cache).
@@ -124,7 +137,7 @@ final class ScheduleModel {
             seedOfflineSample()
             return
         }
-        Self.forgetOldBannerSignIn()
+        checkStoredSignIn()
         loadTerms()
     }
 
@@ -593,21 +606,6 @@ final class ScheduleModel {
         guard offline else { return }
         if let blockMode { self.blockMode = blockMode }
         if let change { updateState(change) }
-    }
-
-    /// Earlier builds could sign in to UNC Charlotte in an embedded browser. Sign-in is gone; once, wipe any
-    /// cookies / site data that browser kept for uncc.edu.
-    private static func forgetOldBannerSignIn() {
-        let key = "didForgetBannerSignIn"
-        guard !UserDefaults.standard.bool(forKey: key) else { return }
-        let store = WKWebsiteDataStore.default()
-        let types = WKWebsiteDataStore.allWebsiteDataTypes()
-        store.fetchDataRecords(ofTypes: types) { records in
-            let uncc = records.filter { $0.displayName.lowercased().contains("uncc.edu") }
-            store.removeData(ofTypes: types, for: uncc) {
-                UserDefaults.standard.set(true, forKey: key)
-            }
-        }
     }
 
     /// SMOKE ONLY: opens the class detail for the current timetable's first class with these instructors (and, when

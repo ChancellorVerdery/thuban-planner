@@ -1,9 +1,10 @@
 import SwiftUI
 import ThubanPlannerCore
 
-/// The Schedule section (⌘3): pick a Banner term, take the classes from the Banner plan or Thuban's route, fetch
-/// their sections, and page through every timetable that fits (with blocked times). Sidebar on the left, the week
-/// grid on the right. Read-only against Banner: the user registers in Banner themselves with the copied CRNs.
+/// The Schedule section (⌘3): pick a Banner term, take the classes from Thuban's route (plus added ones), fetch their
+/// sections, and page through every timetable that fits (with blocked times). Sidebar on the left, the week grid on
+/// the right. "Export to Banner…" (CRN strip, ⇧⌘E) creates a new Plan Ahead plan after the user signs in and
+/// confirms; it never registers — the user registers in Banner themselves.
 struct ScheduleView: View {
     @Environment(AppModel.self) private var app
     @Environment(\.thubanTheme) private var theme
@@ -36,6 +37,16 @@ struct ScheduleView: View {
         }
         .sheet(item: Binding(get: { model.detail }, set: { model.detail = $0 })) { item in
             ScheduleClassDetailSheet(item: item)
+                .environment(app)
+                .environment(\.thubanTheme, theme)
+        }
+        .sheet(isPresented: Binding(get: { model.showSignIn }, set: { model.showSignIn = $0 })) {
+            ScheduleSignInSheet()
+                .environment(app)
+                .environment(\.thubanTheme, theme)
+        }
+        .sheet(item: Binding(get: { model.exportDraft }, set: { if $0 == nil { model.closeExport() } })) { item in
+            ScheduleExportSheet(draft: model.exportDraft ?? item)
                 .environment(app)
                 .environment(\.thubanTheme, theme)
         }
@@ -245,6 +256,12 @@ private struct ScheduleCRNStrip: View {
                 }
                 .buttonStyle(SecondaryButtonStyle(height: 32))
                 .help("Copies \(model.currentCRNText) — paste them into Banner’s registration yourself.")
+                Button { model.beginExport() } label: {
+                    HStack(spacing: 7) { Icon(.download, size: 15); Text("Export to Banner…") }
+                }
+                .buttonStyle(PrimaryButtonStyle(height: 32))
+                .disabled(!model.canExport)
+                .help("Create a new Plan Ahead plan in Banner with these sections (⇧⌘E). You confirm first; it never registers you.")
             }
             .padding(.horizontal, 28)
             .frame(height: 52)

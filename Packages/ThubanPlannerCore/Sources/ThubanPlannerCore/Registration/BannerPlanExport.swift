@@ -44,6 +44,13 @@ public struct BannerExportRequest: Hashable, Sendable {
     public var contentType: String
     public var body: Data
 
+    public init(method: String, url: URL, contentType: String, body: Data) {
+        self.method = method
+        self.url = url
+        self.contentType = contentType
+        self.body = body
+    }
+
     public var bodyText: String { String(decoding: body, as: UTF8.self) }
 
     /// One line for the log / dry run: "POST https://… [application/json] {…}".

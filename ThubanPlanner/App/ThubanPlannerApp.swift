@@ -50,6 +50,9 @@ struct ThubanPlannerApp: App {
                 Button("Copy CRNs") { appModel.scheduleTab.copyCRNs() }
                     .keyboardShortcut("c", modifiers: [.command, .shift])
                     .disabled(appModel.section != .schedule || appModel.scheduleTab.currentOption == nil)
+                Button("Export to Banner…") { appModel.scheduleTab.beginExport() }
+                    .keyboardShortcut("e", modifiers: [.command, .shift])
+                    .disabled(appModel.section != .schedule || !appModel.scheduleTab.canExport)
                 Button("Refresh Sections") { appModel.scheduleTab.refreshAllSections() }
                     .keyboardShortcut("r", modifiers: [.command, .shift])
                     .disabled(appModel.section != .schedule || appModel.scheduleTab.rows.isEmpty)
