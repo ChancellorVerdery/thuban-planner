@@ -1,0 +1,47 @@
+{
+ "data": {
+  "newSearch": {
+   "teachers": {
+    "edges": [
+     {
+      "node": {
+       "avgDifficulty": 2.6,
+       "avgRating": 4.1,
+       "department": "Science",
+       "firstName": "Ritchie",
+       "id": "VGVhY2hlci0zMDQwNTc2",
+       "lastName": "Dudley",
+       "legacyId": 3040576,
+       "numRatings": 7,
+       "school": {
+        "id": "U2Nob29sLTEyNTM=",
+        "legacyId": 1253,
+        "name": "University of North Carolina at Charlotte"
+       },
+       "wouldTakeAgainPercent": 87.5
+      }
+     },
+     {
+      "node": {
+       "avgDifficulty": 0,
+       "avgRating": 0,
+       "department": "Kinesiology",
+       "firstName": "Joanna",
+       "id": "VGVhY2hlci0yNzYwNDE1",
+       "lastName": "Dudley",
+       "legacyId": 2760415,
+       "numRatings": 0,
+       "school": {
+        "id": "U2Nob29sLTEyNTM=",
+        "legacyId": 1253,
+        "name": "University of North Carolina at Charlotte"
+       },
+       "wouldTakeAgainPercent": -1
+      }
+     }
+    ],
+    "resultCount": 2
+   }
+  }
+ }
+}

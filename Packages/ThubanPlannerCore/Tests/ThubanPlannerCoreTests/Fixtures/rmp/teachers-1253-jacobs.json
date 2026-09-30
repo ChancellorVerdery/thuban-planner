@@ -1,0 +1,29 @@
+{
+ "data": {
+  "newSearch": {
+   "teachers": {
+    "edges": [
+     {
+      "node": {
+       "avgDifficulty": 5,
+       "avgRating": 1,
+       "department": "Economics",
+       "firstName": "Molly",
+       "id": "VGVhY2hlci0yMTEwMTQx",
+       "lastName": "Jacobs",
+       "legacyId": 2110141,
+       "numRatings": 4,
+       "school": {
+        "id": "U2Nob29sLTEyNTM=",
+        "legacyId": 1253,
+        "name": "University of North Carolina at Charlotte"
+       },
+       "wouldTakeAgainPercent": -1
+      }
+     }
+    ],
+    "resultCount": 1
+   }
+  }
+ }
+}

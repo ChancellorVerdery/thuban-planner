@@ -1,0 +1,281 @@
+{
+ "data": {
+  "newSearch": {
+   "teachers": {
+    "edges": [
+     {
+      "node": {
+       "avgDifficulty": 3.6,
+       "avgRating": 2.7,
+       "department": "Mathematics",
+       "firstName": "Zhiyi",
+       "id": "VGVhY2hlci01Mzc0",
+       "lastName": "Zhang",
+       "legacyId": 5374,
+       "numRatings": 120,
+       "school": {
+        "id": "U2Nob29sLTEyNTM=",
+        "legacyId": 1253,
+        "name": "University of North Carolina at Charlotte"
+       },
+       "wouldTakeAgainPercent": 22.807
+      }
+     },
+     {
+      "node": {
+       "avgDifficulty": 1.7,
+       "avgRating": 2.9,
+       "department": "Mathematics",
+       "firstName": "Hao",
+       "id": "VGVhY2hlci0xMjU3MjUw",
+       "lastName": "Zhang",
+       "legacyId": 1257250,
+       "numRatings": 6,
+       "school": {
+        "id": "U2Nob29sLTEyNTM=",
+        "legacyId": 1253,
+        "name": "University of North Carolina at Charlotte"
+       },
+       "wouldTakeAgainPercent": 0
+      }
+     },
+     {
+      "node": {
+       "avgDifficulty": 2.9,
+       "avgRating": 4,
+       "department": "Computer Science",
+       "firstName": "Xiang",
+       "id": "VGVhY2hlci0yODQ1ODI1",
+       "lastName": "Zhang",
+       "legacyId": 2845825,
+       "numRatings": 16,
+       "school": {
+        "id": "U2Nob29sLTEyNTM=",
+        "legacyId": 1253,
+        "name": "University of North Carolina at Charlotte"
+       },
+       "wouldTakeAgainPercent": 76.4706
+      }
+     },
+     {
+      "node": {
+       "avgDifficulty": 3.7,
+       "avgRating": 3.3,
+       "department": "Mechanical Engineering",
+       "firstName": "Haitao",
+       "id": "VGVhY2hlci05MTg0NzA=",
+       "lastName": "Zhang",
+       "legacyId": 918470,
+       "numRatings": 15,
+       "school": {
+        "id": "U2Nob29sLTEyNTM=",
+        "legacyId": 1253,
+        "name": "University of North Carolina at Charlotte"
+       },
+       "wouldTakeAgainPercent": 44.4444
+      }
+     },
+     {
+      "node": {
+       "avgDifficulty": 4.1,
+       "avgRating": 2.6,
+       "department": "Business",
+       "firstName": "Dongsong",
+       "id": "VGVhY2hlci0yNDcwNTY1",
+       "lastName": "Zhang",
+       "legacyId": 2470565,
+       "numRatings": 14,
+       "school": {
+        "id": "U2Nob29sLTEyNTM=",
+        "legacyId": 1253,
+        "name": "University of North Carolina at Charlotte"
+       },
+       "wouldTakeAgainPercent": 35.7143
+      }
+     },
+     {
+      "node": {
+       "avgDifficulty": 3.3,
+       "avgRating": 3.3,
+       "department": "Electrical Engineering",
+       "firstName": "Yong",
+       "id": "VGVhY2hlci0xNjMxNTAz",
+       "lastName": "Zhang",
+       "legacyId": 1631503,
+       "numRatings": 4,
+       "school": {
+        "id": "U2Nob29sLTEyNTM=",
+        "legacyId": 1253,
+        "name": "University of North Carolina at Charlotte"
+       },
+       "wouldTakeAgainPercent": 66.6667
+      }
+     },
+     {
+      "node": {
+       "avgDifficulty": 3.6,
+       "avgRating": 2.7,
+       "department": "Biology",
+       "firstName": "Jian",
+       "id": "VGVhY2hlci0zMjc4ODU=",
+       "lastName": "Zhang",
+       "legacyId": 327885,
+       "numRatings": 70,
+       "school": {
+        "id": "U2Nob29sLTEyNTM=",
+        "legacyId": 1253,
+        "name": "University of North Carolina at Charlotte"
+       },
+       "wouldTakeAgainPercent": 30
+      }
+     },
+     {
+      "node": {
+       "avgDifficulty": 3.1,
+       "avgRating": 3.9,
+       "department": "Finance & Business Law",
+       "firstName": "Yilei",
+       "id": "VGVhY2hlci0yMzE4MDI2",
+       "lastName": "Zhang",
+       "legacyId": 2318026,
+       "numRatings": 10,
+       "school": {
+        "id": "U2Nob29sLTEyNTM=",
+        "legacyId": 1253,
+        "name": "University of North Carolina at Charlotte"
+       },
+       "wouldTakeAgainPercent": 70
+      }
+     },
+     {
+      "node": {
+       "avgDifficulty": 2.9,
+       "avgRating": 3.9,
+       "department": "Computer Science",
+       "firstName": "Shaoting",
+       "id": "VGVhY2hlci0xOTIxMDk5",
+       "lastName": "Zhang",
+       "legacyId": 1921099,
+       "numRatings": 9,
+       "school": {
+        "id": "U2Nob29sLTEyNTM=",
+        "legacyId": 1253,
+        "name": "University of North Carolina at Charlotte"
+       },
+       "wouldTakeAgainPercent": 66.6667
+      }
+     },
+     {
+      "node": {
+       "avgDifficulty": 1.8,
+       "avgRating": 4.3,
+       "department": "Mathematics  Statistics",
+       "firstName": "Jialin",
+       "id": "VGVhY2hlci0yMTI2NTgx",
+       "lastName": "Zhang",
+       "legacyId": 2126581,
+       "numRatings": 6,
+       "school": {
+        "id": "U2Nob29sLTEyNTM=",
+        "legacyId": 1253,
+        "name": "University of North Carolina at Charlotte"
+       },
+       "wouldTakeAgainPercent": 66.6667
+      }
+     },
+     {
+      "node": {
+       "avgDifficulty": 3.3,
+       "avgRating": 2.8,
+       "department": "Information Systems",
+       "firstName": "Peiqin Zhang",
+       "id": "VGVhY2hlci0xNjg2ODU1",
+       "lastName": "Xun Li",
+       "legacyId": 1686855,
+       "numRatings": 4,
+       "school": {
+        "id": "U2Nob29sLTEyNTM=",
+        "legacyId": 1253,
+        "name": "University of North Carolina at Charlotte"
+       },
+       "wouldTakeAgainPercent": -1
+      }
+     },
+     {
+      "node": {
+       "avgDifficulty": 4.3,
+       "avgRating": 3.3,
+       "department": "Mathematics",
+       "firstName": "Xing",
+       "id": "VGVhY2hlci0xNTAyNDAy",
+       "lastName": "Zhang",
+       "legacyId": 1502402,
+       "numRatings": 3,
+       "school": {
+        "id": "U2Nob29sLTEyNTM=",
+        "legacyId": 1253,
+        "name": "University of North Carolina at Charlotte"
+       },
+       "wouldTakeAgainPercent": -1
+      }
+     },
+     {
+      "node": {
+       "avgDifficulty": 3.3,
+       "avgRating": 2.3,
+       "department": "Finance & Business Law",
+       "firstName": "Xinde",
+       "id": "VGVhY2hlci0xMjY5MDAy",
+       "lastName": "Zhang",
+       "legacyId": 1269002,
+       "numRatings": 6,
+       "school": {
+        "id": "U2Nob29sLTEyNTM=",
+        "legacyId": 1253,
+        "name": "University of North Carolina at Charlotte"
+       },
+       "wouldTakeAgainPercent": -1
+      }
+     },
+     {
+      "node": {
+       "avgDifficulty": 0,
+       "avgRating": 0,
+       "department": "Mathematics  Statistics",
+       "firstName": "Meijiao",
+       "id": "VGVhY2hlci0xOTI2MTkw",
+       "lastName": "Zhang",
+       "legacyId": 1926190,
+       "numRatings": 0,
+       "school": {
+        "id": "U2Nob29sLTEyNTM=",
+        "legacyId": 1253,
+        "name": "University of North Carolina at Charlotte"
+       },
+       "wouldTakeAgainPercent": -1
+      }
+     },
+     {
+      "node": {
+       "avgDifficulty": 0,
+       "avgRating": 0,
+       "department": "Mathematics",
+       "firstName": "Kelsey",
+       "id": "VGVhY2hlci0zMTQ2MTU1",
+       "lastName": "Zhang",
+       "legacyId": 3146155,
+       "numRatings": 0,
+       "school": {
+        "id": "U2Nob29sLTEyNTM=",
+        "legacyId": 1253,
+        "name": "University of North Carolina at Charlotte"
+       },
+       "wouldTakeAgainPercent": -1
+      }
+     }
+    ],
+    "resultCount": 15
+   }
+  }
+ }
+}

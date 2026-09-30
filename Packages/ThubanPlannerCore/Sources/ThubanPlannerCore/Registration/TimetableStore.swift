@@ -12,25 +12,48 @@ public struct TimetableTermState: Codable, Hashable, Sendable {
     public var pins: [String: String]
     public var blocks: [TimetableBlock]
     public var filters: TimetableFilters
-    public var sort: TimetableSort
+    /// Sort criteria in priority order (never empty; no duplicates).
+    public var sorts: [TimetableSort] {
+        didSet { let n = TimetableSort.normalizedList(sorts); if n != sorts { sorts = n } }
+    }
+    /// The first criterion; setting it replaces the whole list with just that one.
+    public var sort: TimetableSort {
+        get { sorts.first ?? .fewestDays }
+        set { sorts = [newValue] }
+    }
     /// The timetable last shown (0-based).
     public var selectedIndex: Int
 
     public init(addedCourses: [String] = [], removedCourses: [String] = [],
                 excludedCRNs: [String] = [], pins: [String: String] = [:], blocks: [TimetableBlock] = [],
-                filters: TimetableFilters = TimetableFilters(), sort: TimetableSort = .fewestDays, selectedIndex: Int = 0) {
+                filters: TimetableFilters = TimetableFilters(), sort: TimetableSort = .fewestDays, sorts: [TimetableSort]? = nil,
+                selectedIndex: Int = 0) {
         self.addedCourses = addedCourses
         self.removedCourses = removedCourses
         self.excludedCRNs = excludedCRNs
         self.pins = pins
         self.blocks = blocks
         self.filters = filters
-        self.sort = sort
+        self.sorts = TimetableSort.normalizedList(sorts ?? [sort])
         self.selectedIndex = selectedIndex
     }
 
     enum CodingKeys: String, CodingKey {
-        case addedCourses, removedCourses, excludedCRNs, pins, blocks, filters, sort, selectedIndex
+        case addedCourses, removedCourses, excludedCRNs, pins, blocks, filters, sort, sorts, selectedIndex
+    }
+
+    /// Writes `sorts` and, for older builds, `sort` (the first criterion).
+    public func encode(to encoder: Encoder) throws {
+        var c = encoder.container(keyedBy: CodingKeys.self)
+        try c.encode(addedCourses, forKey: .addedCourses)
+        try c.encode(removedCourses, forKey: .removedCourses)
+        try c.encode(excludedCRNs, forKey: .excludedCRNs)
+        try c.encode(pins, forKey: .pins)
+        try c.encode(blocks, forKey: .blocks)
+        try c.encode(filters, forKey: .filters)
+        try c.encode(sort, forKey: .sort)
+        try c.encode(sorts, forKey: .sorts)
+        try c.encode(selectedIndex, forKey: .selectedIndex)
     }
 
     public init(from decoder: Decoder) throws {
@@ -41,7 +64,11 @@ public struct TimetableTermState: Codable, Hashable, Sendable {
         pins = (try? c.decodeIfPresent([String: String].self, forKey: .pins)) ?? [:]
         blocks = (try? c.decodeIfPresent([TimetableBlock].self, forKey: .blocks)) ?? []
         filters = (try? c.decodeIfPresent(TimetableFilters.self, forKey: .filters)) ?? TimetableFilters()
-        sort = (try? c.decodeIfPresent(TimetableSort.self, forKey: .sort)) ?? .fewestDays
+        // `sorts` (a list; unknown entries skipped), else an older file's single `sort`, else the default.
+        let list = ((try? c.decodeIfPresent([JSONValue].self, forKey: .sorts)) ?? nil)?
+            .compactMap { $0.stringValue.flatMap(TimetableSort.init(rawValue:)) } ?? []
+        let single = (try? c.decodeIfPresent(TimetableSort.self, forKey: .sort)) ?? nil
+        sorts = TimetableSort.normalizedList(list.isEmpty ? single.map { [$0] } ?? [] : list)
         selectedIndex = max(0, (try? c.decodeIfPresent(Int.self, forKey: .selectedIndex)) ?? 0)
     }
 }

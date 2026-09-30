@@ -1,0 +1,191 @@
+{
+ "data": {
+  "newSearch": {
+   "teachers": {
+    "edges": [
+     {
+      "node": {
+       "avgDifficulty": 2.8,
+       "avgRating": 4,
+       "department": "African Studies",
+       "firstName": "Debra",
+       "id": "VGVhY2hlci0zMDk4MjUx",
+       "lastName": "Smith",
+       "legacyId": 3098251,
+       "numRatings": 5,
+       "school": {
+        "id": "U2Nob29sLTEyNTM=",
+        "legacyId": 1253,
+        "name": "University of North Carolina at Charlotte"
+       },
+       "wouldTakeAgainPercent": 80
+      }
+     },
+     {
+      "node": {
+       "avgDifficulty": 4,
+       "avgRating": 1.7,
+       "department": "Sociology",
+       "firstName": "Megan",
+       "id": "VGVhY2hlci0yNjQ1OTY2",
+       "lastName": "Smith",
+       "legacyId": 2645966,
+       "numRatings": 72,
+       "school": {
+        "id": "U2Nob29sLTEyNTM=",
+        "legacyId": 1253,
+        "name": "University of North Carolina at Charlotte"
+       },
+       "wouldTakeAgainPercent": 19.1781
+      }
+     },
+     {
+      "node": {
+       "avgDifficulty": 3.3,
+       "avgRating": 3.7,
+       "department": "Engineering",
+       "firstName": "Jake",
+       "id": "VGVhY2hlci0yOTA3MDMz",
+       "lastName": "Smithwick",
+       "legacyId": 2907033,
+       "numRatings": 3,
+       "school": {
+        "id": "U2Nob29sLTEyNTM=",
+        "legacyId": 1253,
+        "name": "University of North Carolina at Charlotte"
+       },
+       "wouldTakeAgainPercent": 50
+      }
+     },
+     {
+      "node": {
+       "avgDifficulty": 2.6,
+       "avgRating": 4.9,
+       "department": "Mechanical Engineering",
+       "firstName": "Kamia",
+       "id": "VGVhY2hlci0yNzM0NDM5",
+       "lastName": "Smith",
+       "legacyId": 2734439,
+       "numRatings": 40,
+       "school": {
+        "id": "U2Nob29sLTEyNTM=",
+        "legacyId": 1253,
+        "name": "University of North Carolina at Charlotte"
+       },
+       "wouldTakeAgainPercent": 97.619
+      }
+     },
+     {
+      "node": {
+       "avgDifficulty": 3.1,
+       "avgRating": 3.6,
+       "department": "International Studies",
+       "firstName": "Dale",
+       "id": "VGVhY2hlci0yMzAyMDEy",
+       "lastName": "Smith",
+       "legacyId": 2302012,
+       "numRatings": 29,
+       "school": {
+        "id": "U2Nob29sLTEyNTM=",
+        "legacyId": 1253,
+        "name": "University of North Carolina at Charlotte"
+       },
+       "wouldTakeAgainPercent": 65.5172
+      }
+     },
+     {
+      "node": {
+       "avgDifficulty": 3.7,
+       "avgRating": 2.5,
+       "department": "African-American Studies",
+       "firstName": "Dorothy",
+       "id": "VGVhY2hlci0xMjIxMzUz",
+       "lastName": "Smith-Ruiz",
+       "legacyId": 1221353,
+       "numRatings": 29,
+       "school": {
+        "id": "U2Nob29sLTEyNTM=",
+        "legacyId": 1253,
+        "name": "University of North Carolina at Charlotte"
+       },
+       "wouldTakeAgainPercent": 31.5789
+      }
+     },
+     {
+      "node": {
+       "avgDifficulty": 3.4,
+       "avgRating": 3.9,
+       "department": "Global & International Studies",
+       "firstName": "Dale",
+       "id": "VGVhY2hlci0yNDA1NTcx",
+       "lastName": "Smith",
+       "legacyId": 2405571,
+       "numRatings": 8,
+       "school": {
+        "id": "U2Nob29sLTEyNTM=",
+        "legacyId": 1253,
+        "name": "University of North Carolina at Charlotte"
+       },
+       "wouldTakeAgainPercent": 75
+      }
+     },
+     {
+      "node": {
+       "avgDifficulty": 2.3,
+       "avgRating": 4.3,
+       "department": "Ethnic Studies",
+       "firstName": "Debra C",
+       "id": "VGVhY2hlci03NTg3OQ==",
+       "lastName": "Smith",
+       "legacyId": 75879,
+       "numRatings": 51,
+       "school": {
+        "id": "U2Nob29sLTEyNTM=",
+        "legacyId": 1253,
+        "name": "University of North Carolina at Charlotte"
+       },
+       "wouldTakeAgainPercent": 82.6087
+      }
+     },
+     {
+      "node": {
+       "avgDifficulty": 4,
+       "avgRating": 2.7,
+       "department": "Mechanical Engineering",
+       "firstName": "Stuart ",
+       "id": "VGVhY2hlci0xOTg0ODMy",
+       "lastName": "Smith",
+       "legacyId": 1984832,
+       "numRatings": 6,
+       "school": {
+        "id": "U2Nob29sLTEyNTM=",
+        "legacyId": 1253,
+        "name": "University of North Carolina at Charlotte"
+       },
+       "wouldTakeAgainPercent": 50
+      }
+     },
+     {
+      "node": {
+       "avgDifficulty": 3.1,
+       "avgRating": 3.6,
+       "department": "Engineering",
+       "firstName": "Stuart",
+       "id": "VGVhY2hlci05ODk1NA==",
+       "lastName": "Smith",
+       "legacyId": 98954,
+       "numRatings": 9,
+       "school": {
+        "id": "U2Nob29sLTEyNTM=",
+        "legacyId": 1253,
+        "name": "University of North Carolina at Charlotte"
+       },
+       "wouldTakeAgainPercent": 66.6667
+      }
+     }
+    ],
+    "resultCount": 36
+   }
+  }
+ }
+}

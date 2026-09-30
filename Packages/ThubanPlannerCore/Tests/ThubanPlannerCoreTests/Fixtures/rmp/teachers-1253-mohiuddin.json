@@ -1,0 +1,29 @@
+{
+ "data": {
+  "newSearch": {
+   "teachers": {
+    "edges": [
+     {
+      "node": {
+       "avgDifficulty": 3.6,
+       "avgRating": 3.6,
+       "department": "Physics",
+       "firstName": "Farida",
+       "id": "VGVhY2hlci0xNzEwNDE1",
+       "lastName": "Mohiuddin-Jacobs",
+       "legacyId": 1710415,
+       "numRatings": 78,
+       "school": {
+        "id": "U2Nob29sLTEyNTM=",
+        "legacyId": 1253,
+        "name": "University of North Carolina at Charlotte"
+       },
+       "wouldTakeAgainPercent": 70.5882
+      }
+     }
+    ],
+    "resultCount": 1
+   }
+  }
+ }
+}

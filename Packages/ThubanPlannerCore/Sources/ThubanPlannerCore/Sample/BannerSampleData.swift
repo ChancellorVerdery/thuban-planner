@@ -29,7 +29,9 @@ public enum BannerSampleData {
         ([.tuesday, .thursday], 17 * 60 + 30, 18 * 60 + 45),
     ]
     private static let buildings = ["DUKE", "EPIC", "GRIGG", "CAMERON", "BURSON", "WOODWARD", "FRETWELL"]
-    private static let instructors = ["Harish Cherukuri", "Alireza Tabarraei", "Jun Xu", "Terry Xu", "Nate Fried", "Katie Gordon", "Umesh Silwal"]
+    /// Fictional instructors ("" = not assigned yet); `RMPSampleData` has their (fictional) ratings.
+    public static let instructors = ["Dana Whitfield", "Marcus Oyelaran", "Chen, L.", "Priya Raman", "Elena Brandt", "Tomas Reyes",
+                                     "Grace Okafor", "Owen Lindqvist", ""]
 
     /// FNV-1a: stable across launches (Swift's `Hasher` is seeded per process).
     static func stableHash(_ text: String) -> UInt64 {
@@ -82,7 +84,7 @@ public enum BannerSampleData {
                 seatsAvailable: seatsRaw, maximumEnrollment: isLab ? 24 : 60, enrollment: max(0, (isLab ? 24 : 60) - seatsRaw),
                 waitCapacity: 10, waitCount: seatsRaw <= 0 ? Int(h % 5) : 0, waitAvailable: 10,
                 openSection: seatsRaw > 0,
-                instructors: [instructors[Int((h >> UInt64(i + 7)) % UInt64(instructors.count))]],
+                instructors: [instructors[Int((h >> UInt64(i + 7)) % UInt64(instructors.count))]].filter { !$0.isEmpty },
                 meetings: [meeting])
         }
     }

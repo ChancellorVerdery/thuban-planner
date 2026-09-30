@@ -63,7 +63,7 @@ public struct TimetableFilters: Codable, Hashable, Sendable {
 
 /// How the list of timetables is ordered.
 public enum TimetableSort: String, Codable, CaseIterable, Sendable, Identifiable {
-    case fewestDays, fewestSessions, latestStart, earliestFinish, leastGaps, mostSeats
+    case fewestDays, fewestSessions, highestRated, latestStart, earliestFinish, leastGaps, mostSeats
 
     public var id: String { rawValue }
 
@@ -71,11 +71,35 @@ public enum TimetableSort: String, Codable, CaseIterable, Sendable, Identifiable
         switch self {
         case .fewestDays: return "Fewest class days"
         case .fewestSessions: return "Fewest class sessions"
+        case .highestRated: return "Highest professor rating"
         case .latestStart: return "Latest start"
         case .earliestFinish: return "Earliest finish"
         case .leastGaps: return "Least time between classes"
         case .mostSeats: return "Most open seats"
         }
+    }
+
+    /// Compact label for a list of criteria ("Fewest days → Highest rating").
+    public var shortLabel: String {
+        switch self {
+        case .fewestDays: return "Fewest days"
+        case .fewestSessions: return "Fewest sessions"
+        case .highestRated: return "Highest rating"
+        case .latestStart: return "Latest start"
+        case .earliestFinish: return "Earliest finish"
+        case .leastGaps: return "Least gaps"
+        case .mostSeats: return "Most seats"
+        }
+    }
+
+    /// The default priority list.
+    public static let defaultList: [TimetableSort] = [.fewestDays]
+
+    /// Unknown / duplicate criteria dropped (first occurrence wins); empty → the default list.
+    public static func normalizedList(_ list: [TimetableSort]) -> [TimetableSort] {
+        var seen = Set<TimetableSort>()
+        let unique = list.filter { seen.insert($0).inserted }
+        return unique.isEmpty ? defaultList : unique
     }
 }
 
@@ -300,6 +324,20 @@ public enum TimetableGenerator {
     public static func generate(courses rawCourses: [TimetableCourse], blocks: [TimetableBlock] = [],
                                 filters: TimetableFilters = TimetableFilters(), sort: TimetableSort = .fewestDays,
                                 limit: Int = defaultLimit) -> TimetableResult {
+        generate(courses: rawCourses, blocks: blocks, filters: filters, sort: sort, ratings: .empty, limit: limit)
+    }
+
+    /// `generate` with professor ratings for the `.highestRated` sort (`TimetableRatings`; ignored by other sorts).
+    public static func generate(courses rawCourses: [TimetableCourse], blocks: [TimetableBlock] = [],
+                                filters: TimetableFilters = TimetableFilters(), sort: TimetableSort = .fewestDays,
+                                ratings: TimetableRatings, limit: Int = defaultLimit) -> TimetableResult {
+        generate(courses: rawCourses, blocks: blocks, filters: filters, sorts: [sort], ratings: ratings, limit: limit)
+    }
+
+    /// `generate` with an ordered list of sort criteria (compared in order; see `sorted(_:by:ratings:)`).
+    public static func generate(courses rawCourses: [TimetableCourse], blocks: [TimetableBlock] = [],
+                                filters: TimetableFilters = TimetableFilters(), sorts: [TimetableSort],
+                                ratings: TimetableRatings = .empty, limit: Int = defaultLimit) -> TimetableResult {
         let courses = merge(rawCourses)
         guard !courses.isEmpty else { return TimetableResult(options: [], capped: false, limit: limit, reports: [], problems: []) }
 
@@ -394,7 +432,7 @@ public enum TimetableGenerator {
             let picks = vector.enumerated().map { c, i in TimetableOption.Pick(course: courses[c].code, choice: flat[i]) }
             return TimetableOption(picks: picks, metrics: TimetableMetrics.of(picks.flatMap(\.choice.sections)))
         }
-        options = sorted(options, by: sort)
+        options = sorted(options, by: sorts, ratings: ratings)
         return TimetableResult(options: options, capped: capped, limit: limit, reports: reports, problems: [])
     }
 
@@ -407,6 +445,50 @@ public enum TimetableGenerator {
         }.map(\.option)
     }
 
+    /// Sorts by one criterion with ratings (for `.highestRated`).
+    public static func sorted(_ options: [TimetableOption], by sort: TimetableSort, ratings: TimetableRatings) -> [TimetableOption] {
+        sorted(options, by: [sort], ratings: ratings)
+    }
+
+    /// Sorts by an ordered list of criteria: each criterion's own key in order (`primaryKey`), then the first
+    /// criterion's usual tie-breaks (`fallbackKey`: class days, gaps …), then the option id — deterministic. A single
+    /// criterion orders exactly like `sorted(_:by:)`. Highest professor rating puts scored timetables first, best
+    /// score first (to 1/10,000); unscored ones after every scored one.
+    public static func sorted(_ options: [TimetableOption], by rawSorts: [TimetableSort], ratings: TimetableRatings) -> [TimetableOption] {
+        let sorts = TimetableSort.normalizedList(rawSorts)
+        let keyed = options.map { option -> (option: TimetableOption, id: String, key: [Int]) in
+            let key = sorts.flatMap { primaryKey(option, $0, ratings) } + fallbackKey(option.metrics, sorts[0])
+            return (option, option.id, key)
+        }
+        return keyed.sorted { a, b in
+            if a.key != b.key { return a.key.lexicographicallyPrecedes(b.key) }
+            return a.id < b.id
+        }.map(\.option)
+    }
+
+    /// The criterion's own measure (smaller is better).
+    static func primaryKey(_ option: TimetableOption, _ sort: TimetableSort, _ ratings: TimetableRatings) -> [Int] {
+        let m = option.metrics
+        let start = m.earliestStart ?? 24 * 60
+        let end = m.latestEnd ?? 0
+        let avgStart = m.classDays > 0 ? m.sumOfDayStarts / m.classDays : 24 * 60
+        let avgEnd = m.classDays > 0 ? m.sumOfDayEnds / m.classDays : 0
+        switch sort {
+        case .fewestDays: return [m.classDays]
+        case .fewestSessions: return [m.classSessions]
+        case .highestRated: return ratings.score(option).map { [0, -Int(($0.value * 10_000).rounded())] } ?? [1, 0]
+        case .latestStart: return [-start, -avgStart]
+        case .earliestFinish: return [end, avgEnd]
+        case .leastGaps: return [m.gapMinutes]
+        case .mostSeats: return [-m.openSeats]
+        }
+    }
+
+    /// Tie-breaks after every chosen criterion: the first criterion's usual order.
+    static func fallbackKey(_ m: TimetableMetrics, _ first: TimetableSort) -> [Int] {
+        first == .highestRated ? [m.classDays, m.gapMinutes] : sortKey(m, first)
+    }
+
     /// Smaller is better, compared lexicographically.
     static func sortKey(_ m: TimetableMetrics, _ sort: TimetableSort) -> [Int] {
         let start = m.earliestStart ?? 24 * 60      // nothing timed = the latest possible start
@@ -416,6 +498,8 @@ public enum TimetableGenerator {
         switch sort {
         case .fewestDays: return [m.classDays, m.gapMinutes, -start, end]
         case .fewestSessions: return [m.classSessions, m.classDays, m.gapMinutes, -start, end]
+        // Without ratings (see `sorted(_:by:ratings:)`) it falls back to the fewest-days order.
+        case .highestRated: return [m.classDays, m.gapMinutes, -start, end]
         case .latestStart: return [-start, -avgStart, m.classDays, m.gapMinutes]
         case .earliestFinish: return [end, avgEnd, m.classDays, m.gapMinutes]
         case .leastGaps: return [m.gapMinutes, m.classDays, -start, end]
