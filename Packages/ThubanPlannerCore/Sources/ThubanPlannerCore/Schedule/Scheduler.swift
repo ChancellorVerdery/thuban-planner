@@ -90,7 +90,9 @@ public enum Scheduler {
                 let isSummer = TermKey.parse(cursor).seasonText == "summer"
                 if disabled.contains(JSKey(cursor)) { continue }
                 if isSummer && !useSummers { continue }
-                let cap = JS.max(0, JS.round(capFor(cursor) * capScale))
+                var cap = JS.max(0, JS.round(capFor(cursor) * capScale))
+                // Thuban: a lighter (even-load) cap never drops below the term's minimum. No-op at minimum 0.
+                if capScale < 1 { cap = Swift.max(cap, g.effectiveMin(summer: isSummer)) }
                 var picked: [Int] = []
                 var credits = 0.0
                 var added = true
@@ -111,6 +113,9 @@ public enum Scheduler {
                         added = true
                     }
                 }
+                // Thuban: a summer that can't reach the summer minimum isn't worth taking — skip it; its classes
+                // wait for the next term. No-op at minimum 0.
+                if isSummer && !picked.isEmpty && credits < g.effectiveMin(summer: true) { continue }
                 if !picked.isEmpty {
                     terms.append(PlannedTerm(key: cursor, courseIds: picked.map { courses[$0].id }, credits: credits))
                     for c in picked { prior.insert(keys[c]); remSet.remove(keys[c]) }
@@ -120,7 +125,7 @@ public enum Scheduler {
             return Plan(terms: terms, unplaceable: rem.map { courses[$0].id })
         }
 
-        let plan: Plan
+        var plan: Plan
         switch g.strategy {
         case .even:
             let soonest = runPlan(useSummers: false)
@@ -144,6 +149,15 @@ public enum Scheduler {
             plan = finishRank(withSummers) < finishRank(without) ? withSummers : without // summers only if strictly earlier
         case .soonestSummer:
             plan = runPlan(useSummers: true)
+        }
+
+        // Thuban: lift planned fall / spring terms under the minimum by moving classes LATER from earlier planned
+        // terms, when every requirement still holds. Never changes the number of terms or the finish term.
+        if g.effectiveMin(summer: false) > 0 {
+            plan.terms = MinimumBalancer.balance(plan.terms.map { ($0.key, $0.courseIds, $0.credits) },
+                                                 settings: g, courses: courses, keys: keys, byId: byId,
+                                                 preOf: preOf, coOf: coOf)
+                .map { PlannedTerm(key: $0.key, courseIds: $0.ids, credits: $0.credits) }
         }
 
         // Full board: recorded terms (past / current) + planned future terms, chronological.
@@ -185,6 +199,14 @@ public enum Scheduler {
                 return id
             }
             warnings.append("Couldn't place: \(names.joined(separator: ", ")) — check for missing prerequisites or a prerequisite cycle.")
+        }
+        // Thuban: planned terms still under the minimum after balancing.
+        for t in plan.terms {
+            let summer = TermKey.parse(t.key).seasonText == "summer"
+            let minimum = g.effectiveMin(summer: summer)
+            if minimum > 0 && t.credits < minimum {
+                warnings.append("\(TermKey.label(t.key)) has \(JS.numberString(t.credits)) credits — under your \(JS.numberString(minimum))-credit \(summer ? "summer " : "")minimum. Add an elective or lower the minimum.")
+            }
         }
         return Schedule(board: board, edges: edges, unplaceable: plan.unplaceable, warnings: warnings,
                         termsToFinish: plan.terms.count, gradTerm: board.last?.key)

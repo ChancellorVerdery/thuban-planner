@@ -103,6 +103,8 @@ public struct PlannerData: Codable, Hashable, Sendable {
         PlannerData.demoteExtraCurrents(&terms)
         if !settings.maxCredits.isFinite || settings.maxCredits <= 0 { settings.maxCredits = PlannerSettings.defaultMaxCredits }
         if !settings.summerMax.isFinite || settings.summerMax < 0 { settings.summerMax = Swift.min(9, settings.maxCredits) }
+        if !settings.minCredits.isFinite || settings.minCredits < 0 { settings.minCredits = 0 }
+        if !settings.summerMin.isFinite || settings.summerMin < 0 { settings.summerMin = 0 }
     }
 
     public func normalized() -> PlannerData {
@@ -199,6 +201,11 @@ public struct PlannerData: Codable, Hashable, Sendable {
         let summerMax = JS.number(g?["summerMax"])
         settings.summerMax = (!summerMax.isFinite || summerMax < 0) ? Swift.min(9, settings.maxCredits) : summerMax
         settings.strategy = g?["strategy"]?.stringValue.flatMap(Strategy.init(rawValue:)) ?? .soonestSummer
+        // Thuban-only minimums (absent from Atlas data → 0, off).
+        let minCredits = JS.number(g?["minCredits"])
+        settings.minCredits = (!minCredits.isFinite || minCredits < 0) ? 0 : minCredits
+        let summerMin = JS.number(g?["summerMin"])
+        settings.summerMin = (!summerMin.isFinite || summerMin < 0) ? 0 : summerMin
 
         self.init(courses: courses, terms: terms, disabledTerms: disabled, settings: settings)
         if case .number(let v)? = s["version"] { version = Int(v) }

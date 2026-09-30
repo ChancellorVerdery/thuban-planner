@@ -75,11 +75,24 @@ public struct PlannerSettings: Codable, Hashable, Sendable {
     /// Most credit hours in a summer term (≥ 0; default min(9, maxCredits)).
     public var summerMax: Double
     public var strategy: Strategy
+    /// Fewest credit hours a planned fall or spring term should carry (≥ 0; 0 = no minimum). Not an Atlas setting.
+    public var minCredits: Double
+    /// Fewest credit hours worth taking a summer term for (≥ 0; 0 = no minimum). A planned summer that would carry
+    /// less is skipped. Not an Atlas setting.
+    public var summerMin: Double
 
-    public init(maxCredits: Double = 15, summerMax: Double = 9, strategy: Strategy = .soonestSummer) {
+    public init(maxCredits: Double = 15, summerMax: Double = 9, strategy: Strategy = .soonestSummer,
+                minCredits: Double = 0, summerMin: Double = 0) {
         self.maxCredits = maxCredits
         self.summerMax = summerMax
         self.strategy = strategy
+        self.minCredits = minCredits
+        self.summerMin = summerMin
+    }
+
+    /// The minimum the scheduler applies to a term: the setting, never above that term's cap.
+    public func effectiveMin(summer: Bool) -> Double {
+        summer ? Swift.min(summerMin, summerMax) : Swift.min(minCredits, maxCredits)
     }
 
     public static let `default` = PlannerSettings()
@@ -90,6 +103,8 @@ public enum PlannerSetting: Hashable, Sendable {
     case maxCredits(Double)
     case summerMax(Double)
     case strategy(Strategy)
+    case minCredits(Double)
+    case summerMin(Double)
 }
 
 /// Ids like Atlas's `uid(p)`: "<prefix>-<ms since 1970 in base 36><5 random base-36 chars>".

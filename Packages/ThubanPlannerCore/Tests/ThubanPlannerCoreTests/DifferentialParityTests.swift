@@ -115,7 +115,7 @@ final class DifferentialParityTests: XCTestCase {
                     "courses": try reencode(data.courses),
                     "terms": try reencode(data.terms),
                     "disabledTerms": try reencode(data.disabledTerms),
-                    "settings": try reencode(data.settings),
+                    "settings": try atlasSettings(data.settings),
                 ]),
                 "schedule": try reencode(schedule),
                 "summers": try reencode(Scheduler.upcomingSummers(data, now: c.now, calendar: .current)),
@@ -154,6 +154,18 @@ final class DifferentialParityTests: XCTestCase {
     }
 
     /// Swift value → JSON the way `JSON.stringify` would write it (NaN / ±Infinity become null).
+    /// Settings as Atlas knows them: the Thuban-only minimums must come out of any Atlas document as 0 (off), which
+    /// is also what keeps the schedule identical; they are then dropped from the comparison.
+    static func atlasSettings(_ settings: PlannerSettings) throws -> JSONValue {
+        guard settings.minCredits == 0, settings.summerMin == 0 else {
+            return .string("Thuban minimums not off: \(settings.minCredits) / \(settings.summerMin)")
+        }
+        guard case .object(var o) = try reencode(settings) else { return try reencode(settings) }
+        o["minCredits"] = nil
+        o["summerMin"] = nil
+        return .object(o)
+    }
+
     static func reencode<T: Encodable>(_ value: T) throws -> JSONValue {
         let encoder = JSONEncoder()
         encoder.nonConformingFloatEncodingStrategy = .convertToString(positiveInfinity: nonFinite, negativeInfinity: nonFinite, nan: nonFinite)

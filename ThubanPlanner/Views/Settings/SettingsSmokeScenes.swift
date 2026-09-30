@@ -22,6 +22,14 @@ extension SmokeScenes {
             } cleanup: { app in
                 app.setStrategy(.soonestSummer)
             },
+            SmokeScene(name: "settings-planning-minimums") { app in
+                app.setMinCredits(12)
+                app.setSummerMin(6)
+                app.openSettings(.planning)
+            } cleanup: { app in
+                app.setMinCredits(0)
+                app.setSummerMin(0)
+            },
             SmokeScene(name: "settings-planning-empty") { app in
                 settingsSaved = app.data
                 app.replaceData(.empty)

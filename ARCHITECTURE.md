@@ -99,7 +99,8 @@ files as you like inside your folder.
 - `disabledTerms [key]` — terms the scheduler skips (usually summers; may name terms with no Term row).
 - `settings {maxCredits (default 15), summerMax (default min(9, max)), strategy}` — strategies (Atlas labels):
   `soonest-summer` "Graduate soonest (use summers)", `soonest-optional-summer` "Soonest — summers only if they save a
-  term", `even` "Lighter, even load".
+  term", `even` "Lighter, even load". Thuban-only: `minCredits` and `summerMin` (default 0 = off; Atlas data always
+  loads them as 0) — see "Minimum credits".
 - `importedAt`, `importSource` — provenance of an Atlas import.
 
 Decoding is tolerant and applies Atlas's `loadCourse()` normalization exactly (JS coercions included); `AppModel`
@@ -124,6 +125,16 @@ optional summer = with summers only if the finish rank is strictly earlier; even
 min(1, ceil(total / terms) / max), falling back to full caps (or to summers) rather than failing. Board = recorded terms
 (past / current, incl. empty ones) + planned terms, chronological; edges only between placed classes; warning text
 "Couldn't place: A, B — check for missing prerequisites or a prerequisite cycle."
+
+**Minimum credits (Thuban-only, 2026-09-30).** With `minCredits` / `summerMin` at 0 every line above holds unchanged
+(the parity tests assert Atlas documents load both as 0). Otherwise, with each minimum clamped to its cap
+(`PlannerSettings.effectiveMin`): a planned summer that would carry fewer than `summerMin` credits is skipped (its
+classes wait); the even strategy's lighter cap never drops below `minCredits`; after packing, `MinimumBalancer` lifts
+fall / spring terms under `minCredits` by moving classes LATER from earlier planned terms when every requirement
+still holds (prereq users stay strictly later, coreq users same-or-later, target within `maxCredits`, source keeps its
+own minimum) — never adding or removing terms, so the finish term never moves; terms still short get the warning
+"Fall 2027 has 9 credits — under your 12-credit minimum. Add an elective or lower the minimum."
+Tests: `MinimumCreditsTests`.
 
 It is PROVEN identical to Atlas: `GoldenScheduleTests` replays 400 seeded random plans (cycles, lecture ↔ lab coreq
 loops, duplicate codes / ids, unknown refs, 0- and 15-credit classes, summer cap 0, disabled terms, no terms, > 64

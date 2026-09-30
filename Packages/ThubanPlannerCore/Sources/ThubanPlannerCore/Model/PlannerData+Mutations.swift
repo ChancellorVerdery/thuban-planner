@@ -110,6 +110,8 @@ extension PlannerData {
         case .maxCredits(let value): settings.maxCredits = Swift.max(0, value.isNaN ? 0 : value)
         case .summerMax(let value): settings.summerMax = Swift.max(0, value.isNaN ? 0 : value)
         case .strategy(let strategy): settings.strategy = strategy
+        case .minCredits(let value): settings.minCredits = Swift.max(0, value.isNaN ? 0 : value)
+        case .summerMin(let value): settings.summerMin = Swift.max(0, value.isNaN ? 0 : value)
         }
     }
 

@@ -1,7 +1,7 @@
 import SwiftUI
 import ThubanPlannerCore
 
-/// Settings ▸ Planning: the two credit caps and the route strategy (Atlas's wording), with a live preview of the
+/// Settings ▸ Planning: the credit caps and minimums (the minimums are Thuban-only) and the route strategy (Atlas's wording), with a live preview of the
 /// route those settings produce. The caps are typed into drafts that commit on Return / focus loss (one write); the
 /// preview follows the drafts as you type, computed on a copy of the plan (`app.settingsPreviewSchedule`).
 /// OWNER: Engineer C.
@@ -10,9 +10,12 @@ struct PlanningSettings: View {
     @Environment(\.thubanTheme) private var theme
     @State private var maxDraft = ""
     @State private var summerDraft = ""
+    @State private var minDraft = ""
+    @State private var summerMinDraft = ""
 
     static let maxRange: ClosedRange<Double> = 1 ... 30
     static let summerRange: ClosedRange<Double> = 0 ... 30
+    static let minRange: ClosedRange<Double> = 0 ... 30
 
     var body: some View {
         VStack(alignment: .leading, spacing: 28) {
@@ -21,14 +24,24 @@ struct PlanningSettings: View {
 
             SettingsPlanningPreview(settings: previewSettings, isDraft: previewSettings != app.settings)
 
-            SettingsGroup("Credit caps", caption: "Changes apply when you press Return or leave the field.") {
+            SettingsGroup("Credit load", caption: "Changes apply when you press Return or leave the field. A minimum of 0 is off.") {
                 VStack(spacing: 0) {
                     capRow("Max credits per semester",
                            detail: "The most credit hours the planner will pack into a fall or spring term.",
                            draft: $maxDraft, range: Self.maxRange, stored: app.settings.maxCredits) { app.setMaxCredits($0) }
+                    capRow("Min credits per semester",
+                           detail: minDetail("Fall and spring terms below this take classes from earlier terms when the requirements allow; any still short are flagged.",
+                                             minimum: app.settings.minCredits, cap: app.settings.maxCredits),
+                           draft: $minDraft, range: Self.minRange, stored: app.settings.minCredits) { app.setMinCredits($0) }
+                        .thubanHairline(.top, color: theme.lineColor)
                     capRow("Max credits in summer",
                            detail: "Summers usually carry a lighter cap. 0 keeps the planner out of summers.",
                            draft: $summerDraft, range: Self.summerRange, stored: app.settings.summerMax) { app.setSummerMax($0) }
+                        .thubanHairline(.top, color: theme.lineColor)
+                    capRow("Min credits in summer",
+                           detail: minDetail("A summer that would carry fewer credits is skipped; its classes wait for fall.",
+                                             minimum: app.settings.summerMin, cap: app.settings.summerMax),
+                           draft: $summerMinDraft, range: Self.minRange, stored: app.settings.summerMin) { app.setSummerMin($0) }
                         .thubanHairline(.top, color: theme.lineColor)
                 }
                 .thubanPanel(padding: 0)
@@ -52,6 +65,8 @@ struct PlanningSettings: View {
         .onChange(of: app.settings) { old, new in
             if old.maxCredits != new.maxCredits { maxDraft = JS.numberString(new.maxCredits) }
             if old.summerMax != new.summerMax { summerDraft = JS.numberString(new.summerMax) }
+            if old.minCredits != new.minCredits { minDraft = JS.numberString(new.minCredits) }
+            if old.summerMin != new.summerMin { summerMinDraft = JS.numberString(new.summerMin) }
         }
     }
 
@@ -79,6 +94,13 @@ struct PlanningSettings: View {
     private func syncDrafts() {
         maxDraft = JS.numberString(app.settings.maxCredits)
         summerDraft = JS.numberString(app.settings.summerMax)
+        minDraft = JS.numberString(app.settings.minCredits)
+        summerMinDraft = JS.numberString(app.settings.summerMin)
+    }
+
+    /// A minimum's explanation, noting when it is above the cap (the planner then uses the cap).
+    private func minDetail(_ text: String, minimum: Double, cap: Double) -> String {
+        minimum > cap ? text + " It's above the max, so the max is used." : text
     }
 
     /// The saved settings with any valid draft applied (what the preview shows).
@@ -86,6 +108,8 @@ struct PlanningSettings: View {
         var s = app.settings
         if let v = Self.parse(maxDraft, in: Self.maxRange) { s.maxCredits = v }
         if let v = Self.parse(summerDraft, in: Self.summerRange) { s.summerMax = v }
+        if let v = Self.parse(minDraft, in: Self.minRange) { s.minCredits = v }
+        if let v = Self.parse(summerMinDraft, in: Self.minRange) { s.summerMin = v }
         return s
     }
 
@@ -323,10 +347,12 @@ struct SettingsLoadStrip: View {
     private func column(_ term: BoardTerm, peak: Double) -> some View {
         let isSummer = term.season == .summer
         let cap = isSummer ? settings.summerMax : settings.maxCredits
+        let minimum = settings.effectiveMin(summer: isSummer)
+        let short = minimum > 0 && term.credits < minimum
         return VStack(spacing: 5) {
             Text(JS.numberString(term.credits))
                 .font(ThubanFont.mono(12, weight: .semibold))
-                .foregroundStyle(theme.inkColor)
+                .foregroundStyle(short ? theme.negTextColor : theme.inkColor)
                 .monospacedDigit()
             ZStack(alignment: .bottom) {
                 RoundedRectangle(cornerRadius: 4, style: .continuous)
@@ -335,6 +361,13 @@ struct SettingsLoadStrip: View {
                 RoundedRectangle(cornerRadius: 4, style: .continuous)
                     .fill(isSummer ? theme.signalColor : theme.accentColor)
                     .frame(height: max(3, barHeight * CGFloat(min(1, term.credits / peak))))
+                if minimum > 0 {
+                    // The minimum as a tick across the bar.
+                    Rectangle()
+                        .fill(short ? theme.negTextColor : theme.inkDimColor)
+                        .frame(width: 36, height: 1.5)
+                        .offset(y: -barHeight * CGFloat(min(1, minimum / peak)))
+                }
             }
             .frame(width: 30, height: barHeight, alignment: .bottom)
             VStack(spacing: 0) {
@@ -349,6 +382,6 @@ struct SettingsLoadStrip: View {
         }
         .frame(width: 52)
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel("\(term.label): \(JS.numberString(term.credits)) of \(JS.numberString(cap)) credits")
+        .accessibilityLabel("\(term.label): \(JS.numberString(term.credits)) of \(JS.numberString(cap)) credits\(short ? ", under the \(JS.numberString(minimum))-credit minimum" : "")")
     }
 }

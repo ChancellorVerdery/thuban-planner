@@ -56,5 +56,8 @@ extension AppModel {
     /// Most credits in a fall / spring term (0 or less resets to 15 on the next load, like Atlas).
     func setMaxCredits(_ value: Double) { mutate { $0.setSetting(.maxCredits(value)) } }
     func setSummerMax(_ value: Double) { mutate { $0.setSetting(.summerMax(value)) } }
+    /// Fewest credits for a planned fall / spring term, and for a summer worth taking (0 = off; Thuban-only).
+    func setMinCredits(_ value: Double) { mutate { $0.setSetting(.minCredits(value)) } }
+    func setSummerMin(_ value: Double) { mutate { $0.setSetting(.summerMin(value)) } }
     func setStrategy(_ strategy: Strategy) { mutate { $0.setSetting(.strategy(strategy)) } }
 }
