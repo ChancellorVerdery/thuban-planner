@@ -8,6 +8,8 @@ enum IconName: String, CaseIterable {
     case planner
     /// Route tab (two term boxes joined by a ribbon).
     case route
+    /// Schedule tab (a week grid with two class blocks).
+    case schedule
     /// Settings (the Thuban drop).
     case settings
     // Planner / Route
@@ -46,6 +48,7 @@ enum IconName: String, CaseIterable {
         switch self {
         case .planner: return ["M4.5 5h15a1 1 0 0 1 1 1v12a1 1 0 0 1 -1 1h-15a1 1 0 0 1 -1 -1v-12a1 1 0 0 1 1 -1z", "M3.5 9.5h17", "M15 9.5V19", "M6.5 13h5.5", "M6.5 16h4"]
         case .route: return ["M4.5 4.5h4a1 1 0 0 1 1 1v5a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1v-5a1 1 0 0 1 1 -1z", "M15.5 12.5h4a1 1 0 0 1 1 1v5a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1v-5a1 1 0 0 1 1 -1z", "M9.5 8c3.5 0 2 8 5 8"]
+        case .schedule: return ["M5 4.5h14a1.5 1.5 0 0 1 1.5 1.5v12.5a1.5 1.5 0 0 1 -1.5 1.5h-14a1.5 1.5 0 0 1 -1.5 -1.5v-12.5a1.5 1.5 0 0 1 1.5 -1.5z", "M3.5 8.5h17", "M9.5 8.5v11.5", "M14.5 8.5v11.5", "M6 11.5h1.5v3h-1.5z", "M16.5 13.5h1.5v3.5h-1.5z"]
         case .settings: return ["M12 3.5s6 6.2 6 10.5a6 6 0 0 1-12 0c0-4.3 6-10.5 6-10.5z"]
         case .graduation: return ["M2.5 9.5L12 5.5l9.5 4L12 13.5z", "M6.5 11.5v3.75c0 1.5 2.5 2.75 5.5 2.75s5.5-1.25 5.5-2.75v-3.75", "M21.5 9.5v5"]
         case .sun: return ["M8.5 12a3.5 3.5 0 1 0 7 0a3.5 3.5 0 1 0 -7 0z", "M12 3.5v2", "M12 18.5v2", "M3.5 12h2", "M18.5 12h2", "M6 6l1.4 1.4", "M16.6 16.6L18 18", "M6 18l1.4-1.4", "M16.6 7.4L18 6"]

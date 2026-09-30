@@ -43,6 +43,7 @@ struct ShellView: View {
             switch app.section {
             case .planner: PlannerView()
             case .route: RouteView()
+            case .schedule: ScheduleView()
             case .settings: SettingsView()
             }
         }
@@ -55,7 +56,7 @@ private struct CourseSheetItem: Identifiable {
 
 // MARK: - Title bar
 
-/// [traffic lights] mark + serif "Thuban Planner" ……… status chip. (Settings is a section: ⌘3 / ⌘,.)
+/// [traffic lights] mark + serif "Thuban Planner" ……… status chip. (Settings is a section: ⌘4 / ⌘,.)
 struct TitleBar: View {
     @Environment(AppModel.self) private var app
     @Environment(\.thubanTheme) private var theme
@@ -124,7 +125,7 @@ struct StatusChip: View {
 
 // MARK: - Section bar
 
-/// Section tabs (Planner / Route / Settings) on the left, the current section's toolbar on the right.
+/// Section tabs (Planner / Route / Schedule / Settings) on the left, the current section's toolbar on the right.
 struct SectionBar: View {
     @Environment(AppModel.self) private var app
     @Environment(\.thubanTheme) private var theme
@@ -137,6 +138,7 @@ struct SectionBar: View {
                 switch app.section {
                 case .planner: PlannerToolbar()
                 case .route: RouteToolbar()
+                case .schedule: ScheduleToolbar()
                 case .settings: SettingsToolbar()
                 }
             }

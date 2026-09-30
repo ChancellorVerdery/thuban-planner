@@ -36,6 +36,33 @@ struct ThubanPlannerApp: App {
                         .keyboardShortcut(KeyEquivalent(section.shortcut), modifiers: .command)
                 }
             }
+            CommandMenu("Schedule") {
+                Button("Previous Schedule") { appModel.scheduleTab.previousOption() }
+                    .keyboardShortcut("[", modifiers: .command)
+                    .disabled(appModel.section != .schedule || appModel.scheduleTab.optionCount < 2)
+                Button("Next Schedule") { appModel.scheduleTab.nextOption() }
+                    .keyboardShortcut("]", modifiers: .command)
+                    .disabled(appModel.section != .schedule || appModel.scheduleTab.optionCount < 2)
+                Divider()
+                Button(appModel.scheduleTab.blockMode ? "Stop Blocking Times" : "Block Times") { appModel.scheduleTab.blockMode.toggle() }
+                    .keyboardShortcut("b", modifiers: .command)
+                    .disabled(appModel.section != .schedule || appModel.scheduleTab.selectedTermCode == nil)
+                Button("Copy CRNs") { appModel.scheduleTab.copyCRNs() }
+                    .keyboardShortcut("c", modifiers: [.command, .shift])
+                    .disabled(appModel.section != .schedule || appModel.scheduleTab.currentOption == nil)
+                Button("Refresh Sections") { appModel.scheduleTab.refreshAllSections() }
+                    .keyboardShortcut("r", modifiers: [.command, .shift])
+                    .disabled(appModel.section != .schedule || appModel.scheduleTab.rows.isEmpty)
+                Divider()
+                if appModel.scheduleTab.auth.isSignedIn {
+                    Button("Sign Out of Banner") { appModel.scheduleTab.signOut() }
+                } else {
+                    Button("Sign In to Banner…") {
+                        appModel.section = .schedule
+                        appModel.scheduleTab.showSignIn = true
+                    }
+                }
+            }
             CommandMenu("Route") {
                 Button("Calculate Route") { appModel.showRoute() }
                     .keyboardShortcut("r", modifiers: .command)

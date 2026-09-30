@@ -53,18 +53,27 @@ Packages/ThubanPlannerCore/ SwiftPM library + tests (`swift test`)
   Schedule/  Schedule (BoardTerm, TermKind, RouteEdge, RequirementKind, CourseStatus), Scheduler (scheduleDegree,
              upcomingSummers, planStatus)
   Support/   JS (JavaScript Number/String/truthiness/Math.round/localeCompare semantics), JSONValue, V8Sort (V8 TimSort)
+  Registration/ Schedule tab core: BannerTerms (term codes ↔ keys, course-code parsing), BannerSections (sections,
+             meetings, conflicts, clock), BannerPlan (Plan Ahead `bootstraps` parser, meta / sign-in helpers),
+             BannerRequestGuard (read-only allow / deny lists, WebKit content rules), BannerClient (class search over
+             URLSession), Timetable (generator), TimetableStore (schedule.json + schedule-cache.json)
   Store/     PlannerStore (planner.json, atomic writes, 14 daily backups, 20 labelled snapshots), Preferences,
              AppPaths (THUBAN_PLANNER_HOME), JSONFile
   Import/    AtlasImporter (SQL, ssh command, fetch, convert, ImportSummary), AtlasDocument (tolerant rows +
              recompose), CommandRunner / ProcessRunner (tests use FixtureRunner)
-  Sample/    SampleData (a mechanical-engineering degree for smoke / THUBAN_PLANNER_SEED=sample)
+  Sample/    SampleData (a mechanical-engineering degree for smoke / THUBAN_PLANNER_SEED=sample), BannerSampleData
+             (deterministic terms / sections for the offline Schedule smoke scenes)
   Theme/     Copied from Thuban Gym — ColorScheme, SchemePresets, ThemeSelection, ThemeResolver, ResolvedTheme …
-  Tests/     Fixtures/golden-schedule.json (400 cases from Atlas's own scheduler), atlas-psql-output.txt, atlas-legacy.json
+  Tests/     Fixtures/golden-schedule.json (400 cases from Atlas's own scheduler), atlas-psql-output.txt, atlas-legacy.json,
+             banner/ (real getTerms / searchResults / linkedSections captures, a reconstructed plan, the term page head)
 Shared/
   Theme/     ThemeEnvironment (tokens → Color, ThubanFont, ThubanMetrics, modifiers, ChipKind)
   Art/       AppArt + AppArtSource (the mark: ~/Desktop/Claude/Thuban Icons/final/planner.svg), Icon (line icons)
 ThubanPlanner/
-  App/       ThubanPlannerApp (window, menus: New Class ⌘N, Go ⌘1–⌘3, Settings ⌘,, Route ▸ Calculate ⌘R / Fit ⌘0),
+  App/       ThubanPlannerApp (window, menus: New Class ⌘N, Go ⌘1–⌘4, Settings ⌘,, Route ▸ Calculate ⌘R / Fit ⌘0,
+             Schedule ▸ Previous / Next ⌘[ ⌘], Block Times ⌘B, Copy CRNs ⇧⌘C, Refresh Sections ⇧⌘R, Sign In / Out),
+             Schedule/ (ScheduleModel — the tab's own @Observable model, `app.scheduleTab`; BannerWebSession — WebKit
+             sign-in store, navigation guard, hidden Plan Ahead reader),
              AppModel (+Queries, +Mutations, +Import), Routes (AppSection, SettingsPane, ThubanScheme),
              AppIconRenderer (live dock icon), SmokeHarness, Smoke/SmokeScenes (registry, pre-wired)
   Views/Shell        ShellView: TitleBar (mark + serif "Thuban Planner", StatusChip), SectionBar (SectionTabs + the
@@ -75,6 +84,8 @@ ThubanPlanner/
   Views/Planner      PlannerView, PlannerToolbar, PlannerSmokeScenes                              (A)
   Views/Route        RouteView, RouteToolbar, RouteSmokeScenes                                    (B)
   Views/ClassDetail  ClassDetailSheet, ClassDetailSmokeScenes                                     (B)
+  Views/Schedule     ScheduleView, ScheduleToolbar, ScheduleSidebar, ScheduleCourseCard, ScheduleWeekGrid,
+                     ScheduleSignInSheet, ScheduleTheme (course colours), ScheduleSmokeScenes
   Views/Settings     SettingsView (nav), SettingsToolbar, SettingsChrome, SettingsPaneHeader, PlanningSettings,
                      AppearanceSettings (working), ImportSettings, DataSettings, AboutSettings, SettingsSmokeScenes (C)
   Resources          Assets.xcassets (AppIcon from scripts/make_app_icon.sh), entitlements (no sandbox)
@@ -208,7 +219,7 @@ set: { app.setMaxCredits($0) })`.
 
 ### Navigation and shared UI state
 
-`app.section` (.planner / .route / .settings; ⌘1–⌘3), `app.openSettings(.importAtlas)` (⌘, opens the last pane;
+`app.section` (.planner / .route / .schedule / .settings; ⌘1–⌘4), `app.openSettings(.importAtlas)` (⌘, opens the last pane;
 `app.settingsPane` is the selected pane), `app.showRoute()` ("Calculate route": fits and switches to Route; ⌘R),
 `app.presentCourse(id)` / `app.presentedCourseId` (class detail sheet, hosted by the shell). Shared between a section
 and its toolbar: `app.selectedCourseId` (Planner selection; Route highlights it), `app.editRequestCourseId` (a row
@@ -334,7 +345,68 @@ resolved ref as a row (code, title, its status chip; click → show that class),
 "Required by" (`app.dependents(of:)`). Facts row: offered in summer yes/no, taken in / planned for. Footer: "Edit in
 Planner" (switches to Planner, selects the row, dismisses) and Done (default). Esc closes.
 
-### Settings (C) — `Views/Settings` (section ⌘3 / ⌘,)
+### Schedule — `Views/Schedule`, `App/Schedule`, core `Registration/` (section ⌘3)
+
+Builds every weekly timetable for a UNC Charlotte term from the classes planned for it. STRICTLY READ-ONLY against
+Banner: it never registers, never adds / removes / changes plan items, never saves a term; the user copies the CRNs
+and registers in Banner themselves.
+
+- **Model**: `app.scheduleTab` (`ScheduleModel`, `@MainActor @Observable`, owned by `AppModel`; activated the first time
+  the tab shows). Rows (`ScheduleCourseRow`) come from the selected source — `.bannerPlan` (the Plan Ahead plan: the
+  preferred plan first, a plan menu when there are several; a plan item with a CRN pins that section until the user
+  unpins it) or `.route` (the classes `app.schedule` places in the term) — minus removed, plus added codes
+  ("MEGR 2144"). Each row shows code, title, credits, sections found and open.
+- **Terms**: `classSearch/getTerms` (cached 12 h); the picker shows the newest six plus the calendar term; default =
+  the last term used, else the next term the route plans, else the calendar term. `BannerTermCode`: YYYY + 10 spring /
+  60 summer (50 / 70 read as summer) / 80 fall ↔ "spring-2027"; " (View Only)" is stripped.
+- **Sections**: `BannerClient` — one anonymous session (synchronizer token from `term/termSelection?mode=search`,
+  `term/search?mode=search` POST with the term, then per course `classSearch/resetDataForm` + `searchResults/
+  searchResults`, 500 per page, exact course-number match, one re-established-session retry on 0 results), fetched
+  sequentially with a 450 ms pause, cached per term + course with the fetch time (`schedule-cache.json`, stale after
+  6 h; "Refresh sections" refetches all). Linked sections (`isSectionLinked`) fetch `fetchLinkedSections`; a choice is
+  then a linked set (`TimetableChoice`). UNC Charlotte doesn't appear to link (labs are separate "L" courses).
+- **Generator** (`TimetableGenerator.generate`, pure): exactly one choice per course; conflict = two timed meetings on a
+  shared weekday with overlapping [begin, end) AND overlapping date ranges; online / TBA meetings never conflict (listed
+  under the grid). Filters: open seats only (> 0), hide full or wait-listed, allow online, campuses; user exclusions and
+  pins; weekly blocks (`TimetableBlock`) remove any section meeting inside one. Most-constrained-course-first
+  backtracking with forward checking, capped at 10,000 ("showing the first 10,000"). Zero results explain themselves:
+  a course with no sections, a course whose sections were all filtered (with counts per reason), a pair of courses
+  that always clash, or "no combination fits". Sorts: fewest class days, latest start, earliest finish, least time
+  between classes, most open seats — ties broken by the option id, so output is deterministic.
+- **Sign-in / "the user's cookies"**: the app NEVER reads Chrome's (or any browser's) cookie store and never sees or
+  stores a password (no Keychain). "Sign in" opens `ScheduleSignInSheet`: UNC Charlotte's own SSO page in a WKWebView on
+  `WKWebsiteDataStore.default()` (persistent, the app's own). Everything that needs the sign-in runs INSIDE WebKit on
+  that store — `BannerPlanReader`, a hidden web view: open `term/termSelection?mode=plan` (a webauth page = signed
+  out), POST `term/search?mode=plan` from the page with its own token (`callAsyncJavaScript` fetch, credentials
+  included), open the `fwdURL` / `plan/selectPlan`, read `JSON.stringify(window.bootstraps)` (HTML fallback) and
+  `<meta name="fullName">`. The PUBLIC class search deliberately does NOT use the sign-in: `URLSessionBannerTransport`
+  is an ephemeral session with its own cookie jar (least privilege). "Sign out" deletes every uncc.edu cookie and data
+  record. States: signed out, checking, signed in as <name>, signed in earlier (unknown), session ended (expired).
+- **Read-only enforcement**: `BannerRequestGuard.check` (app-made requests: HTTPS selfservice.uncc.edu
+  /StudentRegistrationSsb/ only, GET, POST only to `term/search` and `classSearch/resetDataForm`) and the deny list
+  (submitPlan, addPlanItem, deletePlan, makePreferred, savePlanNote, markApproved, saveTerm, classRegistration/submit,
+  addRegistrationItem, addCRNRegistrationItems, register) applied to every URLSession request and redirect, every web
+  view navigation (`BannerNavigationGuard`; POST navigations to Banner also need the allow list) and every fetch / XHR /
+  resource via a compiled `WKContentRuleList`.
+- **Screen**: 340 pt sidebar (semester menu, Banner account card, source segmented control + plan, class cards that
+  expand to sections with include checkboxes and a pin, "Add a class", filters) | header ("Schedule 3 of 128", credits
+  · days · span · gaps, sort menu, ◀ ▶ and ←/→) | week grid (Mon–Fri, weekends when used; 7 AM–10 PM widened as needed,
+  30-minute rules; course-coloured meetings, hatched blocks) | CRN strip + Copy CRNs. "Block times" (toolbar, ⌘B):
+  drag to add a block (15-minute snap), click one to rename / retime / delete. States: loading terms, can't reach
+  Banner (Try again), sign-in prompt / session ended, no classes, finding sections, couldn't load sections, "Why
+  nothing fits" card over the grid. Course colours: `ScheduleTheme` (accent, pos, neg, accent turned round the wheel,
+  accentDeep, signal — theme tokens only).
+- **Files**: `schedule.json` (per Banner term code: source, plan, added / removed classes, excluded CRNs, pins,
+  unpinned plan pins, blocks, filters, sort, last schedule index; `lastTermCode`) and `schedule-cache.json` (terms,
+  sections, plans; safe to delete), both next to planner.json (THUBAN_PLANNER_HOME honoured), atomic, 0600.
+- **Tests**: `BannerTests` (term codes, real-fixture decoding incl. null times / several meetings / negative seats /
+  double spaces, request guard, plan parsing on the reconstructed fixture + tolerant variants + HTML fallback, client
+  flow on a fake transport, store round trip), `TimetableTests` (conflicts, date ranges, blocks, online, filters, pins,
+  linked sets, zero-result reasons, cap, determinism, sorting, 6 × 20 performance). Live, public, read-only check:
+  `THUBAN_PLANNER_LIVE_BANNER=1 scripts/test.sh` (term list + one MEGR 2144 search; never signs in). Plan Ahead
+  reading is verified against fixtures only (it needs a real student sign-in).
+
+### Settings (C) — `Views/Settings` (section ⌘4 / ⌘,)
 
 Pane list on the left (Planning, Appearance, Import, Data, About), pane on the right (`app.settingsPane`).
 
@@ -357,9 +429,9 @@ Pane list on the left (Planning, Appearance, Import, Data, About), pane on the r
 
 `SmokeHarness` seeds `SampleData` into a temp home (43 classes of a mechanical-engineering degree, fall 2024 → current
 fall 2026, summer 2027 switched off, route to Spring 2028), sizes the window to 1440 × 900, then captures `10-planner`,
-`11-route`, `12-settings`, every registered scene (`30+`), `900-planner-dark`, `901-route-dark`, and every Settings pane
+`11-route`, `12-schedule`, `13-settings`, every registered scene (`30+`), `900-planner-dark`, `901-route-dark`, and every Settings pane
 (`950-settings-…`; these sit above the scene range so scene numbers never collide). Register extra states in YOUR area's file — the registry line
-`SmokeScenes.all = planner + route + classDetail + settings` is pre-wired and frozen:
+`SmokeScenes.all = planner + route + classDetail + settings + schedule` is pre-wired and frozen (the Schedule scenes run offline on `BannerSampleData`):
 
 ```swift
 extension SmokeScenes {                       // Views/Route/RouteSmokeScenes.swift
@@ -388,7 +460,7 @@ Always undo state in `cleanup`. Look at your PNGs (Read tool) before you finish.
 
 - `DERIVED=.build/DerivedData-<you> scripts/build.sh` — ALWAYS a private DerivedData, run from your own worktree
   (see Git). Regenerates the project first.
-- `scripts/test.sh` — core tests (`swift test`, 110 tests incl. 400 golden cases and the 3,200-case differential run against Atlas's JS). Add tests for core logic you add.
+- `scripts/test.sh` — core tests (`swift test`, 186 tests (one live test skipped) incl. 400 golden cases and the 3,200-case differential run against Atlas's JS). Add tests for core logic you add.
 - `scripts/golden.sh` — regenerates the golden cases from Atlas's own scheduler (macOS JavaScriptCore; no Node).
 - `scripts/v8check.sh` — needs a real V8 (`node` / `deno`, or `V8_NODE=<Electron binary>`): checks the V8 sort port's
   comparator call order against V8's own sort and regenerates the golden cases on V8's own sort, diffing them with the

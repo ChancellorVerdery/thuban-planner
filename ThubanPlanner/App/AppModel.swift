@@ -75,6 +75,11 @@ final class AppModel {
     /// Route: bump to re-fit the board (toolbar "Fit", "Calculate route", ⌘0).
     var routeFitRequest = 0
 
+    // MARK: Schedule tab (App/Schedule/ScheduleModel.swift)
+
+    /// The Schedule section's own observable model (Banner terms, sections, timetables, schedule.json).
+    @ObservationIgnored let scheduleTab: ScheduleModel
+
     // MARK: Import (AppModel+Import.swift)
 
     var importPhase: ImportPhase = .idle
@@ -92,10 +97,12 @@ final class AppModel {
 
     init(store: PlannerStore = PlannerStore()) {
         self.store = store
+        scheduleTab = ScheduleModel(store: TimetableStore(directory: store.directory), offline: SmokeHarness.isEnabled)
         preferences = Preferences.load()
         systemIsDark = Self.currentSystemIsDark()
         theme = ThemeResolver.resolve(preferences.theme, systemIsDark: systemIsDark)
         if let raw = preferences.lastSection, let saved = AppSection(rawValue: raw) { section = saved }
+        scheduleTab.app = self
     }
 
     // MARK: Lifecycle
@@ -190,7 +197,11 @@ final class AppModel {
 
     private func recomputeSchedule() {
         let fresh = Scheduler.scheduleDegree(data, now: now, calendar: calendar)
-        if fresh != schedule { schedule = fresh }
+        if fresh != schedule {
+            schedule = fresh
+            // The Schedule tab's "Thuban route" source reads the route.
+            if scheduleTab.isActivated { scheduleTab.refreshRows() }
+        }
         if let id = selectedCourseId, data.course(id) == nil { selectedCourseId = nil }
         if let id = presentedCourseId, data.course(id) == nil { presentedCourseId = nil }
     }

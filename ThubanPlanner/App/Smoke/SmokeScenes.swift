@@ -30,9 +30,9 @@ struct SmokeScene {
 
 /// The scene registry. Each area owns ONE static list in its own file — `SmokeScenes.planner` in
 /// Views/Planner/PlannerSmokeScenes.swift, `.route` in Views/Route/RouteSmokeScenes.swift, `.classDetail` in
-/// Views/ClassDetail/ClassDetailSmokeScenes.swift, `.settings` in Views/Settings/SettingsSmokeScenes.swift — so
+/// Views/ClassDetail/ClassDetailSmokeScenes.swift, `.settings` in Views/Settings/SettingsSmokeScenes.swift, `.schedule` in Views/Schedule/ScheduleSmokeScenes.swift — so
 /// parallel branches never edit the same line. This line is pre-wired and frozen; the harness runs the scenes in
 /// this order after the standard walk.
 enum SmokeScenes {
-    static var all: [SmokeScene] { planner + route + classDetail + settings }
+    static var all: [SmokeScene] { planner + route + classDetail + settings + schedule }
 }
