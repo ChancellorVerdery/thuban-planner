@@ -75,6 +75,13 @@ struct ThubanPlannerApp: App {
 }
 
 final class AppDelegate: NSObject, NSApplicationDelegate {
+    func applicationWillFinishLaunching(_ notification: Notification) {
+        // `--refresh-icon`: stamp the themed icon on the bundle and exit before any window appears.
+        MainActor.assumeIsolated {
+            SharedTheme.handleRefreshLaunch { AppIconRenderer.render(theme: $0) }
+        }
+    }
+
     func applicationDidFinishLaunching(_ notification: Notification) {
         NSApplication.shared.setActivationPolicy(.regular)
     }

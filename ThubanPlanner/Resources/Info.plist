@@ -32,5 +32,7 @@
 	<false/>
 	<key>NSSupportsSuddenTermination</key>
 	<false/>
+	<key>ThubanSharedTheme</key>
+	<true/>
 </dict>
 </plist>

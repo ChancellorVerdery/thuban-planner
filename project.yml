@@ -39,6 +39,7 @@ targets:
         NSPrincipalClass: NSApplication
         NSSupportsAutomaticTermination: false
         NSSupportsSuddenTermination: false
+        ThubanSharedTheme: true
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: org.thuban.planner
