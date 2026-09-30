@@ -117,6 +117,29 @@ public enum BannerPlanExport {
     public static let submitPlanBatchURL = URL(string: "https://selfservice.uncc.edu/StudentRegistrationSsb/ssb/plan/submitPlan/batch")!
     /// Plan Ahead's term page ("Open Plan Ahead").
     public static let planAheadURL = URL(string: "https://selfservice.uncc.edu/StudentRegistrationSsb/ssb/term/termSelection?mode=plan")!
+    /// UNC Charlotte's sign-in page for Banner registration — where Banner itself sends a signed-out request for a
+    /// student-only page (verified live 2026-09-30). After sign-in it returns to `/StudentRegistrationSsb/login/cas`,
+    /// which starts the Banner session. (Plan Ahead's term page, by contrast, silently redirects a signed-out visitor to
+    /// the public landing page, so it can't be used to sign in.)
+    public static let signInURL = URL(string: "https://webauth.uncc.edu/idp/profile/cas/login?TARGET=https%3A%2F%2Fselfservice.uncc.edu%2FStudentRegistrationSsb%2Flogin%2Fcas")!
+    /// A student-only, read-only JSON endpoint: 200 + JSON when the Banner session is signed in, a redirect to the
+    /// sign-in page otherwise. Used to decide "signed in" — never a page's look.
+    public static let sessionCheckURL = URL(string: "https://selfservice.uncc.edu/StudentRegistrationSsb/ssb/plan/getTerms?searchTerm=&offset=1&max=1")!
+
+    /// JavaScript (run inside a page on selfservice.uncc.edu) that answers "in" when `sessionCheckURL` returns JSON,
+    /// "out" when it redirects (to sign-in) or returns HTML, "error" otherwise. Redirects are not followed.
+    public static let sessionCheckScript = """
+    try {
+      const r = await fetch(url, { credentials: 'include', redirect: 'manual',
+        headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'application/json, text/javascript, */*; q=0.01' } });
+      if (r.type === 'opaqueredirect' || (r.status >= 300 && r.status < 400)) { return 'out'; }
+      if (r.status === 401 || r.status === 403) { return 'out'; }
+      if (r.status !== 200) { return 'error'; }
+      const text = (await r.text()).trim();
+      if (text.startsWith('[') || text.startsWith('{')) { return 'in'; }
+      return 'out';
+    } catch (e) { return 'error'; }
+    """
     public static let termSearchURL = URL(string: "https://selfservice.uncc.edu/StudentRegistrationSsb/ssb/term/search?mode=plan")!
     public static let selectPlanURL = URL(string: "https://selfservice.uncc.edu/StudentRegistrationSsb/ssb/plan/selectPlan")!
     public static let newPlanURL = URL(string: "https://selfservice.uncc.edu/StudentRegistrationSsb/ssb/plan/plan")!

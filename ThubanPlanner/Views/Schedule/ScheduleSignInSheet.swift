@@ -4,8 +4,10 @@ import WebKit
 
 /// "Sign in to UNC Charlotte": UNC Charlotte's own sign-in page in an embedded web view on the app's persistent WebKit
 /// store. Opens only when the user chooses to sign in (sidebar) or starts an export. The user types their credentials
-/// into UNC Charlotte's page; the app never sees or stores them (no Keychain) and never signs in by itself. When a
-/// signed-in Banner page loads, the footer says so and the button continues (to the export, if one is waiting).
+/// into UNC Charlotte's page; the app never sees or stores them (no Keychain) and never signs in by itself. The sheet
+/// opens UNC Charlotte's sign-in page for Banner (`BannerPlanExport.signInURL`). "Signed in" is decided by asking Banner
+/// (a student-only JSON endpoint answers with data only for a signed-in session — `BannerWebKit.sessionState`), never
+/// by which pages were visited; then the footer says so and the button continues (to the export, if one is waiting).
 /// Every navigation passes `BannerNavigationGuard`, and content rules block every write to Banner in this view.
 struct ScheduleSignInSheet: View {
     @Environment(AppModel.self) private var app
@@ -15,7 +17,10 @@ struct ScheduleSignInSheet: View {
     @State private var currentHost = ""
     @State private var isLoading = false
     @State private var blockedMessage: String?
-    @State private var sawSignInPage = false
+    /// On a Banner page, but Banner says the session isn't signed in (e.g. the public landing page).
+    @State private var onBannerSignedOut = false
+    /// Bumped to send the web view back to the sign-in page.
+    @State private var restartToken = 0
 
     var body: some View {
         let model = app.scheduleTab
@@ -55,7 +60,7 @@ struct ScheduleSignInSheet: View {
             ZStack {
                 theme.bgColor
                 if let configuration, !model.offline {
-                    ScheduleWebView(configuration: configuration, start: BannerWebKit.signInURL,
+                    ScheduleWebView(configuration: configuration, start: BannerWebKit.signInURL, restartToken: restartToken,
                                     onPage: pageLoaded, onLoading: { isLoading = $0 }, onBlocked: { blockedMessage = $0 })
                 } else if model.offline {
                     VStack(spacing: 8) {
@@ -78,6 +83,13 @@ struct ScheduleSignInSheet: View {
                     .foregroundStyle(blockedMessage != nil ? theme.negTextColor : theme.inkDimColor)
                     .lineLimit(2)
                 Spacer(minLength: 8)
+                if onBannerSignedOut, !model.auth.isSignedIn {
+                    Button("Go to sign-in page") {
+                        onBannerSignedOut = false
+                        restartToken += 1
+                    }
+                    .buttonStyle(.thubanSecondary)
+                }
                 Button("Cancel") { dismiss() }
                     .buttonStyle(.thubanSecondary)
                     .keyboardShortcut(.cancelAction)
@@ -102,19 +114,33 @@ struct ScheduleSignInSheet: View {
         if let blockedMessage { return blockedMessage }
         switch model.auth {
         case .signedIn(let name): return "Signed in\(name.map { " as \($0)" } ?? "")." + (model.exportAfterSignIn ? " Continue to review the plan before anything is created." : " You can close this.")
+        default:
+            if onBannerSignedOut { return "This Banner page isn’t signed in yet. Use “Go to sign-in page” and sign in with your NinerNET account." }
+        }
+        switch model.auth {
         case .expired: return "Your earlier sign-in ended. Sign in with your NinerNET account; Duo may ask you to approve it."
         default: return "Sign in with your NinerNET account. Duo may ask you to approve the sign-in."
         }
     }
 
-    private func pageLoaded(_ url: URL, fullName: String?) {
+    private func pageLoaded(_ url: URL, fullName: String?, webView: WKWebView) {
         currentHost = url.host ?? ""
-        if BannerPage.isSignInURL(url) { sawSignInPage = true }
-        let onBanner = url.host?.lowercased() == BannerRequestGuard.host && !BannerPage.isSignInURL(url)
-        // Signed in = back on Banner with the student's name on the page, or back on Banner after UNC Charlotte's
-        // sign-in page in this sheet.
-        if onBanner, (fullName?.isEmpty == false) || sawSignInPage {
-            app.scheduleTab.didSignIn(name: fullName.flatMap { $0.isEmpty ? nil : $0 })
+        guard url.host?.lowercased() == BannerRequestGuard.host, !url.path.lowercased().contains("/login") else {
+            onBannerSignedOut = false
+            return
+        }
+        // On a Banner page: ask Banner whether this session is signed in.
+        Task { @MainActor in
+            switch await BannerWebKit.sessionState(in: webView) {
+            case .signedIn:
+                onBannerSignedOut = false
+                app.scheduleTab.didSignIn(name: fullName.flatMap { $0.isEmpty ? nil : $0 })
+            case .signedOut:
+                onBannerSignedOut = true
+                app.scheduleTab.markNotSignedIn()
+            case .unknown:
+                break
+            }
         }
     }
 }
@@ -124,7 +150,8 @@ struct ScheduleSignInSheet: View {
 private struct ScheduleWebView: NSViewRepresentable {
     var configuration: WKWebViewConfiguration
     var start: URL
-    var onPage: (URL, String?) -> Void
+    var restartToken: Int
+    var onPage: (URL, String?, WKWebView) -> Void
     var onLoading: (Bool) -> Void
     var onBlocked: (String) -> Void
 
@@ -138,14 +165,24 @@ private struct ScheduleWebView: NSViewRepresentable {
         return view
     }
 
-    func updateNSView(_ nsView: WKWebView, context: Context) { context.coordinator.parent = self }
+    func updateNSView(_ nsView: WKWebView, context: Context) {
+        context.coordinator.parent = self
+        if context.coordinator.restartToken != restartToken {
+            context.coordinator.restartToken = restartToken
+            nsView.load(URLRequest(url: start))
+        }
+    }
 
     @MainActor
     final class Coordinator: NSObject, WKNavigationDelegate {
         var parent: ScheduleWebView
         let policy = BannerNavigationGuard()
+        var restartToken = 0
 
-        init(_ parent: ScheduleWebView) { self.parent = parent }
+        init(_ parent: ScheduleWebView) {
+            self.parent = parent
+            restartToken = parent.restartToken
+        }
 
         func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction,
                      decisionHandler: @escaping @MainActor (WKNavigationActionPolicy) -> Void) {
@@ -158,7 +195,7 @@ private struct ScheduleWebView: NSViewRepresentable {
             parent.onLoading(false)
             guard let url = webView.url else { return }
             webView.evaluateJavaScript("document.querySelector('meta[name=\"fullName\"]')?.content || ''") { [weak self] value, _ in
-                MainActor.assumeIsolated { self?.parent.onPage(url, value as? String) }
+                MainActor.assumeIsolated { self?.parent.onPage(url, value as? String, webView) }
             }
         }
 

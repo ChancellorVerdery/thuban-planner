@@ -77,6 +77,11 @@ extension ScheduleModel {
         auth = .signedIn(name: name)
     }
 
+    /// Called by the sign-in sheet when Banner says this session is NOT signed in (e.g. the public landing page).
+    func markNotSignedIn() {
+        if auth.isSignedIn || auth == .unknown { auth = .signedOut }
+    }
+
     /// The sign-in sheet closed: continue the export that asked for it.
     func signInSheetClosed() {
         guard exportAfterSignIn else { return }

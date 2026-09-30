@@ -434,10 +434,14 @@ not come back.)
   never signs in by itself. The sheet opens only when the user clicks "Sign in" in the sidebar's account footer
   ("UNC Charlotte account · Not signed in · Sign in" / "Signed in as X · Sign out" / "Signed in earlier" / "Sign-in
   ended") or starts an export while signed out. It is an embedded WKWebView on `WKWebsiteDataStore.default()` showing
-  `term/termSelection?mode=plan` → UNC Charlotte's own CAS / Shibboleth page (webauth.uncc.edu); the app never sees or
-  stores the password (no Keychain) and never reads another browser's cookies. Signed in = back on selfservice
-  StudentRegistrationSsb (not a sign-in URL) with a non-empty `<meta name="fullName">`, or after passing a sign-in
-  page in this sheet. Activation only checks locally whether uncc.edu cookies exist ("Signed in earlier"). Sign out
+  `BannerPlanExport.signInURL` — UNC Charlotte's own CAS / Shibboleth page (webauth.uncc.edu, TARGET =
+  StudentRegistrationSsb/login/cas, which starts the Banner session). NOT `term/termSelection?mode=plan`: signed out,
+  that silently redirects to Banner's public landing page (verified live 2026-09-30 — the first build started there,
+  and clicking around the landing page was mistaken for a sign-in). The app never sees or stores the password (no
+  Keychain) and never reads another browser's cookies. Signed in is decided ONLY by asking Banner: on every
+  selfservice page the sheet runs `BannerPlanExport.sessionCheckScript` (GET `plan/getTerms`, redirects not
+  followed): JSON = signed in, redirect / HTML = signed out (the footer then offers "Go to sign-in page"). The
+  exporter runs the same check after opening Plan Ahead. Activation only checks locally whether uncc.edu cookies exist ("Signed in earlier"). Sign out
   deletes every uncc.edu cookie and website-data record. The old one-time `forgetOldBannerSignIn` cleanup is DELETED
   (it can never wipe a new sign-in); its `didForgetBannerSignIn` default is simply ignored.
 - **Export to Banner… (`ScheduleModel+Export.swift`, `Views/Schedule/ScheduleExportSheet.swift`, core

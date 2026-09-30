@@ -160,6 +160,21 @@ final class BannerExportGuardTests: XCTestCase {
     let term = "202710"
     func url(_ s: String) -> URL { URL(string: s)! }
 
+    func testSignInStartsOnUNCCSignInPageAndSessionCheckIsReadOnly() {
+        // The sheet must open UNC Charlotte's real sign-in page (Plan Ahead's term page only redirects a signed-out
+        // visitor to Banner's public landing page), returning to Banner's login/cas.
+        let signIn = BannerPlanExport.signInURL
+        XCTAssertEqual(signIn.host, "webauth.uncc.edu")
+        let target = URLComponents(url: signIn, resolvingAgainstBaseURL: false)?.queryItems?.first { $0.name == "TARGET" }?.value
+        XCTAssertEqual(target, "https://selfservice.uncc.edu/StudentRegistrationSsb/login/cas")
+        XCTAssertTrue(BannerRequestGuard.checkBrowser(url: signIn).isAllowed)
+        XCTAssertTrue(BannerPage.isSignInURL(signIn))
+        // The session check is a plain GET the guard allows, never a write.
+        XCTAssertEqual(BannerRequestGuard.check(method: "GET", url: BannerPlanExport.sessionCheckURL), .allow)
+        XCTAssertFalse(BannerPlanExport.sessionCheckScript.lowercased().contains("post"))
+        XCTAssertTrue(BannerPlanExport.sessionCheckScript.contains("redirect: 'manual'"))
+    }
+
     func testPlanCreationDeniedWithoutAuthorization() {
         let add = BannerPlanExport.addPlanItemRequest(term: term, crn: "20263")
         XCTAssertFalse(BannerRequestGuard.check(method: "POST", url: add.url, body: add.body).isAllowed)

@@ -17,8 +17,25 @@ import os
 enum BannerWebKit {
     static let logger = Logger(subsystem: "org.thuban.planner", category: "banner")
 
-    /// The sign-in start page: Plan Ahead's term selection (UNC Charlotte's sign-in page when signed out).
-    static var signInURL: URL { BannerPlanExport.planAheadURL }
+    /// The sign-in start page: UNC Charlotte's own sign-in page for Banner (returns to Banner's `login/cas`).
+    static var signInURL: URL { BannerPlanExport.signInURL }
+
+    enum SessionState { case signedIn, signedOut, unknown }
+
+    /// Asks Banner, from inside `webView` (which must be showing a selfservice.uncc.edu page), whether this WebKit
+    /// store's Banner session is signed in: a student-only JSON endpoint answers with data only when it is. Read-only.
+    static func sessionState(in webView: WKWebView) async -> SessionState {
+        guard webView.url?.host?.lowercased() == BannerRequestGuard.host else { return .unknown }
+        let world = WKContentWorld.world(name: "thuban-session-check")
+        let value = try? await webView.callAsyncJavaScript(BannerPlanExport.sessionCheckScript,
+                                                           arguments: ["url": BannerPlanExport.sessionCheckURL.absoluteString],
+                                                           in: nil, contentWorld: world)
+        switch value as? String {
+        case "in": return .signedIn
+        case "out": return .signedOut
+        default: return .unknown
+        }
+    }
 
     /// The sign-in sheet's configuration: persistent default store, every write blocked.
     static func signInConfiguration() async -> WKWebViewConfiguration {
@@ -284,13 +301,15 @@ final class BannerPlanExporter: NSObject, WKNavigationDelegate {
 
     // MARK: Pieces
 
-    /// Step 1: the Plan Ahead term page; throws `.signedOut` on a sign-in page. Returns the student's name.
+    /// Step 1: the Plan Ahead term page; throws `.signedOut` on a sign-in page (or Banner's public landing page, where a
+    /// signed-out visitor is sent) or when Banner says the session isn't signed in. Returns the student's name.
     private func openPlanAhead() async throws -> String? {
         do {
             _ = try await open(BannerPlanExport.planAheadURL)
         } catch BannerError.signedOut {
             throw BannerExportFailure.signedOut
         }
+        if let view = webView, await BannerWebKit.sessionState(in: view) == .signedOut { throw BannerExportFailure.signedOut }
         let name = try? await webView?.evaluateJavaScript("document.querySelector('meta[name=\"fullName\"]')?.content || ''") as? String
         return name.flatMap { $0.isEmpty ? nil : $0 }
     }
