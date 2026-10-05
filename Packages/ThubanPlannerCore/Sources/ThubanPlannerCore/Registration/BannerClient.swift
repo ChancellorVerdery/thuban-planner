@@ -197,6 +197,39 @@ public actor BannerClient {
         return all.filter { seen.insert($0.crn).inserted }
     }
 
+    /// Every section of a whole SUBJECT in a term — one search (`txt_subject` only, 500 per page) instead of one per
+    /// course; used for "which courses were offered". Re-establishes the session once when Banner answers 0.
+    public func subjectSections(subject: String, term code: String) async throws -> [BannerSection] {
+        let first = try await searchSubject(subject, term: code)
+        if !first.isEmpty { return first }
+        try await startSession()
+        try await selectTerm(code)
+        return try await searchSubject(subject, term: code)
+    }
+
+    private func searchSubject(_ subject: String, term code: String) async throws -> [BannerSection] {
+        if selectedTerm != code { try await selectTerm(code) }
+        var all: [BannerSection] = []
+        var offset = 0
+        _ = try await send(request("POST", url("classSearch/resetDataForm"), form: []), expectJSON: false)
+        while true {
+            let query: [(String, String)] = [
+                ("txt_subject", subject.uppercased()), ("txt_term", code),
+                ("startDatepicker", ""), ("endDatepicker", ""), ("uniqueSessionId", uniqueSessionId),
+                ("pageOffset", String(offset)), ("pageMaxSize", String(Self.pageSize)),
+                ("sortColumn", "subjectDescription"), ("sortDirection", "asc"),
+            ]
+            let data = try await send(request("GET", url("searchResults/searchResults", query)), expectJSON: true)
+            let page: BannerSearchPage
+            do { page = try BannerSearchPage.decode(data) } catch { throw BannerError.unreadable("Banner’s class search couldn’t be read.") }
+            all += page.sections.filter { $0.subject.uppercased() == subject.uppercased() }
+            offset += Self.pageSize
+            if page.sections.isEmpty || offset >= page.totalCount || offset > 5000 { break }
+        }
+        var seen = Set<String>()
+        return all.filter { seen.insert($0.crn).inserted }
+    }
+
     /// `searchResults/fetchLinkedSections` — the sets of sections that must be taken with `crn`.
     public func linkedSections(term code: String, crn: String) async throws -> [[BannerSection]] {
         if selectedTerm != code { try await selectTerm(code) }

@@ -17,9 +17,13 @@ public struct Course: Codable, Hashable, Sendable, Identifiable {
     public var summerOk: Bool
     /// The past / current term key it was taken in; nil = still to take (the scheduler places it).
     public var term: String?
+    /// Thuban-only labels ("tech-elective", "prereq:PHYS 4242", "program:Minor in Mathematics"). Absent (nil) by
+    /// default and for every Atlas document, so encoding is unchanged unless a feature set them; the scheduler never
+    /// reads them.
+    public var tags: [String]?
 
     public init(id: String, code: String, title: String = "", credits: Double = 3, prereqs: [String] = [], coreqs: [String] = [],
-                summerOk: Bool = false, term: String? = nil) {
+                summerOk: Bool = false, term: String? = nil, tags: [String]? = nil) {
         self.id = id
         self.code = code
         self.title = title
@@ -28,6 +32,7 @@ public struct Course: Codable, Hashable, Sendable, Identifiable {
         self.coreqs = coreqs
         self.summerOk = summerOk
         self.term = term
+        self.tags = tags
     }
 
     public var isTaken: Bool { term != nil }

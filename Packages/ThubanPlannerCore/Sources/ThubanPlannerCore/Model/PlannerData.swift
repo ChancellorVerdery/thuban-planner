@@ -94,6 +94,7 @@ public struct PlannerData: Codable, Hashable, Sendable {
             c.prereqs = PlannerData.cleanRefs(c.prereqs)
             c.coreqs = PlannerData.cleanRefs(c.coreqs)
             if c.term?.isEmpty == true { c.term = nil }
+            if c.tags?.isEmpty == true { c.tags = nil }
             return c
         }
         var seen = Set<String>()
@@ -175,7 +176,8 @@ public struct PlannerData: Codable, Hashable, Sendable {
                 // decompose(): fold the retired preOrCo bucket into coreqs, de-duplicated (exact text), order kept.
                 coreqs: PlannerData.uniq(PlannerData.cleanRefs(json: c["coreqs"]) + PlannerData.cleanRefs(json: c["preOrCo"])),
                 summerOk: JS.truthy(c["summerOk"]),
-                term: (termValue?.isEmpty == false) ? termValue : nil))
+                term: (termValue?.isEmpty == false) ? termValue : nil,
+                tags: PlannerData.tags(json: c["tags"])))
         }
 
         // Terms: valid season + finite year, key recomputed, first key wins, sorted by rank, one current.
@@ -211,6 +213,19 @@ public struct PlannerData: Codable, Hashable, Sendable {
         if case .number(let v)? = s["version"] { version = Int(v) }
         if let text = s["importedAt"]?.stringValue { importedAt = ISO8601DateFormatter().date(from: text) }
         importSource = s["importSource"]?.stringValue
+    }
+
+    /// Thuban-only course tags: an array of non-empty strings (trimmed, de-duplicated); anything else — including the
+    /// absent key of every Atlas document — is nil, so Atlas data round-trips unchanged.
+    static func tags(json value: JSONValue?) -> [String]? {
+        guard let items = value?.arrayValue else { return nil }
+        var out: [String] = []
+        for item in items {
+            guard let text = item.stringValue else { continue }
+            let t = text.trimmingCharacters(in: .whitespacesAndNewlines)
+            if !t.isEmpty, !out.contains(t) { out.append(t) }
+        }
+        return out.isEmpty ? nil : out
     }
 
     /// Atlas `cleanRefs`: an array's elements as `String(x).trim()`, empties dropped; anything else → [].

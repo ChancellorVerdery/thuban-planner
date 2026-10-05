@@ -1,0 +1,4741 @@
+{
+ "version": 1,
+ "generatedAt": "2026-10-05T22:56:11+00:00",
+ "generator": "tools/catalog/refresh_catalog.py",
+ "program": {
+  "id": "uncc-bsme-2025-26",
+  "name": "Mechanical Engineering, B.S.M.E.",
+  "catalogTitle": "Mechanical Engineering, B.S.M.E.",
+  "school": "UNC Charlotte",
+  "catalogYear": "2025-2026",
+  "catalogURL": "https://catalog.charlotte.edu/preview_program.php?catoid=40&poid=11501",
+  "techElectives": {
+   "label": "Technical electives",
+   "count": 4,
+   "credits": 12,
+   "minimumMEGR": 3,
+   "rule": "Select four of the following.  At least three of the four must be MEGR courses.",
+   "degreeWorks": "4 Classes in MEGR 3090 or … or PHYS 4271 — additionally a minimum of 3 Classes in MEGR @"
+  },
+  "core": [
+   "ENGR 1300",
+   "ENGR 1301",
+   "ENGR 1302",
+   "ENGR 1303",
+   "ENGR 3295",
+   "MATH 1241",
+   "MATH 1242",
+   "MATH 2171",
+   "MATH 2241",
+   "MEGR 2141",
+   "MEGR 2144",
+   "MEGR 2152",
+   "MEGR 2157",
+   "MEGR 2173",
+   "MEGR 2174",
+   "MEGR 2180",
+   "MEGR 2233",
+   "MEGR 2234",
+   "MEGR 2242",
+   "MEGR 3111",
+   "MEGR 3114",
+   "MEGR 3116",
+   "MEGR 3121",
+   "MEGR 3123",
+   "MEGR 3152",
+   "MEGR 3156",
+   "MEGR 3161",
+   "MEGR 3173",
+   "MEGR 3174",
+   "MEGR 3216",
+   "MEGR 3221",
+   "MEGR 3251",
+   "MEGR 3255",
+   "MEGR 3256",
+   "PHYS 2101",
+   "PHYS 2101L",
+   "PHYS 2102",
+   "PHYS 2102L"
+  ]
+ },
+ "sources": [
+  "https://catalog.charlotte.edu/preview_program.php?catoid=40&poid=11501",
+  "https://catalog.charlotte.edu/content.php?catoid=40&navoid=4989 (course descriptions)",
+  "UNC Charlotte DegreeWorks audit, BSME catalog year 2025-2026, Technical Elective block (2026-09-26)"
+ ],
+ "electives": [
+  {
+   "code": "BIOL 3161",
+   "inCatalog": true,
+   "inDegreeWorks": true,
+   "megr": false,
+   "condition": null,
+   "existsInCatalog": true
+  },
+  {
+   "code": "MATH 3171",
+   "inCatalog": true,
+   "inDegreeWorks": true,
+   "megr": false,
+   "condition": null,
+   "existsInCatalog": true
+  },
+  {
+   "code": "MEGR 3090",
+   "inCatalog": true,
+   "inDegreeWorks": true,
+   "megr": true,
+   "condition": null,
+   "existsInCatalog": true
+  },
+  {
+   "code": "MEGR 3092",
+   "inCatalog": true,
+   "inDegreeWorks": true,
+   "megr": true,
+   "condition": null,
+   "existsInCatalog": true
+  },
+  {
+   "code": "MEGR 3094",
+   "inCatalog": true,
+   "inDegreeWorks": true,
+   "megr": true,
+   "condition": null,
+   "existsInCatalog": true
+  },
+  {
+   "code": "MEGR 3097",
+   "inCatalog": true,
+   "inDegreeWorks": true,
+   "megr": true,
+   "condition": null,
+   "existsInCatalog": true
+  },
+  {
+   "code": "MEGR 3162",
+   "inCatalog": true,
+   "inDegreeWorks": true,
+   "megr": true,
+   "condition": null,
+   "existsInCatalog": true
+  },
+  {
+   "code": "MEGR 3210",
+   "inCatalog": true,
+   "inDegreeWorks": true,
+   "megr": true,
+   "condition": null,
+   "existsInCatalog": true
+  },
+  {
+   "code": "MEGR 3211",
+   "inCatalog": true,
+   "inDegreeWorks": true,
+   "megr": true,
+   "condition": null,
+   "existsInCatalog": true
+  },
+  {
+   "code": "MEGR 3214",
+   "inCatalog": true,
+   "inDegreeWorks": true,
+   "megr": true,
+   "condition": null,
+   "existsInCatalog": true
+  },
+  {
+   "code": "MEGR 3221",
+   "inCatalog": true,
+   "inDegreeWorks": false,
+   "megr": true,
+   "condition": "may count as a Technical Elective only if MEGR 3216 is completed to fulfill the Design Elective",
+   "existsInCatalog": true
+  },
+  {
+   "code": "MEGR 3225",
+   "inCatalog": true,
+   "inDegreeWorks": true,
+   "megr": true,
+   "condition": null,
+   "existsInCatalog": true
+  },
+  {
+   "code": "MEGR 3231",
+   "inCatalog": true,
+   "inDegreeWorks": true,
+   "megr": true,
+   "condition": null,
+   "existsInCatalog": true
+  },
+  {
+   "code": "MEGR 3232",
+   "inCatalog": true,
+   "inDegreeWorks": true,
+   "megr": true,
+   "condition": null,
+   "existsInCatalog": true
+  },
+  {
+   "code": "MEGR 3233",
+   "inCatalog": true,
+   "inDegreeWorks": true,
+   "megr": true,
+   "condition": null,
+   "existsInCatalog": true
+  },
+  {
+   "code": "MEGR 3234",
+   "inCatalog": true,
+   "inDegreeWorks": true,
+   "megr": true,
+   "condition": null,
+   "existsInCatalog": true
+  },
+  {
+   "code": "MEGR 3235",
+   "inCatalog": true,
+   "inDegreeWorks": true,
+   "megr": true,
+   "condition": null,
+   "existsInCatalog": true
+  },
+  {
+   "code": "MEGR 3236",
+   "inCatalog": true,
+   "inDegreeWorks": true,
+   "megr": true,
+   "condition": null,
+   "existsInCatalog": true
+  },
+  {
+   "code": "MEGR 3237",
+   "inCatalog": true,
+   "inDegreeWorks": true,
+   "megr": true,
+   "condition": null,
+   "existsInCatalog": true
+  },
+  {
+   "code": "MEGR 3238",
+   "inCatalog": true,
+   "inDegreeWorks": true,
+   "megr": true,
+   "condition": null,
+   "existsInCatalog": true
+  },
+  {
+   "code": "MEGR 3240",
+   "inCatalog": true,
+   "inDegreeWorks": true,
+   "megr": true,
+   "condition": null,
+   "existsInCatalog": true
+  },
+  {
+   "code": "MEGR 3241",
+   "inCatalog": true,
+   "inDegreeWorks": true,
+   "megr": true,
+   "condition": null,
+   "existsInCatalog": true
+  },
+  {
+   "code": "MEGR 3242",
+   "inCatalog": true,
+   "inDegreeWorks": true,
+   "megr": true,
+   "condition": null,
+   "existsInCatalog": true
+  },
+  {
+   "code": "MEGR 3244",
+   "inCatalog": true,
+   "inDegreeWorks": true,
+   "megr": true,
+   "condition": null,
+   "existsInCatalog": true
+  },
+  {
+   "code": "MEGR 3245",
+   "inCatalog": true,
+   "inDegreeWorks": true,
+   "megr": true,
+   "condition": null,
+   "existsInCatalog": true
+  },
+  {
+   "code": "MEGR 3260",
+   "inCatalog": true,
+   "inDegreeWorks": true,
+   "megr": true,
+   "condition": null,
+   "existsInCatalog": true
+  },
+  {
+   "code": "MEGR 3261",
+   "inCatalog": true,
+   "inDegreeWorks": true,
+   "megr": true,
+   "condition": null,
+   "existsInCatalog": true
+  },
+  {
+   "code": "MEGR 3262",
+   "inCatalog": true,
+   "inDegreeWorks": true,
+   "megr": true,
+   "condition": null,
+   "existsInCatalog": true
+  },
+  {
+   "code": "MEGR 3270",
+   "inCatalog": true,
+   "inDegreeWorks": true,
+   "megr": true,
+   "condition": null,
+   "existsInCatalog": true
+  },
+  {
+   "code": "MEGR 3271",
+   "inCatalog": true,
+   "inDegreeWorks": true,
+   "megr": true,
+   "condition": null,
+   "existsInCatalog": true
+  },
+  {
+   "code": "MEGR 3272",
+   "inCatalog": true,
+   "inDegreeWorks": true,
+   "megr": true,
+   "condition": null,
+   "existsInCatalog": true
+  },
+  {
+   "code": "MEGR 3282",
+   "inCatalog": true,
+   "inDegreeWorks": true,
+   "megr": true,
+   "condition": null,
+   "existsInCatalog": true
+  },
+  {
+   "code": "MEGR 3283",
+   "inCatalog": true,
+   "inDegreeWorks": true,
+   "megr": true,
+   "condition": null,
+   "existsInCatalog": true
+  },
+  {
+   "code": "MEGR 3310",
+   "inCatalog": true,
+   "inDegreeWorks": true,
+   "megr": true,
+   "condition": null,
+   "existsInCatalog": true
+  },
+  {
+   "code": "MEGR 3451",
+   "inCatalog": true,
+   "inDegreeWorks": true,
+   "megr": true,
+   "condition": null,
+   "existsInCatalog": true
+  },
+  {
+   "code": "MEGR 3452",
+   "inCatalog": true,
+   "inDegreeWorks": true,
+   "megr": true,
+   "condition": null,
+   "existsInCatalog": true
+  },
+  {
+   "code": "MEGR 4090",
+   "inCatalog": true,
+   "inDegreeWorks": true,
+   "megr": true,
+   "condition": null,
+   "existsInCatalog": true
+  },
+  {
+   "code": "MEGR 4091",
+   "inCatalog": true,
+   "inDegreeWorks": true,
+   "megr": true,
+   "condition": null,
+   "existsInCatalog": true
+  },
+  {
+   "code": "MEGR 4092",
+   "inCatalog": true,
+   "inDegreeWorks": true,
+   "megr": true,
+   "condition": null,
+   "existsInCatalog": true
+  },
+  {
+   "code": "MEGR 4094",
+   "inCatalog": true,
+   "inDegreeWorks": true,
+   "megr": true,
+   "condition": null,
+   "existsInCatalog": true
+  },
+  {
+   "code": "MEGR 4097",
+   "inCatalog": true,
+   "inDegreeWorks": true,
+   "megr": true,
+   "condition": null,
+   "existsInCatalog": true
+  },
+  {
+   "code": "MEGR 4098",
+   "inCatalog": true,
+   "inDegreeWorks": true,
+   "megr": true,
+   "condition": null,
+   "existsInCatalog": true
+  },
+  {
+   "code": "MEGR 4127",
+   "inCatalog": true,
+   "inDegreeWorks": true,
+   "megr": true,
+   "condition": null,
+   "existsInCatalog": true
+  },
+  {
+   "code": "MEGR 4143",
+   "inCatalog": true,
+   "inDegreeWorks": true,
+   "megr": true,
+   "condition": null,
+   "existsInCatalog": true
+  },
+  {
+   "code": "MEGR 4210",
+   "inCatalog": true,
+   "inDegreeWorks": true,
+   "megr": true,
+   "condition": null,
+   "existsInCatalog": true
+  },
+  {
+   "code": "MEGR 4211",
+   "inCatalog": true,
+   "inDegreeWorks": true,
+   "megr": true,
+   "condition": null,
+   "existsInCatalog": true
+  },
+  {
+   "code": "MEGR 4235",
+   "inCatalog": true,
+   "inDegreeWorks": true,
+   "megr": true,
+   "condition": null,
+   "existsInCatalog": true
+  },
+  {
+   "code": "MEGR 4237",
+   "inCatalog": true,
+   "inDegreeWorks": true,
+   "megr": true,
+   "condition": null,
+   "existsInCatalog": true
+  },
+  {
+   "code": "MEGR 4240",
+   "inCatalog": true,
+   "inDegreeWorks": true,
+   "megr": true,
+   "condition": null,
+   "existsInCatalog": true
+  },
+  {
+   "code": "MEGR 4242",
+   "inCatalog": true,
+   "inDegreeWorks": true,
+   "megr": true,
+   "condition": null,
+   "existsInCatalog": true
+  },
+  {
+   "code": "MEGR 4244",
+   "inCatalog": true,
+   "inDegreeWorks": true,
+   "megr": true,
+   "condition": null,
+   "existsInCatalog": true
+  },
+  {
+   "code": "MEGR 4271",
+   "inCatalog": true,
+   "inDegreeWorks": true,
+   "megr": true,
+   "condition": null,
+   "existsInCatalog": true
+  },
+  {
+   "code": "MEGR 4272",
+   "inCatalog": true,
+   "inDegreeWorks": true,
+   "megr": true,
+   "condition": null,
+   "existsInCatalog": true
+  },
+  {
+   "code": "MEGR 4273",
+   "inCatalog": true,
+   "inDegreeWorks": true,
+   "megr": true,
+   "condition": null,
+   "existsInCatalog": true
+  },
+  {
+   "code": "MEGR 4274",
+   "inCatalog": true,
+   "inDegreeWorks": true,
+   "megr": true,
+   "condition": null,
+   "existsInCatalog": true
+  },
+  {
+   "code": "MEGR 4280",
+   "inCatalog": true,
+   "inDegreeWorks": true,
+   "megr": true,
+   "condition": null,
+   "existsInCatalog": true
+  },
+  {
+   "code": "MEGR 4290",
+   "inCatalog": true,
+   "inDegreeWorks": true,
+   "megr": true,
+   "condition": null,
+   "existsInCatalog": true
+  },
+  {
+   "code": "MEGR 4291",
+   "inCatalog": true,
+   "inDegreeWorks": true,
+   "megr": true,
+   "condition": null,
+   "existsInCatalog": true
+  },
+  {
+   "code": "MEGR 4292",
+   "inCatalog": true,
+   "inDegreeWorks": true,
+   "megr": true,
+   "condition": null,
+   "existsInCatalog": true
+  },
+  {
+   "code": "MEGR 4310",
+   "inCatalog": true,
+   "inDegreeWorks": true,
+   "megr": true,
+   "condition": null,
+   "existsInCatalog": true
+  },
+  {
+   "code": "MEGR 4311",
+   "inCatalog": true,
+   "inDegreeWorks": true,
+   "megr": true,
+   "condition": null,
+   "existsInCatalog": true
+  },
+  {
+   "code": "MEGR 4312",
+   "inCatalog": true,
+   "inDegreeWorks": true,
+   "megr": true,
+   "condition": null,
+   "existsInCatalog": true
+  },
+  {
+   "code": "PHYS 3220",
+   "inCatalog": true,
+   "inDegreeWorks": true,
+   "megr": false,
+   "condition": null,
+   "existsInCatalog": true
+  },
+  {
+   "code": "PHYS 4110",
+   "inCatalog": true,
+   "inDegreeWorks": true,
+   "megr": false,
+   "condition": null,
+   "existsInCatalog": true
+  },
+  {
+   "code": "PHYS 4140",
+   "inCatalog": true,
+   "inDegreeWorks": true,
+   "megr": false,
+   "condition": null,
+   "existsInCatalog": true
+  },
+  {
+   "code": "PHYS 4232",
+   "inCatalog": true,
+   "inDegreeWorks": true,
+   "megr": false,
+   "condition": null,
+   "existsInCatalog": true
+  },
+  {
+   "code": "PHYS 4242",
+   "inCatalog": true,
+   "inDegreeWorks": true,
+   "megr": false,
+   "condition": null,
+   "existsInCatalog": true
+  },
+  {
+   "code": "PHYS 4271",
+   "inCatalog": true,
+   "inDegreeWorks": true,
+   "megr": false,
+   "condition": null,
+   "existsInCatalog": true
+  },
+  {
+   "code": "MEGR 3222",
+   "inCatalog": false,
+   "inDegreeWorks": true,
+   "megr": true,
+   "condition": null,
+   "existsInCatalog": false
+  },
+  {
+   "code": "MEGR 3243",
+   "inCatalog": false,
+   "inDegreeWorks": true,
+   "megr": true,
+   "condition": null,
+   "existsInCatalog": false
+  },
+  {
+   "code": "MEGR 3280",
+   "inCatalog": false,
+   "inDegreeWorks": true,
+   "megr": true,
+   "condition": null,
+   "existsInCatalog": false
+  },
+  {
+   "code": "MEGR 4212",
+   "inCatalog": false,
+   "inDegreeWorks": true,
+   "megr": true,
+   "condition": null,
+   "existsInCatalog": false
+  },
+  {
+   "code": "MEGR 4213",
+   "inCatalog": false,
+   "inDegreeWorks": true,
+   "megr": true,
+   "condition": null,
+   "existsInCatalog": false
+  },
+  {
+   "code": "MEGR 4281",
+   "inCatalog": false,
+   "inDegreeWorks": true,
+   "megr": true,
+   "condition": null,
+   "existsInCatalog": false
+  },
+  {
+   "code": "MEGR 4282",
+   "inCatalog": false,
+   "inDegreeWorks": true,
+   "megr": true,
+   "condition": null,
+   "existsInCatalog": false
+  },
+  {
+   "code": "MEGR 4313",
+   "inCatalog": false,
+   "inDegreeWorks": true,
+   "megr": true,
+   "condition": null,
+   "existsInCatalog": false
+  }
+ ],
+ "missingFromCatalog": [
+  "MEGR 3222",
+  "MEGR 3243",
+  "MEGR 3280",
+  "MEGR 4212",
+  "MEGR 4213",
+  "MEGR 4281",
+  "MEGR 4282",
+  "MEGR 4313"
+ ],
+ "nextCatalogYear": "2026-2027",
+ "courses": {
+  "BIOL 1110": {
+   "code": "BIOL 1110",
+   "title": "Principles of Biology I",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Introduction to biology for non-majors. Fundamental principles of life with a human emphasis. Not accepted toward the Biology major.",
+   "prereqText": null,
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": null,
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=138542",
+   "coid": "138542",
+   "prereqGroups": [],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [],
+   "core": false
+  },
+  "BIOL 2120": {
+   "code": "BIOL 2120",
+   "title": "General Biology I",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Origin and early evolution of life, basic principles of chemistry, cell biology, and genetics.",
+   "prereqText": "Appropriate eligibility level of BIOL placement; BIOL 1110 with grade of B or above or placement by the department.",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": null,
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=138546",
+   "coid": "138546",
+   "prereqGroups": [
+    [
+     "BIOL 1110"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "with grade of B or above"
+   ],
+   "core": false
+  },
+  "BIOL 2120L": {
+   "code": "BIOL 2120L",
+   "title": "General Biology I Laboratory",
+   "credits": 1.0,
+   "creditsText": "(1)",
+   "description": "The accompanying laboratory to BIOL 2120. Experimental scientific inquiry into the concepts addressed in General Biology I.",
+   "prereqText": null,
+   "coreqText": "BIOL 2120",
+   "preOrCoreqText": null,
+   "restriction": null,
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=141682",
+   "coid": "141682",
+   "prereqGroups": [],
+   "coreqGroups": [
+    [
+     "BIOL 2120"
+    ]
+   ],
+   "preOrCoreqGroups": [],
+   "notes": [],
+   "core": false
+  },
+  "BIOL 2130": {
+   "code": "BIOL 2130",
+   "title": "General Biology II",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Ecology, evolution, biodiversity, plant and animal structure and function.",
+   "prereqText": "BIOL 2120 and BIOL 2120L with grade of C or above, or placement by the department.",
+   "coreqText": "BIOL 2130L with grade of C or above, or placement by the department.",
+   "preOrCoreqText": null,
+   "restriction": null,
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=138547",
+   "coid": "138547",
+   "prereqGroups": [
+    [
+     "BIOL 2120"
+    ],
+    [
+     "BIOL 2120L"
+    ]
+   ],
+   "coreqGroups": [
+    [
+     "BIOL 2130L"
+    ]
+   ],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "with grade of C or above"
+   ],
+   "core": false
+  },
+  "BIOL 2130L": {
+   "code": "BIOL 2130L",
+   "title": "General Biology II Laboratory",
+   "credits": 1.0,
+   "creditsText": "(1)",
+   "description": "The accompanying laboratory to BIOL 2130. Experimental scientific inquiry into the concepts addressed in General Biology II.",
+   "prereqText": "BIOL 2120 and BIOL 2120L with grade of C or above, or placement by the department.",
+   "coreqText": "BIOL 2130",
+   "preOrCoreqText": null,
+   "restriction": null,
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=141683",
+   "coid": "141683",
+   "prereqGroups": [
+    [
+     "BIOL 2120"
+    ],
+    [
+     "BIOL 2120L"
+    ]
+   ],
+   "coreqGroups": [
+    [
+     "BIOL 2130"
+    ]
+   ],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "with grade of C or above"
+   ],
+   "core": false
+  },
+  "BIOL 3111": {
+   "code": "BIOL 3111",
+   "title": "Cell Biology",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Structure and function of cells. Biomolecular structures and their interactions including membranes, proteins and nucleic acids.",
+   "prereqText": "BIOL 2120, BIOL 2130, CHEM 1252, and CHEM 1252L with grades of C or above.",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": "Biology major or minor or permission of department",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=138556",
+   "coid": "138556",
+   "prereqGroups": [
+    [
+     "BIOL 2120"
+    ],
+    [
+     "BIOL 2130"
+    ],
+    [
+     "CHEM 1252"
+    ],
+    [
+     "CHEM 1252L"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "Biology major or minor or permission of department",
+    "with grades of C or above"
+   ],
+   "core": false
+  },
+  "BIOL 3161": {
+   "code": "BIOL 3161",
+   "title": "Introduction to Biotechnology",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "An overview of basic molecular biology, techniques, and uses of biotechnology tools in environmental and biomedical fields.",
+   "prereqText": "BIOL 1110  or BIOL 2120 with grade of C or above, or permission of department.",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": null,
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=140928",
+   "coid": "140928",
+   "prereqGroups": [
+    [
+     "BIOL 1110",
+     "BIOL 2120"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "with grade of C or above",
+    "or permission of department"
+   ],
+   "core": false
+  },
+  "CHEM 1200": {
+   "code": "CHEM 1200",
+   "title": "Fundamentals of Chemistry",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Primarily for students with little or no chemistry background who intend to take CHEM 1251. Introduction to the basic concepts, problem solving skills, and language of chemistry. Develops relationships between chemical formulas and equations, and explores calculations dependent upon these. Students who already have credit for CHEM 1251 with grade of C or above may not take CHEM 1200 for credit. CHEM 1200 will not fulfill chemistry degree requirements.",
+   "prereqText": null,
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": null,
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=138686",
+   "coid": "138686",
+   "prereqGroups": [],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [],
+   "core": false
+  },
+  "CHEM 1251": {
+   "code": "CHEM 1251",
+   "title": "General Chemistry I",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "A principles-oriented course for science and engineering majors. Fundamental principles and laws of chemistry; the relationship of atomic structure to physical and chemical properties of the elements. Topics include: measurements, chemical nomenclature, reactions and stoichiometry, thermochemistry, atomic structure, periodicity, bonding, and molecular structure. Three lecture hours and one Problem Session hour per week.  Students may attempt CHEM 1251 a total of three times. Withdrawing from the course after the Add/Drop deadline constitutes an attempt as does receiving any letter grade.  Stud",
+   "prereqText": "MATH 1100 or MATH 1101 with grade of C or above (or equivalent test score) or CHEM 1200 (which is recommended for students who have not had chemistry in high school) with grade of C or above.",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": null,
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=138691",
+   "coid": "138691",
+   "prereqGroups": [
+    [
+     "MATH 1100",
+     "MATH 1101",
+     "CHEM 1200"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "with grade of C or above",
+    "or equivalent",
+    "test score",
+    "which is recommended for students who have not had chemistry in high school"
+   ],
+   "core": false
+  },
+  "CHEM 1251L": {
+   "code": "CHEM 1251L",
+   "title": "General Chemistry I Laboratory",
+   "credits": 1.0,
+   "creditsText": "(1)",
+   "description": "Experimental investigations involving the fundamental principles and laws of chemistry.  Students may attempt CHEM 1251L a total of three times. Withdrawing from the course after the Add/Drop deadline constitutes an attempt as does receiving any letter grade.  Students who have received credit for CHEM 1251L may not enroll in CHEM 1111L.",
+   "prereqText": null,
+   "coreqText": null,
+   "preOrCoreqText": "CHEM 1251",
+   "restriction": null,
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=138692",
+   "coid": "138692",
+   "prereqGroups": [],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [
+    [
+     "CHEM 1251"
+    ]
+   ],
+   "notes": [],
+   "core": false
+  },
+  "CHEM 1252": {
+   "code": "CHEM 1252",
+   "title": "General Chemistry II",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Continuation of CHEM 1251. Topics include: gas laws, liquids and solids, solutions, chemical kinetics, chemical equilibrium, thermodynamics, and electrochemistry.  Three lecture hours and one Problem Session hour per week.  Students may attempt CHEM 1252 a total of three times. Withdrawing from the course after the Add/Drop deadline constitutes an attempt as does receiving any letter grade.",
+   "prereqText": "CHEM 1251 with grade of C or above",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": null,
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=138693",
+   "coid": "138693",
+   "prereqGroups": [
+    [
+     "CHEM 1251"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "with grade of C or above"
+   ],
+   "core": false
+  },
+  "CHEM 1252L": {
+   "code": "CHEM 1252L",
+   "title": "General Chemistry II Laboratory",
+   "credits": 1.0,
+   "creditsText": "(1)",
+   "description": "Continuation of CHEM 1251L.  Students may attempt CHEM 1252L a total of three times. Withdrawing from the course after the Add/Drop deadline constitutes an attempt as does receiving any letter grade.",
+   "prereqText": "CHEM 1251 and CHEM 1251L with grades of C or above",
+   "coreqText": null,
+   "preOrCoreqText": "CHEM 1252",
+   "restriction": null,
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=138694",
+   "coid": "138694",
+   "prereqGroups": [
+    [
+     "CHEM 1251"
+    ],
+    [
+     "CHEM 1251L"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [
+    [
+     "CHEM 1252"
+    ]
+   ],
+   "notes": [
+    "with grades of C or above"
+   ],
+   "core": false
+  },
+  "CHEM 2131": {
+   "code": "CHEM 2131",
+   "title": "Organic Chemistry I",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Descriptive principles and techniques of organic chemistry and their applications to reactions of aliphatic and aromatic compounds and natural products.  Students may attempt CHEM 2131 a total of three times. Withdrawing from the course after the Add/Drop deadline constitutes an attempt as does receiving any letter grade.",
+   "prereqText": "CHEM 1251 and CHEM 1252 with grades of C or above",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": null,
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=138697",
+   "coid": "138697",
+   "prereqGroups": [
+    [
+     "CHEM 1251"
+    ],
+    [
+     "CHEM 1252"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "with grades of C or above"
+   ],
+   "core": false
+  },
+  "CHEM 2132": {
+   "code": "CHEM 2132",
+   "title": "Organic Chemistry II",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Continuation of CHEM 2131.  Students may attempt CHEM 2132 a total of three times. Withdrawing from the course after the Add/Drop deadline constitutes an attempt as does receiving any letter grade.< Three lecture hours and one Problem Session hour per week./p>",
+   "prereqText": "CHEM 2131 with grade of C or above.",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": null,
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=138699",
+   "coid": "138699",
+   "prereqGroups": [
+    [
+     "CHEM 2131"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "with grade of C or above"
+   ],
+   "core": false
+  },
+  "CHEM 4165": {
+   "code": "CHEM 4165",
+   "title": "Principles of Biochemistry I",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "A study of the structures, properties, and functions of biological molecules, bioenergetics of biological reactions, and enzyme catalysis, with particular emphasis on the underlying chemical principles, including thermodynamics and kinetics.",
+   "prereqText": "CHEM 2132 with grade of C or above.",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": null,
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=138717",
+   "coid": "138717",
+   "prereqGroups": [
+    [
+     "CHEM 2132"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "with grade of C or above"
+   ],
+   "core": false
+  },
+  "ECGR 2111": {
+   "code": "ECGR 2111",
+   "title": "Network Theory I",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Ohm’s Law and the passive sign convention in circuit analysis.  Introduction to Kirchoff’s laws.  Circuit analysis techniques and network theorems.  Energy-storage elements in circuits.  Transient and natural response of first-order circuits.",
+   "prereqText": null,
+   "coreqText": null,
+   "preOrCoreqText": "MATH 2171 or permission of department",
+   "restriction": "Computer Engineering or Electrical Engineering major or minor",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=138891",
+   "coid": "138891",
+   "prereqGroups": [],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [
+    [
+     "MATH 2171"
+    ]
+   ],
+   "notes": [
+    "Computer Engineering or Electrical Engineering major or minor",
+    "or permission of department"
+   ],
+   "core": false
+  },
+  "ECGR 2112": {
+   "code": "ECGR 2112",
+   "title": "Network Theory II",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Continuation of ECGR 2111. Transient and natural response of second-order circuits.  Complex numbers.  Sinusoidal steady state analysis and phasors.  Power and energy in single-phase circuits.  Frequency-domain analysis and Bode Plots.  Introduction to Laplace transforms and transfer functions.",
+   "prereqText": "ECGR 2111, MATH 2171, and PHYS 2102, all with grades of C or above",
+   "coreqText": null,
+   "preOrCoreqText": "ECGR 2254 with grade of C or above",
+   "restriction": "Engineering major or minor",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=138892",
+   "coid": "138892",
+   "prereqGroups": [
+    [
+     "ECGR 2111"
+    ],
+    [
+     "MATH 2171"
+    ],
+    [
+     "PHYS 2102"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [
+    [
+     "ECGR 2254"
+    ]
+   ],
+   "notes": [
+    "Engineering major or minor",
+    "all with grades of C or above",
+    "with grade of C or above"
+   ],
+   "core": false
+  },
+  "ECGR 2161": {
+   "code": "ECGR 2161",
+   "title": "Basic Electrical Engineering I",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Fundamental concepts and methods of analysis of D.C. and A.C. circuits, elementary operation of electronic devices. Not open to Electrical and Computer Engineering majors.",
+   "prereqText": "PHYS 2102 with grade of C or above.",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": "Engineering major or minor.",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=138895",
+   "coid": "138895",
+   "prereqGroups": [
+    [
+     "PHYS 2102"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "Engineering major or minor.",
+    "with grade of C or above"
+   ],
+   "core": false
+  },
+  "ECGR 2254": {
+   "code": "ECGR 2254",
+   "title": "Analytical Foundations of Electrical and Computer Engineering",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Use of MATLAB for numeric simulation analysis, complex numbers, real and complex functions, signal representation, functional approximation by curve fitting, introduction to functions of a discrete variable, linear differential equations, Laplace transforms used for solving linear differential equations, Fourier series and Fourier transforms and their use in solving electrical and computer engineering problems.",
+   "prereqText": "MATH 2164 and MATH 2171 with grade of C or above",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": "Engineering major or minor",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=141348",
+   "coid": "141348",
+   "prereqGroups": [
+    [
+     "MATH 2164"
+    ],
+    [
+     "MATH 2171"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "Engineering major or minor",
+    "with grade of C or above"
+   ],
+   "core": false
+  },
+  "ENGR 1201": {
+   "code": "ENGR 1201",
+   "title": "Introduction to Engineering Practices and Principles I",
+   "credits": 2.0,
+   "creditsText": "(2)",
+   "description": "An introduction to the different disciplines within engineering; the college’s computing system; academic, personal and professional development; teamwork; project planning; engineering design; engineering calculations; and oral and written communication skills within a multi-disciplinary format.",
+   "prereqText": "C or better in MATH 1103 or place in math level 4",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": "College of Engineering major; Register for MATH 1241 or higher.",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=139138",
+   "coid": "139138",
+   "prereqGroups": [
+    [
+     "MATH 1103"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "College of Engineering major; Register for MATH 1241 or higher.",
+    "C or better"
+   ],
+   "core": false
+  },
+  "ENGR 1202": {
+   "code": "ENGR 1202",
+   "title": "Introduction to Engineering Practices and Principles II",
+   "credits": 2.0,
+   "creditsText": "(2)",
+   "description": "Applications in the disciplines of Civil, Computer, Electrical, Mechanical, and Systems Engineering using tools and techniques specific to the major and discipline. Emphasis is on analytical and problem-solving skills and understanding of the profession/curriculum.  Each course section is restricted to a specific engineering major discipline.",
+   "prereqText": "ENGR 1201 and MATH 1241 with grades of C or above",
+   "coreqText": "ENGR 1201 and permission of department",
+   "preOrCoreqText": null,
+   "restriction": "Engineering major or minor.",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=139139",
+   "coid": "139139",
+   "prereqGroups": [
+    [
+     "ENGR 1201"
+    ],
+    [
+     "MATH 1241"
+    ]
+   ],
+   "coreqGroups": [
+    [
+     "ENGR 1201"
+    ]
+   ],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "Engineering major or minor.",
+    "with grades of C or above"
+   ],
+   "core": false
+  },
+  "ENGR 1300": {
+   "code": "ENGR 1300",
+   "title": "Exploring Engineering & Technology with Success",
+   "credits": 2.0,
+   "creditsText": "(2)",
+   "description": "This course will welcome students with a diverse cross-section of backgrounds into the engineering college/profession with a variety of hands-on experiences that informs them of the different engineering careers/disciplines and offers them an opportunity to apply the engineering design process to meaningful, real-world projects. Students will further develop learning efficacy while discovering their passion and finding meaningful connections in the engineering community. With a grade of C or above.",
+   "prereqText": null,
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": "Admission to the College of Engineering",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=146443",
+   "coid": "146443",
+   "prereqGroups": [],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "Admission to the College of Engineering"
+   ],
+   "core": true
+  },
+  "ENGR 1301": {
+   "code": "ENGR 1301",
+   "title": "Foundations of Math and Science for Engineering",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "A study of foundational math and science, including vectors, vector algebra, units, Newton’s laws, atomic structure, properties of matter, quantum mechanics, ideal gas law, chemical bonding, etc. Course consists of both lectures and breakout practice/lab sessions. With a grade of C or above.",
+   "prereqText": null,
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": "Admission to the College of Engineering",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=146444",
+   "coid": "146444",
+   "prereqGroups": [],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "Admission to the College of Engineering"
+   ],
+   "core": true
+  },
+  "ENGR 1302": {
+   "code": "ENGR 1302",
+   "title": "Logic and Computational Problem Solving",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "An immersive project-oriented course where students explore real-world engineering problems, develop methodologies for solving problems logically and with computational tools, and validate solutions.  A modern programming language is introduced. With a grade of C or above.",
+   "prereqText": null,
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": "Admission to the College of Engineering",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=146445",
+   "coid": "146445",
+   "prereqGroups": [],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "Admission to the College of Engineering"
+   ],
+   "core": true
+  },
+  "ENGR 1303": {
+   "code": "ENGR 1303",
+   "title": "Engineering Visualization and Graphical Communication",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "This course enables students to develop foundational knowledge and skills for visualizing and communicating complex three-dimensional designs and data sets. Through hands-on and practical applications, students learn techniques and tools to create visual spatial representations and conduct data analysis that aids in decision-making. Online 2D and 3D applications will be used, as well as spreadsheets and mathematical analysis software. With a grade of C or above.",
+   "prereqText": null,
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": "Admission to the College of Engineering",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=146446",
+   "coid": "146446",
+   "prereqGroups": [],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "Admission to the College of Engineering"
+   ],
+   "core": true
+  },
+  "ENGR 3295": {
+   "code": "ENGR 3295",
+   "title": "Multidisciplinary Professional Development",
+   "credits": 1.0,
+   "creditsText": "(1)",
+   "description": "A series of multidisciplinary and disciplinary seminars and activities designed to introduce students to basic concepts of professionalism in engineering. Topics include: global, societal, and contemporary issues of current interest such as leadership, entrepreneurship, ethics, and professional licensure.  Each course section is restricted to a specific engineering major discipline.  Sections may be cross-listed with more than one engineering major discipline.",
+   "prereqText": null,
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": "Junior or Senior standing per departmental requirements; and Engineering major or minor.",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=139143",
+   "coid": "139143",
+   "prereqGroups": [],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "Junior or Senior standing per departmental requirements; and Engineering major or minor."
+   ],
+   "core": true
+  },
+  "MATH 0900": {
+   "code": "MATH 0900",
+   "title": "Math Study Skills and Algebra Review",
+   "credits": 1.0,
+   "creditsText": "(1)",
+   "description": "Prepares students to be successful in college algebra or precalculus. Topics include: a review of elementary algebra, exponents and radicals, polynomial and rational functions, equations, and inequalities. Study skills needed to be successful in mathematics are an important part of this course. Placement in this course is based on an appropriate eligibility level of math placement and is restricted to students who do not have college-level math credit.",
+   "prereqText": null,
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": null,
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=139857",
+   "coid": "139857",
+   "prereqGroups": [],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [],
+   "core": false
+  },
+  "MATH 1100": {
+   "code": "MATH 1100",
+   "title": "College Algebra",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "The basic mathematics course about the fundamental concepts of algebra for undergraduates whose majors require College Algebra, Pre-Calculus, or Calculus.  Topics include: polynomial, exponential, and logarithmic functions and their graphs.  Students who have already received credit for MATH 1103 or higher with grade of C or above may not receive credit for taking MATH 1100 or MATH 1101.",
+   "prereqText": "Math Placement Level 2 or MATH 0900",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": null,
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=139858",
+   "coid": "139858",
+   "prereqGroups": [
+    [
+     "MATH 0900"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [],
+   "core": false
+  },
+  "MATH 1101": {
+   "code": "MATH 1101",
+   "title": "College Algebra with Workshop",
+   "credits": 4.0,
+   "creditsText": "(4)",
+   "description": "Explores topics that are necessary for success in Pre-Calculus or Calculus courses. Topics include:  functions and their graphs; composition and inverses; exponential, logarithmic, and polynomial functions. May not be taken for credit and for a grade if credit has been received for MATH 1100. Students who have already received credit for MATH 1103 or above will not receive credit for taking MATH 1101.",
+   "prereqText": null,
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": null,
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=141618",
+   "coid": "141618",
+   "prereqGroups": [],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [],
+   "core": false
+  },
+  "MATH 1103": {
+   "code": "MATH 1103",
+   "title": "Precalculus Mathematics for Science and Engineering",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Intended for students who plan to take MATH 1241. Review of polynomial and rational functions, properties of functions, composite, and inverse functions. The study of polynomial and rational inequalities, reciprocal functions, trigonometric functions and their graphs, identities and equations, the law of sines and cosines. A brief introduction of limits of functions through their graphs. Students who have already received credit for MATH 1121 or higher with grade of C or above will not receive credit for taking MATH 1103.",
+   "prereqText": "Math Placement Level 3 or MATH 1100 or MATH 1101",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": null,
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=139860",
+   "coid": "139860",
+   "prereqGroups": [
+    [
+     "MATH 1100",
+     "MATH 1101"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [],
+   "core": false
+  },
+  "MATH 1120": {
+   "code": "MATH 1120",
+   "title": "Calculus",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Intended for students majoring in fields other than engineering, mathematics or science. Elements of differential and integral calculus for polynomial, rational, exponential, logarithmic functions, with applications to business and the social and life sciences. Students who have already received credit for MATH 1121 or higher will not receive credit for taking MATH 1120.",
+   "prereqText": "MATH Placement Level 3 or MATH 1100 or MATH 1101 or MATH 1103",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": null,
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=139862",
+   "coid": "139862",
+   "prereqGroups": [
+    [
+     "MATH 1100",
+     "MATH 1101",
+     "MATH 1103"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [],
+   "core": false
+  },
+  "MATH 1121": {
+   "code": "MATH 1121",
+   "title": "Calculus for Engineering Technology",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Intended for students majoring in Engineering Technology or Construction Management.  Technical problem solutions utilizing analytical geometry and differential calculus.  Topics include: limits, differentiation, curvilinear motion, related rates, optimization problems, and transcendental functions.  Students who have already received credit for MATH 1120, MATH 1241, or higher will not receive credit for taking MATH 1121.",
+   "prereqText": "Math Placement Level 4 or a score of at least 23 on the Math portion of the ACT or MATH 1103 with grade of C or above",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": null,
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=139863",
+   "coid": "139863",
+   "prereqGroups": [
+    [
+     "MATH 1103"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "with grade of C or above"
+   ],
+   "core": false
+  },
+  "MATH 1241": {
+   "code": "MATH 1241",
+   "title": "Calculus I",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Designed for students majoring in Mathematics, Science, or Engineering. Elementary functions, derivatives and their applications, introduction to definite integrals.",
+   "prereqText": "Math Placement Level 4 or MATH 1103 with a grade of C or better.",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": null,
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=139865",
+   "coid": "139865",
+   "prereqGroups": [
+    [
+     "MATH 1103"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "with a grade of C or better"
+   ],
+   "core": true
+  },
+  "MATH 1242": {
+   "code": "MATH 1242",
+   "title": "Calculus II",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Methods for evaluating definite integrals, applications of integration, improper integrals, infinite series, Taylor series, power series, and introduction to differential equations.",
+   "prereqText": "MATH 1241 with grade of C or above.",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": null,
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=139866",
+   "coid": "139866",
+   "prereqGroups": [
+    [
+     "MATH 1241"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "with grade of C or above"
+   ],
+   "core": true
+  },
+  "MATH 2164": {
+   "code": "MATH 2164",
+   "title": "Matrices and Linear Algebra",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Matrix algebra, systems of linear equations, vector spaces, linear transformations, determinants, inner products, eigenvalues.",
+   "prereqText": "MATH 1120 or MATH 1241 with grade of C or above or permission of department.",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": null,
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=139868",
+   "coid": "139868",
+   "prereqGroups": [
+    [
+     "MATH 1120",
+     "MATH 1241"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "with grade of C or above",
+    "or permission of department"
+   ],
+   "core": false
+  },
+  "MATH 2171": {
+   "code": "MATH 2171",
+   "title": "Differential Equations",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "An introduction to ordinary differential equations including first order equations, general theory of linear equations, series solutions, special solutions, special equations such as Bessel’s equation, and applications to physical and geometric problems.",
+   "prereqText": "MATH 1242 with grade of C or above.",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": null,
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=139869",
+   "coid": "139869",
+   "prereqGroups": [
+    [
+     "MATH 1242"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "with grade of C or above"
+   ],
+   "core": true
+  },
+  "MATH 2241": {
+   "code": "MATH 2241",
+   "title": "Calculus III",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Functions of two or more variables, vectors in two and three dimensions, partial derivatives, optimization, double and triple integrals and their applications.",
+   "prereqText": "MATH 1242 with grade of C or above.",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": null,
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=139870",
+   "coid": "139870",
+   "prereqGroups": [
+    [
+     "MATH 1242"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "with grade of C or above"
+   ],
+   "core": true
+  },
+  "MATH 2242": {
+   "code": "MATH 2242",
+   "title": "Calculus IV",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Parametric curves and surfaces, vector fields, line and surface integrals; Green’s theorem, Divergence theorem, Stoke’s theorem and applications. Fourier series and its applications.",
+   "prereqText": "MATH 2241 with grade of C or above.",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": null,
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=139871",
+   "coid": "139871",
+   "prereqGroups": [
+    [
+     "MATH 2241"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "with grade of C or above"
+   ],
+   "core": false
+  },
+  "MATH 3171": {
+   "code": "MATH 3171",
+   "title": "Applied Mathematics",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Separation of variables techniques for the classical partial differential equations of mathematical physics; Fourier series; Sturm-Liouville theory.",
+   "prereqText": "MATH 2241 and MATH 2171 with grades of C or above.",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": null,
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=139888",
+   "coid": "139888",
+   "prereqGroups": [
+    [
+     "MATH 2241"
+    ],
+    [
+     "MATH 2171"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "with grades of C or above"
+   ],
+   "core": false
+  },
+  "MEGR 2141": {
+   "code": "MEGR 2141",
+   "title": "Engineering Mechanics I",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Introduces the principles of particle and rigid body mechanics with engineering applications; force systems and resultants; the equilibrium of particles and rigid bodies; friction; and properties of areas and volumes. Introduces the principles of particle and rigid body mechanics with engineering applications; force systems and resultants; the equilibrium of particles and rigid bodies; friction; and properties of areas and volumes. Individual sections may be restricted to particular majors: -C0x sections are for CEGR and ENVE; -00x sections are open to MEGR, CEGR, or ENVE.",
+   "prereqText": "PHYS 2101 and MATH 1242 with grades of C or above.",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": "Mechanical Engineering, Environmental Engineering or Civil Engineering major (MEGR, CEGR or ENVE).  C0x sections are for Civil Engineering or Environmental Engineering majors only.",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=139921",
+   "coid": "139921",
+   "prereqGroups": [
+    [
+     "PHYS 2101"
+    ],
+    [
+     "MATH 1242"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "Mechanical Engineering, Environmental Engineering or Civil Engineering major (MEGR, CEGR or ENVE).  C0x sections are for Civil Engineering or Environmental Engineering majors only.",
+    "with grades of C or above"
+   ],
+   "core": true
+  },
+  "MEGR 2144": {
+   "code": "MEGR 2144",
+   "title": "Introduction to Solid Mechanics",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Engineering theory of deformable solids and applications. Stress and deformation resulting from axial, torsion and bending loads. Shear and moment diagrams, Mohr’s circle for stress and strain and buckling of columns.",
+   "prereqText": "MEGR 2141 with grade of C or above.",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": "Mechanical Engineering or Civil Engineering major (C sections are for Civil Engineering majors only).",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=139922",
+   "coid": "139922",
+   "prereqGroups": [
+    [
+     "MEGR 2141"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "Mechanical Engineering or Civil Engineering major (C sections are for Civil Engineering majors only).",
+    "with grade of C or above"
+   ],
+   "core": true
+  },
+  "MEGR 2152": {
+   "code": "MEGR 2152",
+   "title": "CAD for Mechanical Engineers",
+   "credits": 1.0,
+   "creditsText": "(1)",
+   "description": "Treatment of design visualization and computer-aided design with an emphasis on design presentation skills. This course requires a grade of C or better for the Mechanical Engineering curriculum.",
+   "prereqText": "ENGR 1303 with a grade of C or better",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": "MEGR major",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=146450",
+   "coid": "146450",
+   "prereqGroups": [
+    [
+     "ENGR 1303"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "MEGR major",
+    "with a grade of C or better"
+   ],
+   "core": true
+  },
+  "MEGR 2156": {
+   "code": "MEGR 2156",
+   "title": "Design Projects I Laboratory",
+   "credits": 2.0,
+   "creditsText": "(2)",
+   "description": "Introduction to design, as well as the fundamentals of manufacturing, including lathe and mill work.  Emphasis on design visualization, functional analysis, communication, and computer-aided design.  Students manufacture a design which then is verified for precision and accuracy.",
+   "prereqText": "ENGR 1201, ENGR 1202, and MEGR 2141, all with grades of C or above.",
+   "coreqText": "MEGR 2180.",
+   "preOrCoreqText": null,
+   "restriction": "Engineering major or minor.",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=139923",
+   "coid": "139923",
+   "prereqGroups": [
+    [
+     "ENGR 1201"
+    ],
+    [
+     "ENGR 1202"
+    ],
+    [
+     "MEGR 2141"
+    ]
+   ],
+   "coreqGroups": [
+    [
+     "MEGR 2180"
+    ]
+   ],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "Engineering major or minor.",
+    "all with grades of C or above"
+   ],
+   "core": false
+  },
+  "MEGR 2157": {
+   "code": "MEGR 2157",
+   "title": "Design Projects I Laboratory",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Introduction to mechanical engineering design with a focus on applying engineering principles to real-world challenges. Students will use engineering models and computer-aided design (CAD) to develop solutions tailored to specific applications. Emphasis is placed on analyzing and optimizing designs, selecting appropriate engineering materials, and effectively communicating solutions through engineering drawings and reports. The course integrates theory with application-based problem-solving, preparing students to address complex design issues across various engineering disciplines. This course",
+   "prereqText": "ENGR 1300, MEGR 2141 and MEGR 2152, all with grades of C or better",
+   "coreqText": "MEGR 2180",
+   "preOrCoreqText": null,
+   "restriction": "MEGR major",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=146451",
+   "coid": "146451",
+   "prereqGroups": [
+    [
+     "ENGR 1300"
+    ],
+    [
+     "MEGR 2141"
+    ],
+    [
+     "MEGR 2152"
+    ]
+   ],
+   "coreqGroups": [
+    [
+     "MEGR 2180"
+    ]
+   ],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "MEGR major",
+    "all with grades of C or better"
+   ],
+   "core": true
+  },
+  "MEGR 2173": {
+   "code": "MEGR 2173",
+   "title": "Mechatronics I",
+   "credits": 2.0,
+   "creditsText": "(2)",
+   "description": "Fundamentals of mechatronic systems, including basic electrical components, sensors, actuators, circuit analysis, data acquisition, and programming a microcontroller. This course requires a grade of C or better for the Mechanical Engineering curriculum.",
+   "prereqText": "ENGR 1302 and PHYS 2102 with grades of C or better",
+   "coreqText": "MEGR 2174",
+   "preOrCoreqText": null,
+   "restriction": "MEGR major",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=146452",
+   "coid": "146452",
+   "prereqGroups": [
+    [
+     "ENGR 1302"
+    ],
+    [
+     "PHYS 2102"
+    ]
+   ],
+   "coreqGroups": [
+    [
+     "MEGR 2174"
+    ]
+   ],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "MEGR major",
+    "with grades of C or better"
+   ],
+   "core": true
+  },
+  "MEGR 2174": {
+   "code": "MEGR 2174",
+   "title": "Mechatronics I Projects Laboratory",
+   "credits": 1.0,
+   "creditsText": "(1)",
+   "description": "Hands-on assembly, programming, diagnostics, and analysis of mechatronic and measurement systems through a series of projects complementing course material of MEGR 2173. This course requires a grade of C or better for the Mechanical Engineering curriculum.",
+   "prereqText": "PHYS 2102L with a grade of C or better",
+   "coreqText": "MEGR 2173",
+   "preOrCoreqText": null,
+   "restriction": "MEGR major",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=146453",
+   "coid": "146453",
+   "prereqGroups": [
+    [
+     "PHYS 2102L"
+    ]
+   ],
+   "coreqGroups": [
+    [
+     "MEGR 2173"
+    ]
+   ],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "MEGR major",
+    "with a grade of C or better"
+   ],
+   "core": true
+  },
+  "MEGR 2180": {
+   "code": "MEGR 2180",
+   "title": "Manufacturing Systems",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "A broad overview of manufacturing materials, processes, and procedures. Topics include: mechanical behavior and physical properties, basic materials, casting, rolling, forming, welding, cutting, surfaces, engineering metrology, quality assurance, and automation. Basic concepts of engineering economics and cost estimating.",
+   "prereqText": "MEGR 2141 with a grade of C or above.",
+   "coreqText": null,
+   "preOrCoreqText": "MEGR 2156 or MEGR 2157",
+   "restriction": "Engineering major or minor.",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=139924",
+   "coid": "139924",
+   "prereqGroups": [
+    [
+     "MEGR 2141"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [
+    [
+     "MEGR 2156",
+     "MEGR 2157"
+    ]
+   ],
+   "notes": [
+    "Engineering major or minor.",
+    "with a grade of C or above"
+   ],
+   "core": true
+  },
+  "MEGR 2233": {
+   "code": "MEGR 2233",
+   "title": "Math and Science for Engineers II",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "A course that includes concepts in chemistry and linear algebra for Mechanical Engineers. Topics include chemical bonding, crystal structure, introduction to electrochemistry, linear systems, matrix algebra, eigenvalues, and eigenvectors. This course requires a grade of C or better for the Mechanical Engineering curriculum.",
+   "prereqText": "ENGR 1301 and MATH 1241 with grades of C or better",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": "MEGR major",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=146454",
+   "coid": "146454",
+   "prereqGroups": [
+    [
+     "ENGR 1301"
+    ],
+    [
+     "MATH 1241"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "MEGR major",
+    "with grades of C or better"
+   ],
+   "core": true
+  },
+  "MEGR 2234": {
+   "code": "MEGR 2234",
+   "title": "Math and Science for Engineers III",
+   "credits": 4.0,
+   "creditsText": "(4)",
+   "description": "Topics include integral transforms, Fourier series, probability distributions, descriptive statistics, and regression. This course requires a grade of C or better for the Mechanical Engineering curriculum.",
+   "prereqText": "MATH 2171 and MEGR 2233 with grades of C or better",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": "MEGR major",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=146455",
+   "coid": "146455",
+   "prereqGroups": [
+    [
+     "MATH 2171"
+    ],
+    [
+     "MEGR 2233"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "MEGR major",
+    "with grades of C or better"
+   ],
+   "core": true
+  },
+  "MEGR 2240": {
+   "code": "MEGR 2240",
+   "title": "Computational Methods for Engineers",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Automated engineering analysis and synthesis techniques based on software engineering principles. Overview of data representation and computing languages. Program development using programming languages and off-the shelf software packages. Study of numerical methods, potential errors, and computational stability. emphasis on effective design, testing, and debugging practices.",
+   "prereqText": "MEGR 2141",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": "Engineering major or minor",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=139926",
+   "coid": "139926",
+   "prereqGroups": [
+    [
+     "MEGR 2141"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "Engineering major or minor"
+   ],
+   "core": false
+  },
+  "MEGR 2242": {
+   "code": "MEGR 2242",
+   "title": "Computational Methods for Engineers",
+   "credits": 2.0,
+   "creditsText": "(2)",
+   "description": "Automated engineering analysis and synthesis techniques based on software engineering principles. Overview of data representation and computing languages. Program development using programming languages and off-the-shelf software packages. Study of numerical methods, potential errors, and computational stability. Emphasis on effective design, testing, and debugging practices. This course requires a grade of C or better for the Mechanical Engineering curriculum.",
+   "prereqText": "MEGR 2233 with a grade of C or better",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": "MEGR major",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=146456",
+   "coid": "146456",
+   "prereqGroups": [
+    [
+     "MEGR 2233"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "MEGR major",
+    "with a grade of C or better"
+   ],
+   "core": true
+  },
+  "MEGR 2279": {
+   "code": "MEGR 2279",
+   "title": "Introduction to Biomedical Engineering",
+   "credits": 1.0,
+   "creditsText": "(1)",
+   "description": "An examination of various aspects of Biomedical Engineering.",
+   "prereqText": null,
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": "Admission to BSME Biomedical Engineering concentration and GPA of 3.0 or above.",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=140951",
+   "coid": "140951",
+   "prereqGroups": [],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "Admission to BSME Biomedical Engineering concentration and GPA of 3.0 or above."
+   ],
+   "core": false
+  },
+  "MEGR 3090": {
+   "code": "MEGR 3090",
+   "title": "Special Topics in Mechanical Engineering",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Technical Elective. Builds upon and synthesizes the knowledge the students have gained from the mechanical engineering core curriculum. The specific topics covered in each separate offering of the course serve as the vehicle for teaching engineering analysis, synthesis and design, while simultaneously affording an opportunity for the students to point themselves toward an area of specialization.",
+   "prereqText": null,
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": "Mechanical Engineering major or permission of department; Junior standing or higher.",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=139928",
+   "coid": "139928",
+   "prereqGroups": [],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "Mechanical Engineering major or permission of department; Junior standing or higher."
+   ],
+   "core": false
+  },
+  "MEGR 3092": {
+   "code": "MEGR 3092",
+   "title": "Special Topics in Motorsports Engineering",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Technical Elective. Builds upon and synthesizes the knowledge the students have gained from the mechanical engineering core curriculum. The specific topics covered in each separate offering of the course serve as the vehicle for teaching engineering analysis, synthesis and design, while simultaneously affording an opportunity for the students to point themselves toward an area of specialization.",
+   "prereqText": null,
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": "Mechanical Engineering major; Junior standing or higher",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=139929",
+   "coid": "139929",
+   "prereqGroups": [],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "Mechanical Engineering major; Junior standing or higher"
+   ],
+   "core": false
+  },
+  "MEGR 3094": {
+   "code": "MEGR 3094",
+   "title": "Special Topics in Energy Engineering",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Technical Elective. Builds upon and synthesizes the knowledge the students have gained from the mechanical engineering core curriculum. The specific topics covered in each separate offering of the course serve as the vehicle for teaching engineering analysis, synthesis and design, while simultaneously affording an opportunity for the students to point themselves toward an area of specialization.",
+   "prereqText": null,
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": "Mechanical Engineering major; Junior standing or higher",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=139930",
+   "coid": "139930",
+   "prereqGroups": [],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "Mechanical Engineering major; Junior standing or higher"
+   ],
+   "core": false
+  },
+  "MEGR 3097": {
+   "code": "MEGR 3097",
+   "title": "Special Topics in Biomedical Engineering",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Technical Elective. Builds upon and synthesizes the knowledge the students have gained from the Mechanical Engineering core curriculum. The specific topics covered in each separate offering of the course serve as the vehicle for teaching engineering analysis, synthesis and/or design, while simultaneously affording an opportunity for the students to point themselves toward the area of specialization of Biomedical Engineering.",
+   "prereqText": null,
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": "Mechanical Engineering major; Junior Standing or higher",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=141346",
+   "coid": "141346",
+   "prereqGroups": [],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "Mechanical Engineering major; Junior Standing or higher"
+   ],
+   "core": false
+  },
+  "MEGR 3111": {
+   "code": "MEGR 3111",
+   "title": "Thermodynamics I",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "First and second laws of thermodynamics. Work and heat carnot cycle. Ideal and real gases. Non-reactive mixture of gases. Availability and irreversibility.",
+   "prereqText": "MATH 1242 and PHYS 2101 with grades of C or above.",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": "MEGR major, CEGR major, ENVE major, EEGR major, or SEGR major",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=139931",
+   "coid": "139931",
+   "prereqGroups": [
+    [
+     "MATH 1242"
+    ],
+    [
+     "PHYS 2101"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "MEGR major, CEGR major, ENVE major, EEGR major, or SEGR major",
+    "with grades of C or above"
+   ],
+   "core": true
+  },
+  "MEGR 3112": {
+   "code": "MEGR 3112",
+   "title": "Thermodynamics II",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "General thermodynamic relations; equations of state and generalized charts. Combustion, dissociation, and chemical equilibrium. Introduction to power cycles.",
+   "prereqText": "MEGR 3111 with grade of C or above.",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": "Engineering major or minor.",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=139932",
+   "coid": "139932",
+   "prereqGroups": [
+    [
+     "MEGR 3111"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "Engineering major or minor.",
+    "with grade of C or above"
+   ],
+   "core": false
+  },
+  "MEGR 3114": {
+   "code": "MEGR 3114",
+   "title": "Fluid Mechanics",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Basic concepts of a fluid and the fundamentals of ideal and real fluid flow. Topics include: fluid statics, conservation principles, Bernoulli’s equation, fluid flow in pipes, and measurement devices.",
+   "prereqText": "MATH 2241 and MEGR 3121 with grades of C or above.",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": "Engineering major or minor.",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=139933",
+   "coid": "139933",
+   "prereqGroups": [
+    [
+     "MATH 2241"
+    ],
+    [
+     "MEGR 3121"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "Engineering major or minor.",
+    "with grades of C or above"
+   ],
+   "core": true
+  },
+  "MEGR 3116": {
+   "code": "MEGR 3116",
+   "title": "Introduction to Heat Transfer",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "One and two dimensional steady state conduction. Finite difference methods. Radiative heat transfer, emissivity, black body radiation. Heat exchange among two and multi-body systems. Introduction to concepts and applications of convective heat transfer.",
+   "prereqText": "MATH 2171 and MEGR 3111 with grades of C or above.",
+   "coreqText": null,
+   "preOrCoreqText": "MEGR 3114.",
+   "restriction": "Engineering major or minor.",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=139934",
+   "coid": "139934",
+   "prereqGroups": [
+    [
+     "MATH 2171"
+    ],
+    [
+     "MEGR 3111"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [
+    [
+     "MEGR 3114"
+    ]
+   ],
+   "notes": [
+    "Engineering major or minor.",
+    "with grades of C or above"
+   ],
+   "core": true
+  },
+  "MEGR 3121": {
+   "code": "MEGR 3121",
+   "title": "Dynamics Systems I",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "The kinematics and kinetics of rigid bodies. Work-energy and impulse-momentum principles and conservation laws. Introduction to the kinematics of mechanisms.",
+   "prereqText": "MEGR 2141 and MATH 1242 with grades of C or above.",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": "Engineering major or minor.",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=139935",
+   "coid": "139935",
+   "prereqGroups": [
+    [
+     "MEGR 2141"
+    ],
+    [
+     "MATH 1242"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "Engineering major or minor.",
+    "with grades of C or above"
+   ],
+   "core": true
+  },
+  "MEGR 3122": {
+   "code": "MEGR 3122",
+   "title": "Dynamic Systems II",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Modeling of mechanical dynamic systems. Vibration of lumped mass systems. Analysis and design of mechanical systems using time domain and frequency domain methods.",
+   "prereqText": "MEGR 2240, MEGR 3121, and MATH 2171 with grades of C or above.",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": "Engineering major or minor.",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=139936",
+   "coid": "139936",
+   "prereqGroups": [
+    [
+     "MEGR 2240"
+    ],
+    [
+     "MEGR 3121"
+    ],
+    [
+     "MATH 2171"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "Engineering major or minor.",
+    "with grades of C or above"
+   ],
+   "core": false
+  },
+  "MEGR 3123": {
+   "code": "MEGR 3123",
+   "title": "Dynamic Systems II",
+   "credits": 2.0,
+   "creditsText": "(2)",
+   "description": "Modeling of mechanical dynamic systems. Analysis and design of mechanical systems using time domain and frequency domain methods.",
+   "prereqText": "MEGR 2234, MEGR 2242, and MEGR 3121, all with grades of C or better",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": "MEGR major",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=146458",
+   "coid": "146458",
+   "prereqGroups": [
+    [
+     "MEGR 2234"
+    ],
+    [
+     "MEGR 2242"
+    ],
+    [
+     "MEGR 3121"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "MEGR major",
+    "all with grades of C or better"
+   ],
+   "core": true
+  },
+  "MEGR 3152": {
+   "code": "MEGR 3152",
+   "title": "Mechanics and Materials Laboratory",
+   "credits": 2.0,
+   "creditsText": "(2)",
+   "description": "Laboratory experiments related to the areas of mechanics and materials engineering. Three hours of laboratory each week.",
+   "prereqText": "MEGR 2144, with a grade of C or above; and MEGR 3171L or MEGR 3174 with a grade of C or above",
+   "coreqText": "MEGR 3161",
+   "preOrCoreqText": null,
+   "restriction": "Engineering major or minor.",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=139937",
+   "coid": "139937",
+   "prereqGroups": [
+    [
+     "MEGR 2144"
+    ],
+    [
+     "MEGR 3171L",
+     "MEGR 3174"
+    ]
+   ],
+   "coreqGroups": [
+    [
+     "MEGR 3161"
+    ]
+   ],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "Engineering major or minor.",
+    "with a grade of C or above"
+   ],
+   "core": true
+  },
+  "MEGR 3156": {
+   "code": "MEGR 3156",
+   "title": "Design Projects Lab II",
+   "credits": 2.0,
+   "creditsText": "(2)",
+   "description": "Study of the process of design and reduction to practice of engineering concepts in a team environment. Requirements definition, concept synthesis, concept of evaluation, project planning and execution.",
+   "prereqText": "MEGR 2144 and MEGR 2180; MEGR 2156 or MEGR 2157; ECGR 2161 or MEGR 2173 and MEGR 2174, all with a grade of C or above",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": "Engineering major or minor.",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=139938",
+   "coid": "139938",
+   "prereqGroups": [
+    [
+     "MEGR 2144"
+    ],
+    [
+     "MEGR 2180"
+    ],
+    [
+     "MEGR 2156",
+     "MEGR 2157"
+    ],
+    [
+     "ECGR 2161",
+     "MEGR 2173"
+    ],
+    [
+     "MEGR 2174"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "Engineering major or minor.",
+    "all with a grade of C or above"
+   ],
+   "core": true
+  },
+  "MEGR 3161": {
+   "code": "MEGR 3161",
+   "title": "Introduction to Engineering Materials",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Classifications of engineering materials. Introduction to property structure relationships. Ideal and defect atomic structures of solids with examples from metals, ceramics and polymers. Cold working and annealing effects. Phase equilibria in alloys; introduction to diffusional processes and transformation kinetics.",
+   "prereqText": "MEGR 2144 and CHEM 1251 or MEGR 1100 or MEGR 2233, with grades of C or above",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": "Engineering major or minor.",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=139939",
+   "coid": "139939",
+   "prereqGroups": [
+    [
+     "MEGR 2144"
+    ],
+    [
+     "CHEM 1251",
+     "MEGR 1100",
+     "MEGR 2233"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "Engineering major or minor.",
+    "with grades of C or above"
+   ],
+   "core": true
+  },
+  "MEGR 3162": {
+   "code": "MEGR 3162",
+   "title": "Mechanical Behavior and Strengthening of Solids",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Technical Elective. Mechanical properties of materials including elastic behavior, plastic flow, fracture, creep, fatigue, and elevated temperature effects. Correlation of properties with atomic and microscopic structure. Dislocation theory and its application to mechanical behavior and strengthening mechanisms. Alloy hardening effects; effects of processing and heat treatments. Applications in Fe-C alloys.",
+   "prereqText": "MEGR 3161, with grade of C or above.",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": "Engineering major or minor.",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=139940",
+   "coid": "139940",
+   "prereqGroups": [
+    [
+     "MEGR 3161"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "Engineering major or minor.",
+    "with grade of C or above"
+   ],
+   "core": false
+  },
+  "MEGR 3171": {
+   "code": "MEGR 3171",
+   "title": "Introduction to Measurements and Instrumentation",
+   "credits": 2.0,
+   "creditsText": "(2)",
+   "description": "Statistical analysis of experimental data, curve fitting. Operational amplifiers and signal conditioning techniques for remote monitoring. Discussion of the principles involved in the use of sensors and transducers in measurements of linear and angular displacement, velocity and acceleration, temperature, force, pressure, torque and flow. Introduction to dynamic measurements and frequency analysis.",
+   "prereqText": "ECGR 2161 and MATH 2241 with grades of C or above.",
+   "coreqText": "MEGR 3171L.",
+   "preOrCoreqText": null,
+   "restriction": "Engineering major or minor.",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=139941",
+   "coid": "139941",
+   "prereqGroups": [
+    [
+     "ECGR 2161"
+    ],
+    [
+     "MATH 2241"
+    ]
+   ],
+   "coreqGroups": [
+    [
+     "MEGR 3171L"
+    ]
+   ],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "Engineering major or minor.",
+    "with grades of C or above"
+   ],
+   "core": false
+  },
+  "MEGR 3171L": {
+   "code": "MEGR 3171L",
+   "title": "Instrumentation Laboratory",
+   "credits": 2.0,
+   "creditsText": "(2)",
+   "description": "Utilization of measuring equipment targeted to mechanical engineering applications. Experiments will focus on the use of instrumentation and computer interfacing methods for the optimization of measurement processes. Basic programming of scientific instruments.",
+   "prereqText": "PHYS 2102L with grade of C or above.",
+   "coreqText": "MEGR 3171.",
+   "preOrCoreqText": null,
+   "restriction": "Engineering major or minor.",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=139942",
+   "coid": "139942",
+   "prereqGroups": [
+    [
+     "PHYS 2102L"
+    ]
+   ],
+   "coreqGroups": [
+    [
+     "MEGR 3171"
+    ]
+   ],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "Engineering major or minor.",
+    "with grade of C or above"
+   ],
+   "core": false
+  },
+  "MEGR 3173": {
+   "code": "MEGR 3173",
+   "title": "Mechatronics II",
+   "credits": 2.0,
+   "creditsText": "(2)",
+   "description": "Fundamentals of mechatronic systems, including concepts in system dynamics, advanced circuit analysis, signal conditioning, error analysis, control, communication, and programming. This course requires a grade of C or better for the Mechanical Engineering curriculum.",
+   "prereqText": "MEGR 2173 with a grade of C or better",
+   "coreqText": "MEGR 3174",
+   "preOrCoreqText": null,
+   "restriction": "MEGR major",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=146459",
+   "coid": "146459",
+   "prereqGroups": [
+    [
+     "MEGR 2173"
+    ]
+   ],
+   "coreqGroups": [
+    [
+     "MEGR 3174"
+    ]
+   ],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "MEGR major",
+    "with a grade of C or better"
+   ],
+   "core": true
+  },
+  "MEGR 3174": {
+   "code": "MEGR 3174",
+   "title": "Mechatronics II Projects Laboratory",
+   "credits": 1.0,
+   "creditsText": "(1)",
+   "description": "Hands-on assembly, programming, diagnostics, and analysis of mechatronic and measurement systems through a series of projects complementing course material of MEGR 3173. This course requires a grade of C or better for the Mechanical Engineering curriculum.",
+   "prereqText": "MEGR 2174 with a grade of C or better",
+   "coreqText": "MEGR 3173",
+   "preOrCoreqText": null,
+   "restriction": null,
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=146460",
+   "coid": "146460",
+   "prereqGroups": [
+    [
+     "MEGR 2174"
+    ]
+   ],
+   "coreqGroups": [
+    [
+     "MEGR 3173"
+    ]
+   ],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "with a grade of C or better"
+   ],
+   "core": true
+  },
+  "MEGR 3210": {
+   "code": "MEGR 3210",
+   "title": "Automotive Power Plants",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Technical Elective. Energy analysis of internal and external combustion engines for vehicular propulsion. Thermodynamic principles for combustion efficient use of fuel combustion, different types of fuel use, and pollutant control.",
+   "prereqText": "MEGR 3112 with grade of C or above.",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": "Engineering major or minor.",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=139943",
+   "coid": "139943",
+   "prereqGroups": [
+    [
+     "MEGR 3112"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "Engineering major or minor.",
+    "with grade of C or above"
+   ],
+   "core": false
+  },
+  "MEGR 3211": {
+   "code": "MEGR 3211",
+   "title": "Road Vehicle Dynamics",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Technical Elective. An introduction to road vehicle Dynamics. Acceleration and braking performance, road loads, steady-state cornering, suspension, steering system and tire behavior.",
+   "prereqText": "MEGR 3122 with grade of C or above.",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": "Engineering major or minor.",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=139944",
+   "coid": "139944",
+   "prereqGroups": [
+    [
+     "MEGR 3122"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "Engineering major or minor.",
+    "with grade of C or above"
+   ],
+   "core": false
+  },
+  "MEGR 3214": {
+   "code": "MEGR 3214",
+   "title": "Refrigeration and Air/Conditioning",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Technical Elective. Thermodynamics and heat transfer applied to analysis, design of cooling/heating systems.",
+   "prereqText": "MEGR 3112 and MEGR 3116  with grades of C or above.",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": "Engineering major or minor.",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=139945",
+   "coid": "139945",
+   "prereqGroups": [
+    [
+     "MEGR 3112"
+    ],
+    [
+     "MEGR 3116"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "Engineering major or minor.",
+    "with grades of C or above"
+   ],
+   "core": false
+  },
+  "MEGR 3216": {
+   "code": "MEGR 3216",
+   "title": "Thermal/Fluid Design",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Design of systems utilizing thermodynamic, heat transfer, and fluid flow principles. Topics include: thermal system design, thermodynamic modeling, design applications with heat transfer, thermo-economic optimization of simple and complex systems.",
+   "prereqText": "MEGR 3112, MEGR 3114, and MEGR 3116 with grades of C or above.",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": "Engineering major or minor.",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=139946",
+   "coid": "139946",
+   "prereqGroups": [
+    [
+     "MEGR 3112"
+    ],
+    [
+     "MEGR 3114"
+    ],
+    [
+     "MEGR 3116"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "Engineering major or minor.",
+    "with grades of C or above"
+   ],
+   "core": true
+  },
+  "MEGR 3221": {
+   "code": "MEGR 3221",
+   "title": "Machine Analysis and Design I",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Technical application of basic principles of mechanical science to analysis of machines and mechanical systems. Design of typical machine elements. Strength and deflection requirements.",
+   "prereqText": "MEGR 3121 and MEGR 2144 with grades of C or above.",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": "Engineering major or minor.",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=139947",
+   "coid": "139947",
+   "prereqGroups": [
+    [
+     "MEGR 3121"
+    ],
+    [
+     "MEGR 2144"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "Engineering major or minor.",
+    "with grades of C or above"
+   ],
+   "core": true
+  },
+  "MEGR 3225": {
+   "code": "MEGR 3225",
+   "title": "Introduction to Finite Element Analysis",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Technical Elective. The basic concepts of finite element analysis (FEA) are introduced. The necessary concepts from linear algebra are reviewed. Simple elements such as truss and beam elements are emphasized, with an introduction to continuum elements for structural analysis. Introduction to heat transfer elements for steady state conduction and convection. Mathematics software is used to illustrate such concepts as the finite element assembly process, and the solution of the primary unknowns. A commercially available finite element code is also introduced.",
+   "prereqText": "MATH 2171, MEGR 2144, and either MEGR 2240 or MEGR 2242 with grades of C or above",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": "Engineering major or minor.",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=139949",
+   "coid": "139949",
+   "prereqGroups": [
+    [
+     "MATH 2171"
+    ],
+    [
+     "MEGR 2144"
+    ],
+    [
+     "MEGR 2240",
+     "MEGR 2242"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "Engineering major or minor.",
+    "with grades of C or above"
+   ],
+   "core": false
+  },
+  "MEGR 3231": {
+   "code": "MEGR 3231",
+   "title": "Advanced CAD/CAM",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Technical Elective. An introduction to advanced CAD modeling techniques, reverse engineering and Rapid technologies with a detailed application of these tools in engineering design.",
+   "prereqText": "MEGR 2156 or MEGR 2157 with a grade of C or above.",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": "Engineering major or minor.",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=139950",
+   "coid": "139950",
+   "prereqGroups": [
+    [
+     "MEGR 2156",
+     "MEGR 2157"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "Engineering major or minor.",
+    "with a grade of C or above"
+   ],
+   "core": false
+  },
+  "MEGR 3232": {
+   "code": "MEGR 3232",
+   "title": "Plastic Part Design",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Technical Elective. An introduction to the science and technology of polymer materials and processes with an emphasis on the application of these topics to engineering design.",
+   "prereqText": "MEGR 2156 or MEGR 2157 with a grade of C or above.",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": "Engineering major or minor.",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=139951",
+   "coid": "139951",
+   "prereqGroups": [
+    [
+     "MEGR 2156",
+     "MEGR 2157"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "Engineering major or minor.",
+    "with a grade of C or above"
+   ],
+   "core": false
+  },
+  "MEGR 3233": {
+   "code": "MEGR 3233",
+   "title": "Introduction to Biomaterials",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Technical Elective. An introduction to biomaterials science and engineering, focusing on traditional classes of materials used for biomedical applications (i.e., metals, ceramics, polymers, and composites).",
+   "prereqText": "MEGR 3161 with grade of C or above.",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": "Engineering major or minor.",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=139952",
+   "coid": "139952",
+   "prereqGroups": [
+    [
+     "MEGR 3161"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "Engineering major or minor.",
+    "with grade of C or above"
+   ],
+   "core": false
+  },
+  "MEGR 3234": {
+   "code": "MEGR 3234",
+   "title": "Introduction to Biodynamics",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Technical Elective. Introduces dynamic analysis of the human musculoskeletal system. Students learn to develop lumped mass, planar rigid body and 3D rigid body models of human movement, and to learn to calculate internal forces in muscles and joints during daily and sports activities.",
+   "prereqText": "MEGR 2144 with grade of C or above",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": "Engineering major or minor",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=139953",
+   "coid": "139953",
+   "prereqGroups": [
+    [
+     "MEGR 2144"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "Engineering major or minor",
+    "with grade of C or above"
+   ],
+   "core": false
+  },
+  "MEGR 3235": {
+   "code": "MEGR 3235",
+   "title": "Waves and Optics",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Technical Elective. An introductory study of optics covering geometrical optics, optical instruments, wave optics (interference and diffraction), Fourier analysis, and polarization.",
+   "prereqText": "MATH 2171 and MEGR 3122 with grades of C or above.",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": "Engineering major or minor.",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=139954",
+   "coid": "139954",
+   "prereqGroups": [
+    [
+     "MATH 2171"
+    ],
+    [
+     "MEGR 3122"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "Engineering major or minor.",
+    "with grades of C or above"
+   ],
+   "core": false
+  },
+  "MEGR 3236": {
+   "code": "MEGR 3236",
+   "title": "Introduction to Nanoscale Science and Engineering",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Technical Elective.  Introduction to nanoscale science and engineering.  Topics include:  nanomanufacturing, nanomaterials and nanostructures, nanomechanics, experiments with nano-instruments, and related environmental issues.",
+   "prereqText": "MEGR 3161 with a grade of C or above",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": "Engineering major or minor.",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=140952",
+   "coid": "140952",
+   "prereqGroups": [
+    [
+     "MEGR 3161"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "Engineering major or minor.",
+    "with a grade of C or above"
+   ],
+   "core": false
+  },
+  "MEGR 3237": {
+   "code": "MEGR 3237",
+   "title": "Introduction to Control Systems",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Technical Elective.  Treatment of the theoretical and practical foundations for the design of automatic control systems; control-oriented modeling, idealized time-domain control design and real-world frequency-domain design techniques that can be used to address practical issues of environmental disturbances, model uncertainty, sensor imperfections, communication delays, and actuator dynamics.",
+   "prereqText": "MEGR 3122 with grade of C or above",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": null,
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=141344",
+   "coid": "141344",
+   "prereqGroups": [
+    [
+     "MEGR 3122"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "with grade of C or above"
+   ],
+   "core": false
+  },
+  "MEGR 3238": {
+   "code": "MEGR 3238",
+   "title": "Microscopy for Engineering",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Technical elective. Theory and practical experience in microscopic techniques including optical microscopy and SEM; applications of microscopic techniques in engineering fields, such as morphology of microstructures, analysis of compositions, crystal structure determination, and sample preparation.",
+   "prereqText": "MEGR 3161 with a grade of C or above",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": null,
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=141325",
+   "coid": "141325",
+   "prereqGroups": [
+    [
+     "MEGR 3161"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "with a grade of C or above"
+   ],
+   "core": false
+  },
+  "MEGR 3240": {
+   "code": "MEGR 3240",
+   "title": "Advanced Automotive Powerplants",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Technical Elective.  This is a follow-up course to MEGR 3210.  Topics include: engine power parameters, race engine design considerations, advanced engine cycles, component design, and fuel delivery/control strategies.",
+   "prereqText": "MEGR 3210 with a grade of C or above",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": null,
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=141322",
+   "coid": "141322",
+   "prereqGroups": [
+    [
+     "MEGR 3210"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "with a grade of C or above"
+   ],
+   "core": false
+  },
+  "MEGR 3241": {
+   "code": "MEGR 3241",
+   "title": "Advanced Motorsports Instrumentation",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Technical Elective.  Instruction in data acquisition and analysis techniques as applied in a motorsports setting. A survey of current industry hardware standards including sensors, wiring, logging and display units. Wiring harness construction and installation methods. Analysis of acquired data using industry standard data analysis software. Emphasis on application in race car design and operation contexts.",
+   "prereqText": "MEGR 3171 with grade of C or above.",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": "Engineering major or minor.",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=139955",
+   "coid": "139955",
+   "prereqGroups": [
+    [
+     "MEGR 3171"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "Engineering major or minor.",
+    "with grade of C or above"
+   ],
+   "core": false
+  },
+  "MEGR 3242": {
+   "code": "MEGR 3242",
+   "title": "Applied Vehicle Aerodynamics",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Technical Elective. Flow of air around streamlined and bluff bodies, aerodynamic forces, understanding flow separation and reattachments, aerodynamic tools, introduction to computational fluid dynamics, use of commercial CFD packages to solve fluid flow problems, computer simulation and analysis of flow around bluff bodies and road vehicles including racecars.",
+   "prereqText": "MEGR 2240, MEGR 3111, and MEGR 3114, all with grade of C or above.",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": "Engineering major or minor.",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=139956",
+   "coid": "139956",
+   "prereqGroups": [
+    [
+     "MEGR 2240"
+    ],
+    [
+     "MEGR 3111"
+    ],
+    [
+     "MEGR 3114"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "Engineering major or minor.",
+    "all with grade of C or above"
+   ],
+   "core": false
+  },
+  "MEGR 3244": {
+   "code": "MEGR 3244",
+   "title": "Tire Mechanics",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Technical Elective.  In-depth analysis of the tire and its influence on vehicle performance, including: design, materials, construction, structural response, rolling resistance, force and moment generation, NVH, wet and dry traction, wear, high speed limit, and standards.  Tire models, their limitations, and their governing equations.",
+   "prereqText": "MEGR 2144 with a grade of C or above",
+   "coreqText": null,
+   "preOrCoreqText": "MEGR 3121",
+   "restriction": null,
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=141320",
+   "coid": "141320",
+   "prereqGroups": [
+    [
+     "MEGR 2144"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [
+    [
+     "MEGR 3121"
+    ]
+   ],
+   "notes": [
+    "with a grade of C or above"
+   ],
+   "core": false
+  },
+  "MEGR 3245": {
+   "code": "MEGR 3245",
+   "title": "Advanced Experimental Methods",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Technical Elective. Incorporates lectures, research, and experimental labs relating to jet propulsion, rockets, underwater propulsion, high-speed vehicles, etc.  Labs involve configuring instrumentation and data acquisition as well as analysis of data collected during experiments.",
+   "prereqText": "ECGR 2161 with grade of C or above",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": "Engineering major",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=141345",
+   "coid": "141345",
+   "prereqGroups": [
+    [
+     "ECGR 2161"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "Engineering major",
+    "with grade of C or above"
+   ],
+   "core": false
+  },
+  "MEGR 3251": {
+   "code": "MEGR 3251",
+   "title": "Thermal/Fluids Laboratory",
+   "credits": 2.0,
+   "creditsText": "(2)",
+   "description": "Laboratory experiments related to the areas of thermodynamics, fluid mechanics, and heat transfer. Three hours of laboratory each week.",
+   "prereqText": "MEGR 3111, MEGR 3114, and MEGR 3171L, all with grades of C or above.",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": "Engineering major or minor.",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=139957",
+   "coid": "139957",
+   "prereqGroups": [
+    [
+     "MEGR 3111"
+    ],
+    [
+     "MEGR 3114"
+    ],
+    [
+     "MEGR 3171L"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "Engineering major or minor.",
+    "all with grades of C or above"
+   ],
+   "core": true
+  },
+  "MEGR 3255": {
+   "code": "MEGR 3255",
+   "title": "Senior Design I",
+   "credits": 2.0,
+   "creditsText": "(2)",
+   "description": "First of a two-semester sequence leading to a major integrative experience in applying the principles of design and project management to the design of a major mechanical engineering system. Teamwork and communication skills are emphasized.",
+   "prereqText": "MEGR 3111, MEGR 3114, MEGR 3161, MEGR 3171L or MEGR 3174, and MEGR 3156, all with a grade of C or better",
+   "coreqText": null,
+   "preOrCoreqText": "MEGR 3152 and MEGR 3251.",
+   "restriction": "Engineering major or minor.",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=139958",
+   "coid": "139958",
+   "prereqGroups": [
+    [
+     "MEGR 3111"
+    ],
+    [
+     "MEGR 3114"
+    ],
+    [
+     "MEGR 3161"
+    ],
+    [
+     "MEGR 3171L",
+     "MEGR 3174"
+    ],
+    [
+     "MEGR 3156"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [
+    [
+     "MEGR 3152"
+    ],
+    [
+     "MEGR 3251"
+    ]
+   ],
+   "notes": [
+    "Engineering major or minor.",
+    "all with a grade of C or better"
+   ],
+   "core": true
+  },
+  "MEGR 3256": {
+   "code": "MEGR 3256",
+   "title": "Senior Design II",
+   "credits": 2.0,
+   "creditsText": "(2)",
+   "description": "A continuation of MEGR 3255 including project execution leading to an oral presentation and final written report.",
+   "prereqText": "MEGR 3255.",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": "Engineering major or minor.",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=139959",
+   "coid": "139959",
+   "prereqGroups": [
+    [
+     "MEGR 3255"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "Engineering major or minor."
+   ],
+   "core": true
+  },
+  "MEGR 3260": {
+   "code": "MEGR 3260",
+   "title": "Clean Coal Technology",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Technical Elective. A treatment of conventional and high-efficiency low-emissions (HELE) coal-based energy conversion technologies, principles of coal combustion and gasification, pollutant formation and its effects on the environment, emissions regulations, and options for pollution control of existing and newly-constructed power plants.",
+   "prereqText": "MEGR 3112 and MEGR 3114 with grades of C or above",
+   "coreqText": null,
+   "preOrCoreqText": "MEGR 3116",
+   "restriction": null,
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=141318",
+   "coid": "141318",
+   "prereqGroups": [
+    [
+     "MEGR 3112"
+    ],
+    [
+     "MEGR 3114"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [
+    [
+     "MEGR 3116"
+    ]
+   ],
+   "notes": [
+    "with grades of C or above"
+   ],
+   "core": false
+  },
+  "MEGR 3261": {
+   "code": "MEGR 3261",
+   "title": "Sustainable Energy",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Technical Elective. A treatment of global energy challenges, current energy usage, energy carriers, environmental impacts, future energy usage, transitions in energy usage and societal changes, and energy conversion technologies.",
+   "prereqText": null,
+   "coreqText": null,
+   "preOrCoreqText": "MEGR 3112",
+   "restriction": null,
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=141343",
+   "coid": "141343",
+   "prereqGroups": [],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [
+    [
+     "MEGR 3112"
+    ]
+   ],
+   "notes": [],
+   "core": false
+  },
+  "MEGR 3262": {
+   "code": "MEGR 3262",
+   "title": "Turbomachinery",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Technical Elective.  A treatment of the types, uses, and principles of operation of turbomachines; usage of fluid mechanics, thermodynamics and a blend of additional theory and applications for the selection, specification, and use of turbomachines.",
+   "prereqText": "MEGR 3112 and MEGR 3114 with grades of C or above",
+   "coreqText": null,
+   "preOrCoreqText": "MEGR 3116",
+   "restriction": null,
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=141319",
+   "coid": "141319",
+   "prereqGroups": [
+    [
+     "MEGR 3112"
+    ],
+    [
+     "MEGR 3114"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [
+    [
+     "MEGR 3116"
+    ]
+   ],
+   "notes": [
+    "with grades of C or above"
+   ],
+   "core": false
+  },
+  "MEGR 3270": {
+   "code": "MEGR 3270",
+   "title": "Biomedical Fluidics: Microfluidics",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Technical Elective.  Exploration of micro/nanotechnology, microfluidics, and biomedical applications; design, analysis, manufacture, and use of microfluidic platforms; brain cell culturing; manipulation of cellular microenvironments in microfluidic platforms.",
+   "prereqText": "MEGR 3114, MEGR 2279, BIOL 3111, or CHEM 4165 with grade of C or above",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": null,
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=141323",
+   "coid": "141323",
+   "prereqGroups": [
+    [
+     "MEGR 3114",
+     "MEGR 2279",
+     "BIOL 3111",
+     "CHEM 4165"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "with grade of C or above"
+   ],
+   "core": false
+  },
+  "MEGR 3271": {
+   "code": "MEGR 3271",
+   "title": "Biomedical Manufacturing: 3D Biofabrication",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Technical Elective. 3D biofabrication technologies, including 3D printing and its impact on health challenges including the regeneration of tissue, bones, and organs; application of computer-aided design software; 3D fabrication of non-biomaterials; brain cell culturing and 3D fabrication of biomaterials.",
+   "prereqText": "MEGR 2156, MEGR 2180, or MEGR 2279 with grade of C or above",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": null,
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=141324",
+   "coid": "141324",
+   "prereqGroups": [
+    [
+     "MEGR 2156",
+     "MEGR 2180",
+     "MEGR 2279"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "with grade of C or above"
+   ],
+   "core": false
+  },
+  "MEGR 3272": {
+   "code": "MEGR 3272",
+   "title": "Introduction to Bio-Polymers and Composites",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Technical elective.  Addresses the basics of polymer science and engineering and correlation between structural parameters and properties of the polymers including mechanical and biocompatibility properties.  Examples of medical devices made of polymers and used to fix artificial joints or augment tissue are discussed.",
+   "prereqText": "MEGR 3161 with a grade of C or above",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": null,
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=141416",
+   "coid": "141416",
+   "prereqGroups": [
+    [
+     "MEGR 3161"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "with a grade of C or above"
+   ],
+   "core": false
+  },
+  "MEGR 3280": {
+   "code": "MEGR 3280",
+   "title": "Metrology Fundamentals Laboratory",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Introductory metrology concepts and their practical use in industrial settings and precision engineering applications via laboratory work. Basic concepts of calibration and traceability. Laboratory work will focus on the regimes of size, form, angle, and surface texture. Handheld metrology instruments, surface plate work (using common reference artifacts and comparative measurements), and hard gaging. Specification of surface texture profile parameters and verification using profilometry measurements.",
+   "prereqText": "MEGR 2180 with a grade of C or higher",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": null,
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=42&coid=154857",
+   "coid": "154857",
+   "catalogYear": "2026-2027",
+   "prereqGroups": [
+    [
+     "MEGR 2180"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "with a grade of C or higher"
+   ],
+   "core": false
+  },
+  "MEGR 3282": {
+   "code": "MEGR 3282",
+   "title": "Statistical Process Control and Metrology",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Technical Elective. Introduction to metrology. Measurement of size, form and surface texture. Introduction to quality control, control charts for attributes and variables, acceptance sampling. Process capability estimation and process control.",
+   "prereqText": "MEGR 2180 with grade of C or above.",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": "Engineering major or minor.",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=139960",
+   "coid": "139960",
+   "prereqGroups": [
+    [
+     "MEGR 2180"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "Engineering major or minor.",
+    "with grade of C or above"
+   ],
+   "core": false
+  },
+  "MEGR 3283": {
+   "code": "MEGR 3283",
+   "title": "Metrology and Precision Engineering",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Principles of precision design and their use in manufacturing and measurement; review of metrology and uncertainty, a case study of precision machine design, mechanical and optical methods of surface texture measurement, measurement of machine tool errors, coordinate metrology and its applications, and the role of vibration analysis in machine design.",
+   "prereqText": "MEGR 2180 with a grade of C or above",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": null,
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=141321",
+   "coid": "141321",
+   "prereqGroups": [
+    [
+     "MEGR 2180"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "with a grade of C or above"
+   ],
+   "core": false
+  },
+  "MEGR 3310": {
+   "code": "MEGR 3310",
+   "title": "Flight Mechanics",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Fundamentals of atmospheric flight vehicle dynamics, performance, and stability analysis.",
+   "prereqText": "MEGR 2141 with a grade of C or above",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": "MEGR major",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=146461",
+   "coid": "146461",
+   "prereqGroups": [
+    [
+     "MEGR 2141"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "MEGR major",
+    "with a grade of C or above"
+   ],
+   "core": false
+  },
+  "MEGR 3451": {
+   "code": "MEGR 3451",
+   "title": "Stationary Power Plant Systems",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Technical Elective. Thermodynamics and heat transfer applied to the analysis and design of stationary power plant systems.",
+   "prereqText": "MEGR 3112, MEGR 3114, and MEGR 3116, all with grade of C or above.",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": "Engineering major or minor.",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=139963",
+   "coid": "139963",
+   "prereqGroups": [
+    [
+     "MEGR 3112"
+    ],
+    [
+     "MEGR 3114"
+    ],
+    [
+     "MEGR 3116"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "Engineering major or minor.",
+    "all with grade of C or above"
+   ],
+   "core": false
+  },
+  "MEGR 3452": {
+   "code": "MEGR 3452",
+   "title": "Introduction to Nuclear Engineering",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Technical Elective. An introduction to the science and technology of nuclear engineering as applied to power plant operation and design.",
+   "prereqText": "MEGR 3112, MEGR 3114, and MEGR 3116, all with grade of C or above.",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": "Engineering major or minor.",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=139964",
+   "coid": "139964",
+   "prereqGroups": [
+    [
+     "MEGR 3112"
+    ],
+    [
+     "MEGR 3114"
+    ],
+    [
+     "MEGR 3116"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "Engineering major or minor.",
+    "all with grade of C or above"
+   ],
+   "core": false
+  },
+  "MEGR 4090": {
+   "code": "MEGR 4090",
+   "title": "Special Topics in Mechanical Engineering",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Technical Elective. Builds upon and synthesizes the knowledge that the students have gained from the mechanical engineering core curriculum. The specific topics covered in each separate offering of the course serve as the means for teaching engineering analysis, synthesis, and/or design.",
+   "prereqText": null,
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": "Mechanical Engineering major; Junior standing or higher",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=141571",
+   "coid": "141571",
+   "prereqGroups": [],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "Mechanical Engineering major; Junior standing or higher"
+   ],
+   "core": false
+  },
+  "MEGR 4091": {
+   "code": "MEGR 4091",
+   "title": "Special Topics in Aerospace Engineering",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Builds upon and synthesizes the knowledge that the students have gained from the mechanical engineering core curriculum. The specific topics covered in each separate offering of the course will broaden and deepen students’ knowledge in areas of aerospace engineering, including but not limited to: aerospace propulsion, aerospace materials, aerospace structures, aerospace vehicle design, astromechanics, flight dynamics, and aerospace vehicle guidance, navigation, and control.",
+   "prereqText": null,
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": "MEGR major",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=146464",
+   "coid": "146464",
+   "prereqGroups": [],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "MEGR major"
+   ],
+   "core": false
+  },
+  "MEGR 4092": {
+   "code": "MEGR 4092",
+   "title": "Special Topics in Motorsports Engineering",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Technical Elective. Builds upon and synthesizes the knowledge gained from the mechanical engineering core curriculum. The specific topics covered in each separate offering of the course serve as the means for teaching engineering analysis, synthesis, and/or design in topics that relate to Motorsports Engineering.",
+   "prereqText": null,
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": "Mechanical Engineering major; Junior standing or higher",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=141577",
+   "coid": "141577",
+   "prereqGroups": [],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "Mechanical Engineering major; Junior standing or higher"
+   ],
+   "core": false
+  },
+  "MEGR 4094": {
+   "code": "MEGR 4094",
+   "title": "Special Topics in Energy Engineering",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Technical Elective. Builds upon and synthesizes the knowledge gained from the mechanical engineering core curriculum. The specific topics covered in each separate offering of the course serve as the means for teaching engineering analysis, synthesis, and/or design in topics that relate to Energy Engineering.",
+   "prereqText": null,
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": "Mechanical Engineering major; Junior standing or higher",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=141578",
+   "coid": "141578",
+   "prereqGroups": [],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "Mechanical Engineering major; Junior standing or higher"
+   ],
+   "core": false
+  },
+  "MEGR 4097": {
+   "code": "MEGR 4097",
+   "title": "Special Topics in Biomedical Engineering",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Technical Elective. Builds upon and synthesizes the knowledge gained from the mechanical engineering core curriculum. The specific topics covered in each separate offering of the course serve as the means for teaching engineering analysis, synthesis, and/or design in topics in Biomedical Engineering.",
+   "prereqText": null,
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": "Mechanical Engineering major; Junior standing or higher",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=141579",
+   "coid": "141579",
+   "prereqGroups": [],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "Mechanical Engineering major; Junior standing or higher"
+   ],
+   "core": false
+  },
+  "MEGR 4098": {
+   "code": "MEGR 4098",
+   "title": "Special Topics in Precision Engineering",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Technical Elective. Builds upon and synthesizes the knowledge that students have gained from the mechanical engineering core curriculum. The specific topics covered in each separate offering of the course serve as the means for teaching engineering analysis, synthesis, and/or design.",
+   "prereqText": null,
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": "Mechanical Engineering major; Junior standing or higher",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=141615",
+   "coid": "141615",
+   "prereqGroups": [],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "Mechanical Engineering major; Junior standing or higher"
+   ],
+   "core": false
+  },
+  "MEGR 4127": {
+   "code": "MEGR 4127",
+   "title": "Introduction to Robotics",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Technical Elective. Modeling of industrial robots, homogeneous transformations, static forces, kinematics, velocities, dynamics, computer animation of dynamic models, motion trajectory planning, and introduction to vision, sensors and actuators.",
+   "prereqText": null,
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": "Senior standing and Mechanical Engineering major.",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=139969",
+   "coid": "139969",
+   "prereqGroups": [],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "Senior standing and Mechanical Engineering major."
+   ],
+   "core": false
+  },
+  "MEGR 4143": {
+   "code": "MEGR 4143",
+   "title": "Discrete Mechanical Vibrating Systems",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Technical Elective. Free and forced vibrations of lumped parameter systems with multidegrees of freedom. Topics include: transient and steady state response, determination of natural frequencies and mode shapes with and without damping. Introduction to principal coordinates and matrix iteration techniques.",
+   "prereqText": "MEGR 3122 or MEGR 3123 with grade of C or above.",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": "Engineering major or minor.",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=139970",
+   "coid": "139970",
+   "prereqGroups": [
+    [
+     "MEGR 3122",
+     "MEGR 3123"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "Engineering major or minor.",
+    "with grade of C or above"
+   ],
+   "core": false
+  },
+  "MEGR 4210": {
+   "code": "MEGR 4210",
+   "title": "Automotive Powerplants",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "The engineering principles governing internal combustion engine theory, design, and applications.",
+   "prereqText": "MEGR 3112 with grade of C or above",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": "Mechanical Engineering major",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=141574",
+   "coid": "141574",
+   "prereqGroups": [
+    [
+     "MEGR 3112"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "Mechanical Engineering major",
+    "with grade of C or above"
+   ],
+   "core": false
+  },
+  "MEGR 4211": {
+   "code": "MEGR 4211",
+   "title": "Road Vehicle Dynamics",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Technical elective. Topics related to vehicle dynamics and modeling thereof. Acceleration and braking performance, road loads, steady-state cornering, suspension, steering system, and tire behavior.",
+   "prereqText": "MEGR 3122 or MEGR 3123 with grade of C or above",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": "Mechanical Engineering major",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=141575",
+   "coid": "141575",
+   "prereqGroups": [
+    [
+     "MEGR 3122",
+     "MEGR 3123"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "Mechanical Engineering major",
+    "with grade of C or above"
+   ],
+   "core": false
+  },
+  "MEGR 4212": {
+   "code": "MEGR 4212",
+   "title": "Advanced Road Vehicle Dynamics",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Advanced topics related to road vehicle dynamics. Topics will include tire mechanics and behavior modeling, transient handling dynamics, and vehicle modeling and simulation. This course will build on the foundations established in road vehicle dynamics to develop a more comprehensive understanding of vehicle behavior. The course will include instruction on the use of Dymola simulation software, and this software will be used to illustrate and explore the concepts covered over the semester.",
+   "prereqText": "MEGR 4211 with a grade of C or above",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": null,
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=42&coid=154923",
+   "coid": "154923",
+   "catalogYear": "2026-2027",
+   "prereqGroups": [
+    [
+     "MEGR 4211"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "with a grade of C or above"
+   ],
+   "core": false
+  },
+  "MEGR 4213": {
+   "code": "MEGR 4213",
+   "title": "Hybrid and Alternative Fuels Automotive Power Plants",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Course material covers advanced engineering principles governing automotive vehicle design as it relates to alternative fueled and hybrid vehicles.",
+   "prereqText": "MEGR 3121 with a grade of C or better, MEGR 2240 or MEGR 2242 with a grade of C or better, and either ECGR 2161 or MEGR 2173 and MEGR 2174 with grades of C or better",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": null,
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=42&coid=154924",
+   "coid": "154924",
+   "catalogYear": "2026-2027",
+   "prereqGroups": [
+    [
+     "MEGR 3121"
+    ],
+    [
+     "MEGR 2240",
+     "MEGR 2242"
+    ],
+    [
+     "ECGR 2161",
+     "MEGR 2173"
+    ],
+    [
+     "MEGR 2174"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "with a grade of C or better",
+    "with grades of C or better"
+   ],
+   "core": false
+  },
+  "MEGR 4235": {
+   "code": "MEGR 4235",
+   "title": "Waves and Optics",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Technical Elective. An introductory study of optics covering geometrical optics, optical instruments, wave optics (interference and diffraction), Fourier analysis, and polarization.",
+   "prereqText": "MEGR 3122 or MEGR 3123 with a grade of C or above",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": "Mechanical Engineering major",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=141591",
+   "coid": "141591",
+   "prereqGroups": [
+    [
+     "MEGR 3122",
+     "MEGR 3123"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "Mechanical Engineering major",
+    "with a grade of C or above"
+   ],
+   "core": false
+  },
+  "MEGR 4237": {
+   "code": "MEGR 4237",
+   "title": "Introduction to Control Systems",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Fundamentals of classical control analysis and design. Topics include: modeling and analyzing control systems; design of automatic controllers.",
+   "prereqText": "MEGR 3122 or MEGR 3123 with a grade of C or above",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": "Mechanical Engineering major",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=141576",
+   "coid": "141576",
+   "prereqGroups": [
+    [
+     "MEGR 3122",
+     "MEGR 3123"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "Mechanical Engineering major",
+    "with a grade of C or above"
+   ],
+   "core": false
+  },
+  "MEGR 4240": {
+   "code": "MEGR 4240",
+   "title": "Advanced Automotive Powerplants",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Technical Elective. Advanced engineering principles governing internal combustion engine theory, design, and application.",
+   "prereqText": "MEGR 4210",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": "Mechanical Engineering major",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=141582",
+   "coid": "141582",
+   "prereqGroups": [
+    [
+     "MEGR 4210"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "Mechanical Engineering major"
+   ],
+   "core": false
+  },
+  "MEGR 4242": {
+   "code": "MEGR 4242",
+   "title": "Applied Vehicle Aerodynamics",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Flow of air around streamlined and bluff bodies, aerodynamic forces, understanding flow separation and reattachments, aerodynamic tools, introduction to computational fluid dynamics, use of commercial CFD packages to solve fluid flow problems, computer simulation and analysis of flow around bluff bodies and road vehicles including race cars.",
+   "prereqText": "MEGR 3114 with a C or above, and either MEGR 2240 or MEGR 2242 with a grade of C or above",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": "Mechanical Engineering major",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=141581",
+   "coid": "141581",
+   "prereqGroups": [
+    [
+     "MEGR 3114"
+    ],
+    [
+     "MEGR 2240",
+     "MEGR 2242"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "Mechanical Engineering major",
+    "with a C or above",
+    "with a grade of C or above"
+   ],
+   "core": false
+  },
+  "MEGR 4244": {
+   "code": "MEGR 4244",
+   "title": "Tire Mechanics",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "In-depth analysis of the tire and its influence on vehicle performance, including: design, materials, construction, structural response, rolling resistance, force and moment generation, NVH, wet and dry traction, wear, high speed limit, and standards. Tire models, their limitations, and their governing equations.",
+   "prereqText": "MEGR 2144 with grade of C or above",
+   "coreqText": null,
+   "preOrCoreqText": "MEGR 3121",
+   "restriction": "Mechanical Engineering major",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=141614",
+   "coid": "141614",
+   "prereqGroups": [
+    [
+     "MEGR 2144"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [
+    [
+     "MEGR 3121"
+    ]
+   ],
+   "notes": [
+    "Mechanical Engineering major",
+    "with grade of C or above"
+   ],
+   "core": false
+  },
+  "MEGR 4271": {
+   "code": "MEGR 4271",
+   "title": "Orthopedic Biomechanics",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Introduces mechanical properties of human body’s hard tissues (bone and cartilage) and soft tissues (muscles, ligament and tendon), and joint biomechanics.  Focuses on mechanical and biological considerations for treatment of orthopedic diseases and sports injuries, such as bone fractures, ACL injury, and osteoarthritis. Students learn how to solve medical problems using their engineering knowledge and skills.",
+   "prereqText": "MEGR 2144 with grade of C or above",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": "Mechanical Engineering major",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=141573",
+   "coid": "141573",
+   "prereqGroups": [
+    [
+     "MEGR 2144"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "Mechanical Engineering major",
+    "with grade of C or above"
+   ],
+   "core": false
+  },
+  "MEGR 4272": {
+   "code": "MEGR 4272",
+   "title": "Mechanics of the Human Locomotor System",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Introduces dynamic analysis of the human musculoskeletal system. Students learn to develop 3‐D rigid body models of human movement, and how to calculate internal forces in muscles and joints during daily and sports activities. Students also learn how to use motion capture system and simulation software of human locomotion.",
+   "prereqText": "MEGR 2144 with grade of C or above",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": "Mechanical Engineering major",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=141583",
+   "coid": "141583",
+   "prereqGroups": [
+    [
+     "MEGR 2144"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "Mechanical Engineering major",
+    "with grade of C or above"
+   ],
+   "core": false
+  },
+  "MEGR 4273": {
+   "code": "MEGR 4273",
+   "title": "Regenerative Neural Engineering",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "The basic principles of neuroscience and biomedical engineering, and the use of these principles in regenerative neural engineering. Topics include: the state-of-the-art in the use of advanced 3D bioprinting, stem cells, conductive materials, nanomaterials, neural modeling, and brain machine interfaces as applied to solving prevalent clinical issues related to neurology.",
+   "prereqText": "MEGR 2156, MEGR 2157, MEGR 2180, or MEGR 2279, with grade of C or above",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": "Mechanical Engineering major",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=141572",
+   "coid": "141572",
+   "prereqGroups": [
+    [
+     "MEGR 2156",
+     "MEGR 2157",
+     "MEGR 2180",
+     "MEGR 2279"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "Mechanical Engineering major",
+    "with grade of C or above"
+   ],
+   "core": false
+  },
+  "MEGR 4274": {
+   "code": "MEGR 4274",
+   "title": "Bioelectronic Medicine",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "The basic principles of neuroscience and neural engineering, and the use of engineering principles in bioelectronic medicine.  Topics include: the use of optogenetics, electrical stimulation, electromagnetic stimulation, and brain machine Interfaces as applied to solving prevalent clinical issues related to neurology and neural engineering.",
+   "prereqText": "MEGR 2156, MEGR 2157, MEGR 2180, or MEGR 2279, with grade of C or above",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": "Mechanical Engineering major",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=141580",
+   "coid": "141580",
+   "prereqGroups": [
+    [
+     "MEGR 2156",
+     "MEGR 2157",
+     "MEGR 2180",
+     "MEGR 2279"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "Mechanical Engineering major",
+    "with grade of C or above"
+   ],
+   "core": false
+  },
+  "MEGR 4280": {
+   "code": "MEGR 4280",
+   "title": "Advanced Manufacturing Processes",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Detailed analytical treatment of manufacturing materials, processes and procedures. Forming processes, casting processes, metal cutting processes, tool materials, joining processes, automation, and economics.",
+   "prereqText": "MEGR 2144 and MEGR 2180 with grades of C or above, and either MEGR 2156 or MEGR 2157 with a grade of C or above",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": "Mechanical Engineering major",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=141612",
+   "coid": "141612",
+   "prereqGroups": [
+    [
+     "MEGR 2144"
+    ],
+    [
+     "MEGR 2180"
+    ],
+    [
+     "MEGR 2156",
+     "MEGR 2157"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "Mechanical Engineering major",
+    "with grades of C or above",
+    "with a grade of C or above"
+   ],
+   "core": false
+  },
+  "MEGR 4281": {
+   "code": "MEGR 4281",
+   "title": "GD&T for Design and Inspection",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Reconciles the engineering design process with manufacturing quality control. These two conceptual domains of geometric specification (from the perspective of a designer) and verification (from the perspective of a metrologist) are brought together in a comprehensive and integrated manner in this class. Students will learn to (i) develop and interpret rigorous engineering drawings, (ii) convey and recognize design intent via geometric specification, and (iii) anticipate and apply inspection and metrology techniques to verify that manufactured components meet specification. These goals will be ",
+   "prereqText": "MEGR 2180 and either MEGR 2240 or MEGR 2242, with a grade of C or above",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": null,
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=42&coid=154925",
+   "coid": "154925",
+   "catalogYear": "2026-2027",
+   "prereqGroups": [
+    [
+     "MEGR 2180"
+    ],
+    [
+     "MEGR 2240",
+     "MEGR 2242"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "with a grade of C or above"
+   ],
+   "core": false
+  },
+  "MEGR 4282": {
+   "code": "MEGR 4282",
+   "title": "Fundamentals of Precision Machine Design",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "An introduction to the engineering principles utilized in the design, fabrication, and testing of precision systems. This course builds on traditional engineering concepts with a focus on achieving precision, repeatability, and accuracy in the end result. The assessment and quantification of errors. Machine frames, sliding and rolling element bearings, flexures, hydrostatic bearings, as well as sensors and controls will be analyzed.",
+   "prereqText": "MEGR 2180 with a grade of C or above",
+   "coreqText": null,
+   "preOrCoreqText": "MEGR 3221",
+   "restriction": null,
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=42&coid=154926",
+   "coid": "154926",
+   "catalogYear": "2026-2027",
+   "prereqGroups": [
+    [
+     "MEGR 2180"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [
+    [
+     "MEGR 3221"
+    ]
+   ],
+   "notes": [
+    "with a grade of C or above"
+   ],
+   "core": false
+  },
+  "MEGR 4290": {
+   "code": "MEGR 4290",
+   "title": "Introduction to Electric Vehicles and Batteries",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Introduction to the drivetrain and power supply of electric vehicles. Automotive drive cycle analysis and range estimation for conventional vehicles, hybrid vehicles and electric vehicles. Fuel efficiency, carbon emissions, and power requirements of all three types of vehicles will be discussed. Discussions on different types of batteries and their challenges. Basics of battery chemistry and sizing for vehicle demands.",
+   "prereqText": "MEGR 3121 and MEGR 3112",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": null,
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=141879",
+   "coid": "141879",
+   "prereqGroups": [
+    [
+     "MEGR 3121"
+    ],
+    [
+     "MEGR 3112"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [],
+   "core": false
+  },
+  "MEGR 4291": {
+   "code": "MEGR 4291",
+   "title": "Battery Performance and Testing",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Introduction the basic characterization and fundamental working mechanisms of the equipment. Also, students will have the chance to operate the equipment including cyclers, electrochemistry workstation, glovebox battery assembling, etc.",
+   "prereqText": null,
+   "coreqText": null,
+   "preOrCoreqText": "MEGR 3152",
+   "restriction": null,
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=141880",
+   "coid": "141880",
+   "prereqGroups": [],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [
+    [
+     "MEGR 3152"
+    ]
+   ],
+   "notes": [],
+   "core": false
+  },
+  "MEGR 4292": {
+   "code": "MEGR 4292",
+   "title": "Materials Science in Battery Technology",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Introduction to the materials science used in advanced battery technology, especially Li-ion battery technology. Discussions will include basic electrochemical engineering, battery component materials (i.e. electrodes, electrolytes, separator), underlying properties and performance, and full devices.",
+   "prereqText": "MEGR 3161",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": null,
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=141885",
+   "coid": "141885",
+   "prereqGroups": [
+    [
+     "MEGR 3161"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [],
+   "core": false
+  },
+  "MEGR 4310": {
+   "code": "MEGR 4310",
+   "title": "Uncrewed Aerial Vehicles",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Fundamental concepts and technologies related to the dynamics, control, navigation, and guidance of uncrewed aerial vehicles.",
+   "prereqText": "MEGR 3310 and MEGR 3121 all with grades of C or better.",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": "MEGR major",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=146465",
+   "coid": "146465",
+   "prereqGroups": [
+    [
+     "MEGR 3310"
+    ],
+    [
+     "MEGR 3121"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "MEGR major",
+    "all with grades of C or better"
+   ],
+   "core": false
+  },
+  "MEGR 4311": {
+   "code": "MEGR 4311",
+   "title": "Aerospace Materials",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Overview and analysis of weight-efficient and high performance advanced materials for aerospace and other mechanical engineering applications, including composites, polymers, and ceramics.",
+   "prereqText": "MEGR 3161 with a grade of C or above.",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": "MEGR major",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=146466",
+   "coid": "146466",
+   "prereqGroups": [
+    [
+     "MEGR 3161"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "MEGR major",
+    "with a grade of C or above"
+   ],
+   "core": false
+  },
+  "MEGR 4312": {
+   "code": "MEGR 4312",
+   "title": "Aerospace Propulsion",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "An overview of aerospace propulsion and turbomachinery systems, including fundamentals of aerothermodynamics, compressible fluid flows, combustion, propeller propulsion, air-breathing engines, and rocket propulsion.",
+   "prereqText": "MEGR 3111 with C or better and MEGR 3114 with C or better",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": "MEGR major",
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=146467",
+   "coid": "146467",
+   "prereqGroups": [
+    [
+     "MEGR 3111"
+    ],
+    [
+     "MEGR 3114"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "MEGR major",
+    "with C or better"
+   ],
+   "core": false
+  },
+  "MEGR 4313": {
+   "code": "MEGR 4313",
+   "title": "Astromechanics",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Fundamental principles of astromechanics. Topics include the two-body problem, constants of motion and orbital elements, reference frames and coordinate systems, orbital maneuvers, energy and time-of-flight relationships, orbit determination, orbital maneuvers, launch windows and orbital rendezvous, patched conic approximation, spacecraft mission design and space systems technology/history.",
+   "prereqText": "MEGR 3121 with a grade of C or better.",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": null,
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=42&coid=154927",
+   "coid": "154927",
+   "catalogYear": "2026-2027",
+   "prereqGroups": [
+    [
+     "MEGR 3121"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "with a grade of C or better"
+   ],
+   "core": false
+  },
+  "PHYS 1101": {
+   "code": "PHYS 1101",
+   "title": "Introductory Physics I",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "First semester of a two semester algebra-based introductory sequence in physics. Introduction to the fundamental principles of natural phenomena. Topics include: kinematics and dynamics of particles, momentum, work, energy, conservation laws, and mechanics of rigid bodies. Knowledge of basic algebra and trigonometry is needed.",
+   "prereqText": null,
+   "coreqText": null,
+   "preOrCoreqText": "MATH 1100 or MATH 1101 as a prerequisite or MATH 1103, MATH 1120, MATH 1121, MATH 1241, or higher as a pre- or corequisite; an equivalent math test score may also be considered.",
+   "restriction": null,
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=140346",
+   "coid": "140346",
+   "prereqGroups": [],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [
+    [
+     "MATH 1100",
+     "MATH 1101",
+     "MATH 1103",
+     "MATH 1120",
+     "MATH 1121",
+     "MATH 1241"
+    ]
+   ],
+   "notes": [],
+   "core": false
+  },
+  "PHYS 1102": {
+   "code": "PHYS 1102",
+   "title": "Introductory Physics II",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Second semester of the algebra-based introductory sequence in physics. An introduction to topics in electromagnetism, optics, and nuclear physics. A knowledge of basic algebra and trigonometry is needed for this course.",
+   "prereqText": "PHYS 1101 with grade of C or above.",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": null,
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=140348",
+   "coid": "140348",
+   "prereqGroups": [
+    [
+     "PHYS 1101"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "with grade of C or above"
+   ],
+   "core": false
+  },
+  "PHYS 2101": {
+   "code": "PHYS 2101",
+   "title": "Physics for Science and Engineering I",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "First semester of a two-semester calculus-based introductory sequence in general physics. Topics include: kinematics and dynamics of particles, momentum, work, energy, conservation laws, simple harmonic motion, and mechanics of rigid bodies.",
+   "prereqText": null,
+   "coreqText": null,
+   "preOrCoreqText": "MATH 1241 with grade of C or above.",
+   "restriction": null,
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=140357",
+   "coid": "140357",
+   "prereqGroups": [],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [
+    [
+     "MATH 1241"
+    ]
+   ],
+   "notes": [
+    "with grade of C or above"
+   ],
+   "core": true
+  },
+  "PHYS 2101L": {
+   "code": "PHYS 2101L",
+   "title": "Physics for Science and Engineering I Laboratory",
+   "credits": 1.0,
+   "creditsText": "(1)",
+   "description": "Experiments selected from motion on an inclined plane, circular motion, momentum and energy in collisions, torques, and conservation laws. Use of the computer for organizing, graphing and analyzing data.. If a student has completed PHYS 1101L with grade of C or above in a previous semester, the student is exempted from taking PHYS 2101L. Two laboratory hours each week.",
+   "prereqText": null,
+   "coreqText": null,
+   "preOrCoreqText": "PHYS 2101.",
+   "restriction": null,
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=140358",
+   "coid": "140358",
+   "prereqGroups": [],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [
+    [
+     "PHYS 2101"
+    ]
+   ],
+   "notes": [],
+   "core": true
+  },
+  "PHYS 2102": {
+   "code": "PHYS 2102",
+   "title": "Physics for Science and Engineering II",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Second semester of the calculus-based introductory sequence in general physics. Topics include: electric charge, electric fields, and magnetic fields.",
+   "prereqText": "PHYS 2101 with grade of C or above.",
+   "coreqText": null,
+   "preOrCoreqText": "MATH 1242 with grade of C or above.",
+   "restriction": null,
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=140359",
+   "coid": "140359",
+   "prereqGroups": [
+    [
+     "PHYS 2101"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [
+    [
+     "MATH 1242"
+    ]
+   ],
+   "notes": [
+    "with grade of C or above"
+   ],
+   "core": true
+  },
+  "PHYS 2102L": {
+   "code": "PHYS 2102L",
+   "title": "Physics for Science and Engineering II Laboratory",
+   "credits": 1.0,
+   "creditsText": "(1)",
+   "description": "A continuation of PHYS 2101L. Experiments selected from series and parallel circuits, RC circuits, EMF and terminal potential difference, electromagnets, and magnetic induction.. If a student has completed PHYS 1102L with grade of C or above in a previous semester, the student is exempted from taking PHYS 2102L.  Two laboratory hours each week.",
+   "prereqText": "PHYS 2101L (or PHYS 1101L).",
+   "coreqText": null,
+   "preOrCoreqText": "PHYS 2102.",
+   "restriction": null,
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=140360",
+   "coid": "140360",
+   "prereqGroups": [
+    [
+     "PHYS 2101L"
+    ],
+    [
+     "PHYS 1101L"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [
+    [
+     "PHYS 2102"
+    ]
+   ],
+   "notes": [],
+   "core": true
+  },
+  "PHYS 3101": {
+   "code": "PHYS 3101",
+   "title": "Topics and Methods of General Physics",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Integration of mathematical concepts with basic physical principals.  Physics topics chosen from material covered in PHYS 2101 and PHYS 2102.  Mathematical concepts include: approximation methods, integration and differentiation, vector algebra, and coordinate systems.  Exercises and problems emphasize topics traditionally challenging to beginning physics students.  An emphasis is placed on developing additional background and problem solving skills necessary for students to succeed in upper-division physics courses.",
+   "prereqText": "PHYS 2102 and MATH 1242 with grades of C or above.",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": null,
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=140361",
+   "coid": "140361",
+   "prereqGroups": [
+    [
+     "PHYS 2102"
+    ],
+    [
+     "MATH 1242"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "with grades of C or above"
+   ],
+   "core": false
+  },
+  "PHYS 3121": {
+   "code": "PHYS 3121",
+   "title": "Classical Mechanics I",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Topics include: Newtonian mechanics, kinetic energy, work and potential energy, harmonic oscillators, projectiles and charged particles without and with viscous friction, linear and angular momentum, vector algebra and coordinate transformations, Taylor expansions, mathematical analysis using complex numbers, Fourier series analysis of vibrational motions.",
+   "prereqText": "PHYS 3101 or ECGR 2112; and MATH 2171 or MATH 2241; both with grades of C or above.",
+   "coreqText": null,
+   "preOrCoreqText": "MATH 2241",
+   "restriction": null,
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=140362",
+   "coid": "140362",
+   "prereqGroups": [
+    [
+     "PHYS 3101",
+     "ECGR 2112"
+    ],
+    [
+     "MATH 2171",
+     "MATH 2241"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [
+    [
+     "MATH 2241"
+    ]
+   ],
+   "notes": [
+    "both with grades of C or above"
+   ],
+   "core": false
+  },
+  "PHYS 3141": {
+   "code": "PHYS 3141",
+   "title": "Introduction to Modern Physics",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Topics include: Special relativity, quantization of charge, light, and energy, the nuclear atom, wavelike properties of particles, introduction to nuclear reactions and applications, introduction to solid state physics, and introduction to particle physics.",
+   "prereqText": "PHYS 2102 or PHYS 1102; and MATH 1241; both with grades of C or above.",
+   "coreqText": null,
+   "preOrCoreqText": "MATH 1242.",
+   "restriction": null,
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=140363",
+   "coid": "140363",
+   "prereqGroups": [
+    [
+     "PHYS 2102",
+     "PHYS 1102"
+    ],
+    [
+     "MATH 1241"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [
+    [
+     "MATH 1242"
+    ]
+   ],
+   "notes": [
+    "both with grades of C or above"
+   ],
+   "core": false
+  },
+  "PHYS 3220": {
+   "code": "PHYS 3220",
+   "title": "Mathematical Methods in Physics",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Topics include: Vectors and matrices, waves and Fourier analysis, partial differential equations and boundary value problems, and complex variables.",
+   "prereqText": "PHYS 2102, PHYS 3101, and MATH 2241 with grades of C or above.",
+   "coreqText": null,
+   "preOrCoreqText": "MEGR 3121 (Optional for PHYS/MEGR dual majors in place of PHYS 3101 prerequisite)",
+   "restriction": null,
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=140367",
+   "coid": "140367",
+   "prereqGroups": [
+    [
+     "PHYS 2102"
+    ],
+    [
+     "PHYS 3101"
+    ],
+    [
+     "MATH 2241"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [
+    [
+     "MEGR 3121"
+    ]
+   ],
+   "notes": [
+    "with grades of C or above",
+    "Optional for PHYS/MEGR dual majors in place of PHYS 3101 prerequisite"
+   ],
+   "core": false
+  },
+  "PHYS 4110": {
+   "code": "PHYS 4110",
+   "title": "Introduction to Biomedical Optics",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "The basic principles underlying tissue optics, laser-tissue interactions, and optical imaging, microscopy, and spectroscopy for medical applications.",
+   "prereqText": "PHYS 3141; and MATH 2171 or MATH 2241; both with grades of C or above.",
+   "coreqText": null,
+   "preOrCoreqText": "PHYS 3121 or MEGR 2144",
+   "restriction": null,
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=140374",
+   "coid": "140374",
+   "prereqGroups": [
+    [
+     "PHYS 3141"
+    ],
+    [
+     "MATH 2171",
+     "MATH 2241"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [
+    [
+     "PHYS 3121",
+     "MEGR 2144"
+    ]
+   ],
+   "notes": [
+    "both with grades of C or above"
+   ],
+   "core": false
+  },
+  "PHYS 4140": {
+   "code": "PHYS 4140",
+   "title": "Nuclear Physics",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "A study of the nucleus, radioactivity, nuclear reactions, fission, fusion, interactions of radiation with matter and measurement of radiation.",
+   "prereqText": "PHYS 3141; and MATH 2171 or MATH 2241; both with grades of C or above.",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": null,
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=140375",
+   "coid": "140375",
+   "prereqGroups": [
+    [
+     "PHYS 3141"
+    ],
+    [
+     "MATH 2171",
+     "MATH 2241"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "both with grades of C or above"
+   ],
+   "core": false
+  },
+  "PHYS 4231": {
+   "code": "PHYS 4231",
+   "title": "Electromagnetic Theory I",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "The first course of a two-semester sequence. Topics include: Review of Vector Algebra & Calculus, Electrostatics, Electric Potential, Electric Field in Matter, Magnetostatics and Magnetic Field in Matter.",
+   "prereqText": "PHYS 3121 or MEGR 2144; PHYS 3220 or MATH 2242; and MATH 2171 or MATH 2241; all with grades of C or above.",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": null,
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=140378",
+   "coid": "140378",
+   "prereqGroups": [
+    [
+     "PHYS 3121",
+     "MEGR 2144"
+    ],
+    [
+     "PHYS 3220",
+     "MATH 2242"
+    ],
+    [
+     "MATH 2171",
+     "MATH 2241"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "all with grades of C or above"
+   ],
+   "core": false
+  },
+  "PHYS 4232": {
+   "code": "PHYS 4232",
+   "title": "Electromagnetic Theory II",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "A continuation of PHYS 4231. Topics include: Review of Vector Algebra & Calculus, Electrodynamics, Electromagnetic Energy and Momentum Conservation, Poynting Theorem, Electromagnetic Waves, and Radiation.",
+   "prereqText": "PHYS 4231 with grade of C or above.",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": null,
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=140379",
+   "coid": "140379",
+   "prereqGroups": [
+    [
+     "PHYS 4231"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "with grade of C or above"
+   ],
+   "core": false
+  },
+  "PHYS 4241": {
+   "code": "PHYS 4241",
+   "title": "Quantum Mechanics I",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Topics include: blackbody radiation, solutions of the time-independent Schrodinger equation, unbound and bound states, the infinite square well, the harmonic oscillator, the hydrogen atom, spin operators, and the Stern-Gerlach experiment.",
+   "prereqText": "PHYS 3220 or MATH 2241; PHYS 3121 or MEGR 2144; PHYS 3141; and MATH 2171 or PHYS 3101; all with grades of C or above.",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": null,
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=140380",
+   "coid": "140380",
+   "prereqGroups": [
+    [
+     "PHYS 3220",
+     "MATH 2241"
+    ],
+    [
+     "PHYS 3121",
+     "MEGR 2144"
+    ],
+    [
+     "PHYS 3141"
+    ],
+    [
+     "MATH 2171",
+     "PHYS 3101"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "all with grades of C or above"
+   ],
+   "core": false
+  },
+  "PHYS 4242": {
+   "code": "PHYS 4242",
+   "title": "Quantum Mechanics II",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "A continuation of PHYS 4241. Topics include: perturbation theory, atoms in external electric and magnetic fields, the Stark and Zeeman effects, the WKB approximation, selection rules for electromagnetic radiation, scattering theory, multi-electron atoms, and electrons in solids, Bose-Einstein and Fermi-Dirac distributions.",
+   "prereqText": "PHYS 4241 with grade of C or above.",
+   "coreqText": null,
+   "preOrCoreqText": null,
+   "restriction": null,
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=140381",
+   "coid": "140381",
+   "prereqGroups": [
+    [
+     "PHYS 4241"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [],
+   "notes": [
+    "with grade of C or above"
+   ],
+   "core": false
+  },
+  "PHYS 4271": {
+   "code": "PHYS 4271",
+   "title": "Waves and Optics",
+   "credits": 3.0,
+   "creditsText": "(3)",
+   "description": "Topics include: ray analysis of common optical elements, wave properties of light, the superposition of periodic and non-periodic waves, and selected topics from geometrical and physical optics.",
+   "prereqText": "MATH 2171 or PHYS 3101 with grade of C or above",
+   "coreqText": null,
+   "preOrCoreqText": "PHYS 3121 or MEGR 2144",
+   "restriction": null,
+   "catalogURL": "https://catalog.charlotte.edu/preview_course_nopop.php?catoid=40&coid=140382",
+   "coid": "140382",
+   "prereqGroups": [
+    [
+     "MATH 2171",
+     "PHYS 3101"
+    ]
+   ],
+   "coreqGroups": [],
+   "preOrCoreqGroups": [
+    [
+     "PHYS 3121",
+     "MEGR 2144"
+    ]
+   ],
+   "notes": [
+    "with grade of C or above"
+   ],
+   "core": false
+  }
+ }
+}

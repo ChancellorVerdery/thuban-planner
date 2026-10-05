@@ -1,0 +1,12 @@
+SAMPLE CHECKSHEET (synthetic test fixture, not an official UNC Charlotte document)
+Minor in Aerospace Engineering
+Required Courses (9 credit hours)
+MEGR 3310   Flight Mechanics   3
+MEGR 4312   Aerospace Propulsion   3
+  Prerequisite(s): MEGR 3111 and MEGR 3114 with grades of C or above
+MEGR 4311   Aerospace Materials   3
+  Pre- or Corequisite(s): MEGR 3161
+Select one of the following:
+MEGR 4310   Uncrewed Aerial Vehicles   3
+MEGR 4313   Astromechanics   3
+Notes: students must complete MEGR 3121 before enrolling in any of the courses above.
