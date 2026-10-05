@@ -62,6 +62,7 @@ final class CatalogDatasetTests: XCTestCase {
         XCTAssertEqual(CourseCode.normalize(" PHYS  2101l "), "PHYS 2101L")
         XCTAssertEqual(CourseCode.equivalentCodes("phys 2101L"), ["PHYS 2101L", "PHYS 1101L"])
         XCTAssertEqual(CourseCode.equivalentCodes("PHYS 1101L"), ["PHYS 1101L", "PHYS 2101L"])
+        XCTAssertEqual(CourseCode.equivalentCodes("MEGR 3122"), ["MEGR 3122", "MEGR 3123"])
         let index = PlanCourseIndex(BSMESampleData.make())
         XCTAssertEqual(index.find("PHYS 2101L")?.code, "PHYS 1101L")
         XCTAssertEqual(index.find("math2241")?.code, "MATH 2241")
@@ -226,6 +227,8 @@ final class TechElectivesTests: XCTestCase {
         XCTAssertEqual(q2.missing, ["PHYS 3141", "PHYS 4241"])
         XCTAssertFalse(try XCTUnwrap(statuses.first { $0.code == "MEGR 3162" }).isOffered)
         XCTAssertEqual(try XCTUnwrap(statuses.first { $0.code == "MEGR 3225" }).readiness, .ready)
+        // MEGR 3237 names only the old MEGR 3122; the plan's MEGR 3123 satisfies it (catalog-documented pair).
+        XCTAssertEqual(try XCTUnwrap(statuses.first { $0.code == "MEGR 3237" }).readiness, .ready)
         // MEGR 3221 is the design elective here, so it does not count as a technical elective (MEGR 3216 isn't planned).
         let design = try XCTUnwrap(statuses.first { $0.code == "MEGR 3221" })
         XCTAssertEqual(design.planState, .planned)

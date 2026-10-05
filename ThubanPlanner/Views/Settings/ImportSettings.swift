@@ -15,6 +15,20 @@ struct ImportSettings: View {
                                caption: "Bring your plan over from Atlas. Read-only: Atlas is never changed, and nothing here is replaced until you have seen the counts.")
             SettingsImportCard()
             SettingsImportConnection()
+            SettingsGroup("Degree requirements", caption: "Add the required classes of any UNC Charlotte major or minor from a catalog program page (PDF, HTML or MHTML), a DegreeWorks audit, or a checksheet. Only adds what isn’t in your plan; classes you have are never changed.") {
+                HStack(spacing: 10) {
+                    Button { app.degreeTools.openImport() } label: {
+                        HStack(spacing: 6) { Icon(.file, size: 14); Text("Import degree requirements…") }
+                    }
+                    .buttonStyle(SecondaryButtonStyle(height: 32))
+                    Button { app.degreeTools.openElectives() } label: {
+                        HStack(spacing: 6) { Icon(.graduation, size: 14); Text("Technical electives…") }
+                    }
+                    .buttonStyle(GhostButtonStyle(height: 32))
+                    .disabled(app.degreeTools.dataset == nil)
+                    Spacer(minLength: 0)
+                }
+            }
         }
     }
 

@@ -67,7 +67,15 @@ Packages/ThubanPlannerCore/ SwiftPM library + tests (`swift test`)
              AppPaths (THUBAN_PLANNER_HOME), JSONFile
   Import/    AtlasImporter (SQL, ssh command, fetch, convert, ImportSummary), AtlasDocument (tolerant rows +
              recompose), CommandRunner / ProcessRunner (tests use FixtureRunner)
-  Sample/    SampleData (a mechanical-engineering degree for smoke / THUBAN_PLANNER_SEED=sample), BannerSampleData
+  Catalog/   UNC Charlotte catalog data: CatalogDataset (bundled program + elective list + course requirements),
+             CatalogRequirementParser (+ CourseCode: normalize, equivalents), RequirementChainResolver (missing
+             prerequisite closure, OR-choices), TechElectives (statuses, progress, apply / removal, tags),
+             CourseOfferings + OfferingsStore (offerings-cache.json), OfferingsFetcher (Banner subject searches)
+  DegreeImport/ DegreeDocumentText (PDF / HTML / MHTML / DOCX / text → lines), DegreeDocumentParser (catalog page,
+             DegreeWorks audit, checksheet), DegreeImportMerge (add-only plan + apply)
+  Resources/ uncc-bsme-2025-26.json (tools/catalog), uncc-offerings-snapshot.json (Banner, 2026-10-05)
+  Sample/    SampleData (a mechanical-engineering degree for smoke / THUBAN_PLANNER_SEED=sample), BSMESampleData (a
+             fictional UNCC BSME 2025-26 student, real codes — electives / import scenes and tests), BannerSampleData
              (deterministic terms / sections, fictional instructors, for the offline Schedule smoke scenes), RMPSampleData
              (fictional RMP profiles for those instructors)
   Theme/     Copied from Thuban Gym — ColorScheme, SchemePresets, ThemeSelection, ThemeResolver, ResolvedTheme …
@@ -77,7 +85,7 @@ Shared/
   Theme/     ThemeEnvironment (tokens → Color, ThubanFont, ThubanMetrics, modifiers, ChipKind)
   Art/       AppArt + AppArtSource (the mark: ~/Desktop/Claude/Thuban Icons/final/planner.svg), Icon (line icons)
 ThubanPlanner/
-  App/       ThubanPlannerApp (window, menus: New Class ⌘N, Go ⌘1–⌘4, Settings ⌘,, Route ▸ Calculate ⌘R / Fit ⌘0,
+  App/       ThubanPlannerApp (window, menus: New Class ⌘N, Technical Electives… ⇧⌘T, Import Degree Requirements… ⇧⌘I, Go ⌘1–⌘4, Settings ⌘,, Route ▸ Calculate ⌘R / Fit ⌘0,
              Schedule ▸ Previous / Next ⌘[ ⌘], Block Times ⌘B, Copy CRNs ⇧⌘C, Export to Banner… ⇧⌘E, Refresh
              Sections ⇧⌘R), Schedule/ (ScheduleModel — the tab's own @Observable model, `app.scheduleTab`;
              ScheduleModel+Export — sign-in state and the export flow; BannerWebSession — WebKit store, guards,
@@ -96,10 +104,15 @@ ThubanPlanner/
                      ScheduleClassDetailSheet, ScheduleRatingCard, ScheduleSortControl, ScheduleSignInSheet,
                      ScheduleExportSheet,
                      ScheduleTheme (course colours), ScheduleSmokeScenes
+  App/DegreeTools    DegreeToolsModel (`app.degreeTools`: dataset, offerings, the two sheets' state and writes)
+  Views/Electives    ElectivesSheet (list, progress), ElectivesConfirmView (chain tree, OR pickers, remove), smoke scenes
+  Views/DegreeImport DegreeImportSheet (choose / preview / done)
   Views/Settings     SettingsView (nav), SettingsToolbar, SettingsChrome, SettingsPaneHeader, PlanningSettings,
                      AppearanceSettings (working), ImportSettings, DataSettings, AboutSettings, SettingsSmokeScenes (C)
   Resources          Assets.xcassets (AppIcon from scripts/make_app_icon.sh), entitlements (no sandbox)
-scripts/   build.sh, test.sh, smoke.sh, install.sh, regen.sh, make_app_icon.sh(+.swift), golden.sh, v8check.sh
+scripts/   build.sh, test.sh, smoke.sh, install.sh, regen.sh, make_app_icon.sh(+.swift), golden.sh, v8check.sh,
+           refresh_catalog.sh (catalog dataset via headless Chromium; `--offerings` for the Banner snapshot)
+tools/catalog/ fetch.py (Playwright's chrome-headless-shell, page cache), refresh_catalog.py (crawler), reqparse.py
 tools/golden/  gen.mjs + atlas-course.js (Atlas's course.js, unmodified) + v8sort.js + sortcheck.mjs + v8trace.mjs (V8-only check)
 ```
 
@@ -123,6 +136,9 @@ files as you like inside your folder.
   term", `even` "Lighter, even load". Thuban-only: `minCredits` and `summerMin` (default 0 = off; Atlas data always
   loads them as 0) — see "Minimum credits".
 - `importedAt`, `importSource` — provenance of an Atlas import.
+- `Course.tags: [String]?` (Thuban-only, 2026-10-05): "tech-elective", "prereq:PHYS 4242", "program:Minor in
+  Mathematics". nil by default and for every Atlas document (decoded only from an array of strings; empty → nil), so
+  the encoded document and every parity / golden test are unchanged; the scheduler never reads it.
 
 Decoding is tolerant and applies Atlas's `loadCourse()` normalization exactly (JS coercions included); `AppModel`
 re-normalizes after every write, exactly like Atlas reloads after every save — e.g. setting max credits to 0 snaps
@@ -523,6 +539,85 @@ not come back.)
   `THUBAN_PLANNER_LIVE_BANNER=1 scripts/test.sh` (term list + one MEGR 2144 search);
   `THUBAN_PLANNER_LIVE_RMP=1 scripts/test.sh` (three PHYS instructors on both UNCC RMP pages, ~10 requests).
 
+### Technical electives — `Views/Electives`, `App/DegreeTools`, core `Catalog/` (Planner toolbar, ⇧⌘T)
+
+The BSME requires four technical electives (12 credits), at least three MEGR. The catalog's list (68) and
+DegreeWorks' list (75) differ: the catalog adds MEGR 3221 (counts only when MEGR 3216 fills the design elective);
+DegreeWorks adds MEGR 3222, 3243, 3280, 4212, 4213, 4281, 4282, 4313 (six have 2026-27 catalog pages, MEGR 3222 /
+3243 have none). The dataset keeps all 76 with `inCatalog` / `inDegreeWorks`.
+
+- **Dataset** (`Resources/uncc-bsme-2025-26.json`, `CatalogDataset.bsme2025`): program (catalog year, rule, core
+  codes), electives, and 153 courses — every elective plus, recursively, every prerequisite / corequisite they name
+  until the BSME core (core pages read, not recursed) — with title, credits, raw "Prerequisite(s)", "Corequisite(s)",
+  "Pre- or Corequisite(s)", "Restriction(s)" text, parsed groups (AND of OR-groups) and notes (grades, standing,
+  permission, asides). Generated by `scripts/refresh_catalog.sh` (tools/catalog: catalog.charlotte.edu is behind an
+  AWS WAF JavaScript challenge, so pages are loaded with Playwright's cached chrome-headless-shell; program page
+  catoid 40 / poid 11501, subject listings navoid 4989, course pages preview_course_nopop; DegreeWorks-only codes
+  looked up in 2026-27, catoid 42 / navoid 5390). `CatalogRequirementParser` (Swift) and `reqparse.py` implement the
+  same rules; `CatalogDatasetTests` checks they agree on every line.
+- **Equivalents** (`CourseCode.equivalents`): PHYS 2101L ↔ PHYS 1101L (DegreeWorks counts it); the curriculum-change
+  pairs the catalog itself lists as alternatives — MEGR 3122 ↔ 3123, 2240 ↔ 2242, 3171L ↔ 3174, 2156 ↔ 2157 (so MEGR
+  3237's "MEGR 3122" is met by a planned MEGR 3123). Matching is otherwise exact code, case / space-insensitive.
+- **Offered** = at least one section in the six Banner terms up to and including the calendar term (two years with
+  summers) or in any upcoming term `getTerms` lists. `OfferingsFetcher`: `getTerms` once a day, then ONE
+  `BannerClient.subjectSections` search (txt_subject only, 500 a page, resetDataForm first) per elective subject
+  (MEGR, PHYS, BIOL, MATH) per term that is missing or stale — finished terms are fetched once and kept, the
+  calendar / upcoming terms refetched after 7 days — paced 0.45 s, through `BannerRequestGuard`. Cached in
+  `offerings-cache.json` (per term + subject: course number → section count, fetch time; safe to delete). The
+  bundled snapshot (`uncc-offerings-snapshot.json`, 28 searches on 2026-10-05) is used until the first fetch and in
+  the offline smoke run. Refresh: opening the panel (when needed) or "Refresh" (current + upcoming terms).
+- **Chains** (`RequirementChainResolver`): a group is met by any option in the plan (taken or to take — the scheduler
+  orders the rest) or already being added; otherwise the user's choice for that group (`"PHYS 4241#p0"`) or the
+  option needing the fewest additional classes (ties: offered recently, in the catalog, listed first), resolved
+  recursively; additions are deduplicated and ordered prerequisites-first; prerequisite cycles stop with a warning
+  (lecture ↔ lab corequisite loops are normal); a code missing from the catalog is added by code with a warning;
+  not-offered additions are flagged. Added classes are To take with `prereqs` / `coreqs` = the concrete codes (plan
+  spelling), `summerOk` when a summer term in the window ran it, tags "tech-elective" / "prereq:<elective>".
+  Verified chain (2025-26): PHYS 4242 Quantum Mechanics II ← PHYS 4241 Quantum Mechanics I ← (PHYS 3220 or MATH
+  2241), (PHYS 3121 or MEGR 2144), PHYS 3141 Introduction to Modern Physics, (MATH 2171 or PHYS 3101); PHYS 3141 ←
+  (PHYS 2102 or PHYS 1102), MATH 1241, pre/co MATH 1242.
+- **Tracker** (`TechElectives.progress`): electives in the plan (tagged or not) whose catalog condition holds;
+  "2 of 4 chosen · 2 of 3 MEGR". Toolbar button "Tech electives 2/4".
+- **Sheet** (880 × 780): progress card, search, All / MEGR / Other, "Not offered recently (N)" toggle (off by
+  default; those rows dimmed), offerings caption + Refresh; rows: code, title, offered terms ("Fall 2026, Spring 2026
+  + 2 more · upcoming Spring 2027"), credits, status chip (Ready / Needs PHYS 4241 → PHYS 3141 / Needs 3 classes /
+  Chosen · Spring 2029 / In plan / Taken), Add / Remove. Add with everything in the plan → added at once; otherwise
+  the confirmation: "Add PHYS 4242 and 2 prerequisites?", OR pickers (with "+N classes" costs), the tree (In plan ·
+  Fall 2026 / Add / Added above / not in catalog / cycle), the additions with credits, warnings and catalog notes;
+  Add all / Cancel. After adding, a banner says where each class landed (`app.routeTerm`). Remove (only electives
+  tagged here, To take) offers the To-take classes tagged only for it that nothing else still needs.
+- The Planner table marks tagged electives "TE".
+
+### Import degree requirements — `Views/DegreeImport`, core `DegreeImport/` (Planner "…" menu, Settings ▸ Import, ⇧⌘I)
+
+- **Formats** (`DegreeDocumentText`): PDF (PDFKit text; "CODE / - / Title (3)" breaks rejoined), HTML (blocks →
+  lines, entities), MHTML (MIME parts, quoted-printable / base64, the text/html part), .docx (`/usr/bin/unzip -p …
+  word/document.xml`), text / Markdown. Drag a file onto the sheet or Choose a file.
+- **Parsing** (`DegreeDocumentParser`): DegreeWorks (text has "Still needed:") reads ONLY "Still needed" blocks —
+  "1 Class in MEGR 3114" = required (titled by its requirement line), "1 Class in MEGR 3216 / or 3221" or "4 Classes
+  in MEGR 3090 or 3092 …" = a choice group, "additionally …" / "MEGR @" = notes. Catalog pages / checksheets: a line
+  STARTING with a code is a class ("MATH 2171 - Differential Equations (3)", "ENGR 1300 Exploring … (2)", "PHYS 2101
+  (3)", "MEGR 3310   Flight Mechanics   3"); "or CODE" joins the class above into a choose-one group; "Select / Choose
+  N of the following", "Two MATH courses: A or B or C", headings with "Elective" (picks = credit hours ÷ 3) and
+  "Option N" open choice groups; "Prerequisite(s):" / "Corequisite(s):" / "Pre- or Corequisite(s):" / "Credit
+  Hours:" lines attach to the class above; "MATH 3XXX-4XXX …" wildcards become group notes; codes inside prose are
+  skipped and listed. Program name from the page `<h1>` / title lines ("Mathematics, Minor", "Bachelor of Science
+  in Mechanical Engineering"). Limits: no OCR (scanned PDFs read as empty), multi-column PDFs can interleave text,
+  "Option" blocks are offered as choices (take one option), credit-hour buckets of any course ("6 credits of MATH
+  3000+") are notes only, DegreeWorks blocks that only say "See … section" are skipped.
+- **Merge** (`DegreeImportMerge`): only adds; a class already in the plan (same normalized code or an equivalent) is
+  never touched; choice groups are never auto-added (the user ticks options; a plan class counts toward one
+  requirement only — required matches first, then groups in order); missing title / credits / requirements come
+  from the bundled dataset ("details from the catalog"); OR-groups resolve to the option in the plan / being added;
+  added classes are To take, tagged "program:<name>"; importing the same document again adds nothing.
+- **Sheet** (860 × 780): choose (drop zone + merge rules) → reading → preview (counts "N required · M already in
+  your plan · K to add · G choices", the classes to add as checkboxes with requirements, choice cards with option
+  toggles, "Already in your plan", "Lines not read as requirements") → "Add N classes" (snapshot "before degree
+  import", then ONE `mutate`) → done ("where they landed" per class, plan status, backup name).
+- **Fixtures** (`Fixtures/degree/`): BSME catalog page (HTML + MHTML), Mathematics minor (HTML), Physics minor (PDF
+  printed by Chromium), a REDACTED DegreeWorks audit (MHTML; name, ID, advisor, GPA, grades, transfer schools
+  removed), a synthetic aerospace checksheet (.txt + .docx).
+
 ### Settings (C) — `Views/Settings` (section ⌘4 / ⌘,)
 
 Pane list on the left (Planning, Appearance, Import, Data, About), pane on the right (`app.settingsPane`).
@@ -532,7 +627,8 @@ Pane list on the left (Planning, Appearance, Import, Data, About), pane on the r
   (three selectable rows with Atlas's labels, a one-line explanation each, and a live preview "With this: finishes
   Spring 2028 · 3 more terms" computed with `Scheduler.scheduleDegree` on a copy). Commit on submit / blur.
 - **Appearance**: working copy from Gym (mode, eight schemes, text size, preview). Keep.
-- **Import**: header "Bring your plan over from Atlas" / "Read-only: Atlas is never changed."; host + email fields,
+- **Import**: (also "Degree requirements": Import degree requirements… / Technical electives…) header "Bring your
+  plan over from Atlas" / "Read-only: Atlas is never changed."; host + email fields,
   the exact command (`app.atlasImporter.commandDescription`, mono, selectable); `Check Atlas` (primary) →
   fetching (progress + Cancel) → preview card (counts: classes taken / to take with credits, semesters with the
   current one, switched-off terms, settings, unknown refs, "Finishes …", warnings) → `Replace my plan` (confirm when
@@ -570,14 +666,18 @@ SmokeScene(name: "planner-first-run") { app in
 } cleanup: { app in app.replaceData(SampleData.make(now: app.now, calendar: app.calendar)) }
 ```
 
-Always undo state in `cleanup`. Look at your PNGs (Read tool) before you finish. Sample ids are `c-sample-01 … 43`
+Technical electives / degree import scenes live in `Views/Electives/ElectivesSmokeScenes.swift` (`SmokeScenes.electives`,
+appended to the Planner list): panel light / dark, not-offered toggle, the PHYS 4242 chain light / dark, OR pickers,
+added banner, remove, Planner with TE marks, import choose / preview (minor, DegreeWorks, dark) / result — offline on
+`BSMESampleData`, the bundled dataset and offerings snapshot. Always undo state in `cleanup`. Look at your PNGs (Read tool) before you finish. Sample ids are `c-sample-01 … 43`
 (01–29 taken, 30–43 to take; 38 = Senior Design II, the last class).
 
 ## Build / test / smoke
 
 - `DERIVED=.build/DerivedData-<you> scripts/build.sh` — ALWAYS a private DerivedData, run from your own worktree
   (see Git). Regenerates the project first.
-- `scripts/test.sh` — core tests (`swift test`, 225 tests (two live tests skipped) incl. 400 golden cases and the 3,200-case differential run against Atlas's JS). Add tests for core logic you add.
+- `scripts/test.sh` — core tests (`swift test`, 250 tests (three live tests skipped) incl. 400 golden cases and the 3,200-case differential run against Atlas's JS; `TechElectivesTests`, `CatalogDatasetTests`, `DegreeDocumentTests`, `DegreeImportMergeTests`). Add tests for core logic you add. `THUBAN_PLANNER_LIVE_OFFERINGS=<json> scripts/test.sh` refreshes an offerings snapshot (public Banner search).
+- `scripts/refresh_catalog.sh` — regenerates the BSME dataset from the catalog (headless Chromium, ~160 paced page loads on a cold cache); `--offerings` refreshes the bundled offerings snapshot.
 - `scripts/golden.sh` — regenerates the golden cases from Atlas's own scheduler (macOS JavaScriptCore; no Node).
 - `scripts/v8check.sh` — needs a real V8 (`node` / `deno`, or `V8_NODE=<Electron binary>`): checks the V8 sort port's
   comparator call order against V8's own sort and regenerates the golden cases on V8's own sort, diffing them with the

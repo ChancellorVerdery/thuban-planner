@@ -25,6 +25,13 @@ struct ThubanPlannerApp: App {
                 }
                 .keyboardShortcut("n", modifiers: .command)
                 .disabled(!appModel.isLoaded || appModel.loadError != nil)
+                Divider()
+                Button("Technical Electives…") { appModel.degreeTools.openElectives() }
+                    .keyboardShortcut("t", modifiers: [.command, .shift])
+                    .disabled(!appModel.isLoaded || appModel.loadError != nil || appModel.degreeTools.dataset == nil)
+                Button("Import Degree Requirements…") { appModel.degreeTools.openImport() }
+                    .keyboardShortcut("i", modifiers: [.command, .shift])
+                    .disabled(!appModel.isLoaded || appModel.loadError != nil)
             }
             CommandGroup(replacing: .appSettings) {
                 Button("Settings…") { appModel.openSettings() }

@@ -68,8 +68,15 @@ public enum DegreeImportMerge {
             if let hit = index.find(item.code) { already.append(.init(documentCode: item.code, planCode: hit.code)) } else { missing.append(item) }
         }
         var choices: [DegreeImportPlan.Choice] = []
+        // A class counts toward one requirement: required matches first, then each group in order takes up to its pick.
+        var used = Set(already.map { CourseCode.key($0.planCode) })
         for group in document.choices {
-            let inPlan = group.options.compactMap { index.find($0.code)?.code }
+            var inPlan: [String] = []
+            for option in group.options {
+                guard inPlan.count < group.pick, let hit = index.find(option.code)?.code, !used.contains(CourseCode.key(hit)) else { continue }
+                inPlan.append(hit)
+                used.insert(CourseCode.key(hit))
+            }
             let available = group.options.filter { !index.contains($0.code) }
             choices.append(DegreeImportPlan.Choice(group: group, inPlan: inPlan, available: available.map { candidate($0, dataset: dataset) }))
         }

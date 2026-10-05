@@ -28,6 +28,21 @@ struct PlannerClassRow: View {
                             rowActive: hovering || isSelected, accessibility: "Title") { text in
                 app.updateCourse(course.id, CoursePatch(title: text))
             }
+            .overlay(alignment: .trailing) {
+                // A class chosen in Technical electives (tagged "tech-elective").
+                if course.tags?.contains(TechElectives.electiveTag) == true, focus.wrappedValue != .cell(course.id, .title) {
+                    Text("TE")
+                        .font(.system(size: 10.5, weight: .bold))
+                        .foregroundStyle(theme.brassInkColor)
+                        .padding(.horizontal, 5)
+                        .frame(height: 17)
+                        .background(theme.accentTintColor, in: RoundedRectangle(cornerRadius: 4, style: .continuous))
+                        .padding(.trailing, 6)
+                        .allowsHitTesting(false)
+                        .help("Technical elective")
+                        .accessibilityLabel("Technical elective")
+                }
+            }
             .frame(width: columns.title)
 
             PlannerTextCell(value: app.creditsText(course.credits), placeholder: "0", mono: true, alignment: .trailing,

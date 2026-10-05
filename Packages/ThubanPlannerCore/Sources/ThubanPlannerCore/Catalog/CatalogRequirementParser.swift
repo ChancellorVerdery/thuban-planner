@@ -18,10 +18,19 @@ public enum CourseCode {
         BannerText.splitCourseCode(code)?.subject ?? ""
     }
 
-    /// Codes UNC Charlotte counts as the same requirement. Verified: a DegreeWorks audit (BSME, 2025-26) satisfies
-    /// "Introductory Physics I Lab" (catalog: PHYS 2101L) with PHYS 1101L.
+    /// Codes UNC Charlotte counts as the same requirement.
+    /// - PHYS 2101L ↔ PHYS 1101L: a DegreeWorks audit (BSME, 2025-26) satisfies "Introductory Physics I Lab" (catalog:
+    ///   PHYS 2101L) with PHYS 1101L.
+    /// - The BSME curriculum change: the 2025-26 catalog itself lists each old / new pair as interchangeable
+    ///   requirements — "MEGR 3122 or MEGR 3123" (MEGR 4143, 4211, 4235, 4237), "either MEGR 2240 or MEGR 2242" (MEGR
+    ///   3225, 4213, 4281 …), "MEGR 3171L or MEGR 3174" (MEGR 3152, 3255), "MEGR 2156 or MEGR 2157" — while other
+    ///   pages still name only the old code (MEGR 3237: "MEGR 3122"; MEGR 3251: "MEGR 3171L").
     public static let equivalents: [[String]] = [
         ["PHYS 2101L", "PHYS 1101L"],
+        ["MEGR 3123", "MEGR 3122"],
+        ["MEGR 2242", "MEGR 2240"],
+        ["MEGR 3174", "MEGR 3171L"],
+        ["MEGR 2157", "MEGR 2156"],
     ]
 
     /// `code` and every code equivalent to it (normalized; `code` first).

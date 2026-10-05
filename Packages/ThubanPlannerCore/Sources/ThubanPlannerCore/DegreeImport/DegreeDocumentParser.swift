@@ -207,7 +207,8 @@ public enum DegreeDocumentParser {
         var seen = Set<String>()
 
         func closeChoice() {
-            if var group = openChoice, !group.options.isEmpty {
+            // Kept with only wildcard notes too ("MATH 3XXX-4XXX Mathematics Elective"): the preview lists it to plan by hand.
+            if var group = openChoice, !group.options.isEmpty || !group.notes.isEmpty {
                 // An "Option N" block: take all of its classes (or another option's).
                 if group.pick == 0 { group.pick = group.options.count; group.notes.insert("Take every class of one option.", at: 0) }
                 choices.append(group)
@@ -255,7 +256,7 @@ public enum DegreeDocumentParser {
             // "MATH 3XXX-4XXX Mathematics Elective (3)", "PHYS XXXX - Physics Elective Course (3)*": a wildcard.
             if line.range(of: #"^[A-Z]{2,4}\s?[0-9]?X{2,4}"#, options: .regularExpression) != nil {
                 let note = line.replacingOccurrences(of: #"\s*\(\d+\)\**\s*$"#, with: "", options: .regularExpression)
-                if openChoice != nil { openChoice!.notes.append("Or: " + note) } else { skipped.append(line) }
+                if openChoice != nil { openChoice!.notes.append(note) } else { skipped.append(line) }
                 continue
             }
             // "Two MATH courses: MATH 1103* or MATH 1241* or MATH 1242* (3 each)" (codes right away, or after a short
@@ -291,7 +292,7 @@ public enum DegreeDocumentParser {
                     } else if let previous = last, !previous.inChoice, required.indices.contains(previous.index) {
                         let first = required.remove(at: previous.index)
                         seen.remove(first.code)
-                        let label = [section, "\(first.code) or \(code)"].compactMap { $0 }.joined(separator: " — ")
+                        let label = section ?? "Choose one"
                         choices.append(DegreeChoiceGroup(id: "choice-\(choices.count + 1)", label: label, pick: 1, options: [first, item]))
                         last = nil
                     } else if let lastChoice = choices.indices.last, last == nil {

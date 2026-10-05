@@ -18,6 +18,19 @@ struct ShellView: View {
             }
             content
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
+                // Technical electives / Import degree requirements (App/DegreeTools, Views/Electives, Views/DegreeImport).
+                .sheet(item: Binding(get: { app.degreeTools.sheet }, set: { if $0 == nil { app.degreeTools.closeSheet() } })) { sheet in
+                    Group {
+                        switch sheet {
+                        case .electives: ElectivesSheet()
+                        case .degreeImport: DegreeImportSheet()
+                        }
+                    }
+                    .environment(app)
+                    .environment(\.thubanTheme, app.theme)
+                    .environment(\.thubanTextScale, app.preferences.textSize.scale)
+                    .preferredColorScheme(app.theme.isDark ? .dark : .light)
+                }
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(theme.bgColor)

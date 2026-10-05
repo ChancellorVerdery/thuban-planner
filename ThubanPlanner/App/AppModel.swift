@@ -83,6 +83,11 @@ final class AppModel {
     /// The Schedule section's own observable model (Banner terms, sections, timetables, schedule.json).
     @ObservationIgnored let scheduleTab: ScheduleModel
 
+    // MARK: Technical electives + degree import (App/DegreeTools/DegreeToolsModel.swift)
+
+    /// The catalog dataset, Banner offerings and the two sheets (Technical electives, Import degree requirements).
+    @ObservationIgnored let degreeTools: DegreeToolsModel
+
     // MARK: Import (AppModel+Import.swift)
 
     var importPhase: ImportPhase = .idle
@@ -101,12 +106,14 @@ final class AppModel {
     init(store: PlannerStore = PlannerStore()) {
         self.store = store
         scheduleTab = ScheduleModel(store: TimetableStore(directory: store.directory), offline: SmokeHarness.isEnabled)
+        degreeTools = DegreeToolsModel(directory: store.directory, offline: SmokeHarness.isEnabled)
         preferences = Preferences.load()
         if let shared = SharedTheme.load() { preferences.theme = shared }
         systemIsDark = Self.currentSystemIsDark()
         theme = ThemeResolver.resolve(preferences.theme, systemIsDark: systemIsDark)
         if let raw = preferences.lastSection, let saved = AppSection(rawValue: raw) { section = saved }
         scheduleTab.app = self
+        degreeTools.app = self
     }
 
     // MARK: Lifecycle

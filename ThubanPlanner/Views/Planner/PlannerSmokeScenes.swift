@@ -118,7 +118,7 @@ extension SmokeScenes {
             } cleanup: { _ in
                 plannerSmokeWindow()?.setContentSize(SmokeHarness.windowSize)
             },
-        ]
+        ] + electives
     }
 }
 

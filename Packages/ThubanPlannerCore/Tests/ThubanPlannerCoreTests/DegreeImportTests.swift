@@ -36,11 +36,15 @@ final class DegreeDocumentTests: XCTestCase {
         let (_, doc) = try load("math-minor-2025-26.html")
         XCTAssertEqual(doc.programName, "Mathematics, Minor")
         XCTAssertEqual(doc.required.map(\.code), ["MATH 1241", "MATH 1242"])
-        XCTAssertEqual(doc.choices.count, 2)
+        XCTAssertEqual(doc.choices.count, 3)
         XCTAssertEqual(doc.choices[0].options.map(\.code), ["MATH 2164", "MATH 2171", "MATH 2241"])
+        XCTAssertEqual(doc.choices[2].label, "Unrestricted Elective Courses (6 credit hours) — Select two of the following:")
+        XCTAssertEqual(doc.choices[2].pick, 2)
+        XCTAssertTrue(doc.choices[2].options.isEmpty)
+        XCTAssertEqual(doc.choices[2].notes.count, 3)
         XCTAssertEqual(doc.choices[1].label, "Restricted Elective Course (3 credit hours)")
         XCTAssertEqual(doc.choices[1].pick, 1)
-        XCTAssertTrue(doc.choices[1].notes.contains("Or: MATH 3XXX-4XXX Mathematics Elective"))
+        XCTAssertTrue(doc.choices[1].notes.contains("MATH 3XXX-4XXX Mathematics Elective"))
     }
 
     func testPDFWithBrokenLinesAndOptions() throws {
@@ -115,8 +119,10 @@ final class DegreeImportMergeTests: XCTestCase {
         // Choices: MATH 1241 + 1242 already satisfy "Two MATH courses"; the design elective too (MEGR 3221).
         XCTAssertTrue(plan.choices[0].isSatisfied)
         XCTAssertTrue(plan.choices[1].isSatisfied)
-        XCTAssertEqual(plan.choices[2].remaining, 3)
-        XCTAssertEqual(plan.choices[2].inPlan, ["MEGR 3221"], "listed, but counts only with MEGR 3216 — the elective panel knows")
+        XCTAssertEqual(plan.choices[1].inPlan, ["MEGR 3221"])
+        // A class counts toward one requirement: MEGR 3221 fills the design elective, so not a technical elective.
+        XCTAssertEqual(plan.choices[2].remaining, 4)
+        XCTAssertEqual(plan.choices[2].inPlan, [])
         let added = DegreeImportMerge.apply(plan, include: Set(plan.toAdd.map(\.code)), picks: [:], to: &data)
         XCTAssertTrue(added.isEmpty)
         XCTAssertEqual(data.courses, before)
