@@ -23,6 +23,15 @@ extension SmokeScenes {
                 app.section = .planner
                 app.presentCourse("c-sample-14")
             } cleanup: { app in app.presentedCourseId = nil },
+            // A transfer-credit class (STAT 3128, required by ENGR 3295).
+            SmokeScene(name: "class-detail-transfer", window: .sheet) { app in
+                app.section = .planner
+                app.replaceData(SampleData.makeWithTransferCredit(now: app.now, calendar: app.calendar))
+                app.presentCourse("c-sample-t1")
+            } cleanup: { app in
+                app.presentedCourseId = nil
+                app.replaceData(SampleData.make(now: app.now, calendar: app.calendar))
+            },
             // A requirement that names no class in the plan ("not in your plan"), no dependents.
             SmokeScene(name: "class-detail-unknown-ref", window: .sheet) { app in
                 app.section = .route

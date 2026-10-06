@@ -70,6 +70,13 @@ struct PlannerSemestersCard: View {
                             .foregroundStyle(theme.inkFaintColor)
                             .frame(height: 32)
                     }
+                    // Transfer credit is a block BEFORE the first semester.
+                    if app.transferCourses.isEmpty {
+                        PlannerAddChip(label: "Add transfer credit", icon: .transfer) { app.addTransferCourse() }
+                            .help("AP, IB, dual-enrollment or another college’s credit — counts as taken, before your first semester")
+                    } else {
+                        PlannerTransferChip(state: state)
+                    }
                     ForEach(app.plannerSemesterChips, id: \.term.key) { item in
                         PlannerTermChip(term: item.term, credits: item.credits, count: item.count, state: state)
                     }
@@ -154,17 +161,64 @@ struct PlannerTermChip: View {
     }
 }
 
+/// "Transfer credit  12 cr  4": the block before the first semester (AP / dual enrollment / other colleges). Click →
+/// menu: add a transfer class, or move them all back to To take.
+struct PlannerTransferChip: View {
+    @Environment(AppModel.self) private var app
+    @Environment(\.thubanTheme) private var theme
+    @Bindable var state: PlannerViewState
+    @State private var hovering = false
+
+    var body: some View {
+        let count = app.transferCourses.count
+        Menu {
+            Button("Add a transfer class") { app.addTransferCourse() }
+            Divider()
+            Button("Move all to To take…", role: .destructive) { state.pendingClearTransfer = true }
+        } label: {
+            HStack(spacing: 8) {
+                Icon(.transfer, size: 14).foregroundStyle(theme.posTextColor)
+                Text("Transfer credit")
+                    .font(ThubanFont.body(13, weight: .semibold))
+                    .foregroundStyle(theme.posTextColor)
+                Text("\(app.creditsText(app.transferCredits)) cr")
+                    .font(ThubanFont.mono(12))
+                    .monospacedDigit()
+                    .foregroundStyle(theme.posTextColor.opacity(0.8))
+                Glyph(.chevronDown, size: 10)
+                    .foregroundStyle(theme.posTextColor.opacity(0.8))
+            }
+            .padding(.leading, 10)
+            .padding(.trailing, 9)
+            .frame(height: 32)
+            .background(theme.posSoftColor.opacity(hovering ? 1 : 0.75),
+                        in: RoundedRectangle(cornerRadius: ThubanMetrics.controlRadius, style: .continuous))
+            .overlay(RoundedRectangle(cornerRadius: ThubanMetrics.controlRadius, style: .continuous)
+                .strokeBorder(theme.termBorder(.transfer), lineWidth: ThubanMetrics.hairline))
+            .contentShape(RoundedRectangle(cornerRadius: ThubanMetrics.controlRadius, style: .continuous))
+        }
+        .menuStyle(.button)
+        .buttonStyle(.plain)
+        .menuIndicator(.hidden)
+        .fixedSize()
+        .onHover { hovering = $0 }
+        .accessibilityLabel("Transfer credit, \(app.creditsText(app.transferCredits)) credits, \(count) class\(count == 1 ? "" : "es")")
+        .help("\(count) class\(count == 1 ? "" : "es") of transfer / AP credit — counted as taken, before your first semester · click for options")
+    }
+}
+
 /// A dashed "+ Add …" chip.
 struct PlannerAddChip: View {
     @Environment(\.thubanTheme) private var theme
     var label: String
+    var icon: IconName = .plus
     var action: () -> Void
     @State private var hovering = false
 
     var body: some View {
         Button(action: action) {
             HStack(spacing: 6) {
-                Icon(.plus, size: 13)
+                Icon(icon, size: 13)
                 Text(label)
             }
             .font(ThubanFont.body(13, weight: .semibold))

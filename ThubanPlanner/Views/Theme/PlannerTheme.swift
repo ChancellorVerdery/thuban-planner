@@ -9,6 +9,7 @@ import ThubanPlannerCore
 /// | Past term / taken class | `panel2` | `inkDim` (muted, done) |
 /// | Current term / in progress | `signalSoft` | `signalText`, border `signal` |
 /// | Planned (future) term / class | `panel` | `ink`, border `line2`, accent credit badge |
+/// | Transfer credit (Thuban-only) | `posSoft` | `posText`, border `pos` at 45 % |
 /// | Unplaceable class | `negSoft` | `negText` |
 /// | Disabled term (summer off) | `bg` with a dashed `line2` border | `inkFaint` |
 /// | Prerequisite ribbon | — | `accent` at 45 % opacity, 2 pt, solid |
@@ -20,6 +21,7 @@ extension ResolvedTheme {
         case .past: return panel2Color
         case .current: return signalSoftColor
         case .future: return panelColor
+        case .transfer: return posSoftColor
         }
     }
 
@@ -28,6 +30,7 @@ extension ResolvedTheme {
         case .past: return inkDimColor
         case .current: return signalTextColor
         case .future: return inkColor
+        case .transfer: return posTextColor
         }
     }
 
@@ -36,6 +39,7 @@ extension ResolvedTheme {
         case .past: return lineColor
         case .current: return signalColor
         case .future: return line2Color
+        case .transfer: return posColor.opacity(0.45)
         }
     }
 
@@ -46,6 +50,7 @@ extension ResolvedTheme {
         case .past: return "\(credits) cr · done"
         case .current: return "\(credits) cr · current"
         case .future: return "\(credits) cr · planned"
+        case .transfer: return "\(credits) cr · transfer"
         }
     }
 
@@ -71,6 +76,7 @@ extension ResolvedTheme {
         case .planned(let key): return (TermKey.label(key), .accent)
         case .unplaceable: return ("Can’t place", .neg)
         case .unscheduled: return ("Taken (term not listed)", .neutral)
+        case .transfer: return ("Transfer", .pos)
         }
     }
 }

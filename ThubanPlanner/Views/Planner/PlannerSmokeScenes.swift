@@ -118,6 +118,43 @@ extension SmokeScenes {
             } cleanup: { _ in
                 plannerSmokeWindow()?.setContentSize(SmokeHarness.windowSize)
             },
+            // Transfer credit: the chip before the first semester and the "Transfer credit" group first in the table.
+            SmokeScene(name: "planner-transfer") { app in
+                app.section = .planner
+                smokeState.reset()
+                app.replaceData(SampleData.makeWithTransferCredit(now: app.now, calendar: app.calendar))
+            } cleanup: { app in app.replaceData(SampleData.make(now: app.now, calendar: app.calendar)) },
+            SmokeScene(name: "planner-transfer-rows") { app in
+                app.section = .planner
+                smokeState.reset()
+                app.replaceData(SampleData.makeWithTransferCredit(now: app.now, calendar: app.calendar))
+                app.selectedCourseId = "c-sample-t1"
+                try? await Task.sleep(nanoseconds: 400_000_000)
+                plannerSmokeScroll(to: 0.14)
+            } cleanup: { app in
+                app.selectedCourseId = nil
+                plannerSmokeScroll(to: 0)
+                app.replaceData(SampleData.make(now: app.now, calendar: app.calendar))
+            },
+            SmokeScene(name: "planner-transfer-dark") { app in
+                app.section = .planner
+                smokeState.reset()
+                app.replaceData(SampleData.makeWithTransferCredit(now: app.now, calendar: app.calendar))
+                plannerSmokeTheme(app, dark: true)
+            } cleanup: { app in
+                app.replaceData(SampleData.make(now: app.now, calendar: app.calendar))
+                plannerSmokeTheme(app, dark: false)
+            },
+            // No transfer credit yet: the dashed "Add transfer credit" chip before the semesters (the default sample).
+            SmokeScene(name: "planner-transfer-add") { app in
+                app.section = .planner
+                smokeState.reset()
+                app.addTransferCourse()
+            } cleanup: { app in
+                app.replaceData(SampleData.make(now: app.now, calendar: app.calendar))
+                app.selectedCourseId = nil
+                plannerSmokeScroll(to: 0)
+            },
         ] + electives
     }
 }

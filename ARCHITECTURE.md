@@ -173,6 +173,15 @@ own minimum) — never adding or removing terms, so the finish term never moves;
 "Fall 2027 has 9 credits — under your 12-credit minimum. Add an elective or lower the minimum."
 Tests: `MinimumCreditsTests`.
 
+**Transfer column (Thuban-only post-step, 2026-10-05).** `Scheduler.withTransferColumn(schedule, data)` runs AFTER
+`scheduleDegree` (AppModel: `schedule = withTransferColumn(scheduleDegree(data), data)`): it prepends a `BoardTerm`
+{key "transfer", kind `.transfer`, label "Transfer credit"} with every transfer class (document order, credits summed)
+and APPENDS ribbons that start at a transfer class and end at any placed class (incl. a same-column coreq), resolved
+with the scheduler's rules. Ribbons INTO a transfer class from a semester would run backwards and are not drawn.
+Atlas's board (after the column), edges (as a prefix), unplaceable, warnings, termsToFinish, gradTerm and planStatus
+are untouched; no transfer class → the schedule is returned unchanged, so no Atlas document ever gets the column.
+`Schedule.status` → `CourseStatus.transfer` (termKey "transfer"); `Schedule.transferColumn`.
+
 It is PROVEN identical to Atlas: `GoldenScheduleTests` replays 400 seeded random plans (cycles, lecture ↔ lab coreq
 loops, duplicate codes / ids, unknown refs, 0- and 15-credit classes, summer cap 0, disabled terms, no terms, > 64
 classes, all strategies) produced by running Atlas's own `course.js` under JavaScriptCore (`scripts/golden.sh`), and
@@ -227,7 +236,8 @@ set: { app.setMaxCredits($0) })`.
 | `app.calendarTermKey` | term containing today ("fall-2026") — defaults for the Add-semester form |
 | `app.creditsText(3.0)` → "3", `app.termLabel("fall-2025")` → "Fall 2025" | text |
 | `app.schedule.board` / `.columns` (non-empty terms, what the map draws) / `.plannedTerms` / `.edges` / `.edges(into:)` / `.edges(outOf:)` / `.unplaceable` / `.termsToFinish` / `.gradTerm` | route |
-| `BoardTerm {key, season, year, current, kind .past/.current/.future, courseIds, credits, label}` | a column |
+| `BoardTerm {key, season, year, current, kind .past/.current/.future/.transfer, courseIds, credits, label}` | a column |
+| `app.transferCourses`, `app.transferCredits`, `app.schedule.transferColumn` | transfer credit |
 | `TermKey.make/parse/label/rank/next/previous/current/season`, `Season.label`, `Strategy.label`, `Course.displayCode/displayName` | helpers |
 
 ### Writes (`App/AppModel+Mutations.swift`)
@@ -238,6 +248,8 @@ set: { app.setMaxCredits($0) })`.
   `editRequestCourseId`), `updateCourse(id, CoursePatch(code:title:credits:prereqs:coreqs:summerOk:term:))`
   (`term: .some(nil)` = To take), `setTerm(of:to:)`, `setPrereqs(of:text:)` / `setCoreqs(of:text:)` (comma-separated),
   `removeCourse(id)`.
+- Transfer credit: `moveToTransfer(ids)`, `addTransferCourse()` (a new class already in Transfer credit, focused),
+  `clearTransferCredit()` (all back to To take), or `setTerm(of:to: TermKey.transfer)`.
 - Planning: `setMaxCredits(_:)`, `setSummerMax(_:)`, `setStrategy(_:)`.
 - Theme / preferences: `app.preferences.x = …` (auto-saved), `setAppearanceMode`, `selectScheme(id:)`,
   `setThemeSelection`.
@@ -324,6 +336,13 @@ The working surface: what you've taken, what's left, and a one-line answer to "w
   in rank order — label, credits taken in it, a signal dot + "Current" on the current one; a menu per chip: "Mark as
   current", "Remove semester…" (confirm when it has classes: "Its N classes go back to To take"). Empty: "No
   semesters yet — add your past and current terms."
+- **Transfer credit** (2026-10-05): the Semesters row starts with a `posSoft` "Transfer credit · 12 cr" chip
+  (`.transfer` glyph; menu "Add a transfer class", "Move all to To take…" with a confirmation) whenever a class has
+  transfer credit, else a dashed "Add transfer credit" chip in that first slot. Every Term menu (and the row context
+  menu's Term submenu) offers "To take", then "Transfer credit", then the semesters. The table groups transfer
+  classes FIRST ("Transfer credit · 4 classes · 12 cr · AP, IB, …"), the status chip says "Transfer" (pos), the
+  Term cell "Transfer"; "Credits done" includes them with the caption "incl. 12 transfer"; the footer says
+  "33 taken (4 transfer)". No multi-select (the table is single-selection) — move classes one by one.
 - **Summer terms** group (only when `app.upcomingSummers` is non-empty; caption "Switch a summer off (internship,
   travel) to keep the planner out of it."): one `ToggleChip` per key with `.sun`, on = planned, off = disabled
   (`toggleDisabledTerm`).
@@ -358,6 +377,12 @@ A zoomable Sankey-style board of the route (Atlas's "Map"), drawn natively in a 
 - **Zoom / pan**: pinch (`MagnifyGesture`) and ⌘-scroll zoom around the pointer, scroll / drag pans; `Fit` and
   `app.routeFitRequest` changes animate back to the whole board; `app.routeZoom` mirrors the level. Put the pure
   layout (box rects, ribbon endpoints, board size from a `Schedule` + courses) in a NEW core file with tests.
+- **Transfer column**: leftmost (it is `schedule.columns[0]`), `posSoft` card with a `pos` hairline, `posText` label
+  "Transfer credit" and caption "12 cr · transfer", boxes on `panel` with `pos` borders; ribbons from transfer
+  classes to later ones; hover / selection / chain highlight and Fit include it (when the fitted board is wider than
+  the window it still opens at the current term, like past terms). Legend gains "Transfer" when the column exists.
+  Class detail: chip "Transfer", facts "Transfer credit — counts as taken". The Schedule tab never sees transfer
+  classes (Banner terms map to season keys only).
 - **Click** a box → `app.presentCourse(id)` (class detail sheet); hover shows a tooltip "MEGR 3114 · Fluid Mechanics ·
   3 cr · planned Spring 2027".
 - **Empty**: `EmptyState(.route, "No route yet", "Add classes on the Planner — the route draws here.")` with a
@@ -669,7 +694,10 @@ SmokeScene(name: "planner-first-run") { app in
 Technical electives / degree import scenes live in `Views/Electives/ElectivesSmokeScenes.swift` (`SmokeScenes.electives`,
 appended to the Planner list): panel light / dark, not-offered toggle, the PHYS 4242 chain light / dark, OR pickers,
 added banner, remove, Planner with TE marks, import choose / preview (minor, DegreeWorks, dark) / result — offline on
-`BSMESampleData`, the bundled dataset and offerings snapshot. Always undo state in `cleanup`. Look at your PNGs (Read tool) before you finish. Sample ids are `c-sample-01 … 43`
+`BSMESampleData`, the bundled dataset and offerings snapshot. Transfer scenes (`planner-transfer`, `-rows`, `-dark`,
+`-add`, `route-transfer`, `route-transfer-dark`, `class-detail-transfer`) use `SampleData.makeWithTransferCredit`
+(the sample + STAT 3128 / PSYC 1101 / HIST 1110 as `c-sample-t1…t3`, MATH 2164 moved to transfer). The run's
+timeout is `SMOKE_TIMEOUT` (default 360 s). Always undo state in `cleanup`. Look at your PNGs (Read tool) before you finish. Sample ids are `c-sample-01 … 43`
 (01–29 taken, 30–43 to take; 38 = Senior Design II, the last class).
 
 ## Build / test / smoke

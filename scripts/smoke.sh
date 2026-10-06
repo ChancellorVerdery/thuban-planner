@@ -23,12 +23,13 @@ echo "Smoke home: $HOME_DIR"
 echo "Output:     $OUT"
 THUBAN_PLANNER_SMOKE="$OUT" THUBAN_PLANNER_HOME="$HOME_DIR" "$APP" > "$LOG" 2>&1 &
 PID=$!
-for i in {1..180}; do
+TIMEOUT="${SMOKE_TIMEOUT:-360}"
+for (( i = 1; i <= TIMEOUT; i++ )); do
   kill -0 "$PID" 2>/dev/null || break
   sleep 1
 done
 if kill -0 "$PID" 2>/dev/null; then
-  echo "TIMEOUT: app still running after 180 s; stopping it (pid $PID)"; kill "$PID" 2>/dev/null; STATUS=2
+  echo "TIMEOUT: app still running after $TIMEOUT s; stopping it (pid $PID)"; kill "$PID" 2>/dev/null; STATUS=2
 else
   wait "$PID"; STATUS=$?; echo "App exited with status $STATUS"
 fi

@@ -51,6 +51,18 @@ extension AppModel {
 
     func removeCourse(_ id: String) { mutate { $0.removeCourse(id) } }
 
+    // MARK: Transfer credit
+
+    /// Moves classes to "Transfer credit" (term "transfer"; they count as taken).
+    func moveToTransfer(_ ids: Set<String>) { mutate { $0.moveToTransfer(ids) } }
+
+    /// "Add transfer credit": a new class already in Transfer credit (selected, its code field focused).
+    @discardableResult
+    func addTransferCourse() -> Course? { addCourse(title: "Transfer class", term: TermKey.transfer) }
+
+    /// Every transfer-credit class goes back to "To take".
+    func clearTransferCredit() { mutate { $0.clearTransferCredit() } }
+
     // MARK: Planning settings
 
     /// Most credits in a fall / spring term (0 or less resets to 15 on the next load, like Atlas).

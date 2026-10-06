@@ -105,6 +105,8 @@ struct PlannerClassRow: View {
             Menu("Term") {
                 Button("To take") { app.setTerm(of: course.id, to: nil) }
                 Divider()
+                Button("Transfer credit") { app.setTerm(of: course.id, to: TermKey.transfer) }
+                if !app.terms.isEmpty { Divider() }
                 ForEach(app.terms) { term in Button(term.label) { app.setTerm(of: course.id, to: term.key) } }
             }
             Divider()
@@ -375,7 +377,7 @@ struct PlannerCheckbox: View {
 
 // MARK: - Term menu
 
-/// "To take" + every recorded semester.
+/// "To take", "Transfer credit", then every recorded semester.
 struct PlannerTermMenu: View {
     @Environment(AppModel.self) private var app
     @Environment(\.thubanTheme) private var theme
@@ -386,6 +388,10 @@ struct PlannerTermMenu: View {
         Menu {
             Button { app.setTerm(of: course.id, to: nil) } label: {
                 if course.term == nil { Label("To take", systemImage: "checkmark") } else { Text("To take") }
+            }
+            Divider()
+            Button { app.setTerm(of: course.id, to: TermKey.transfer) } label: {
+                if course.isTransfer { Label("Transfer credit", systemImage: "checkmark") } else { Text("Transfer credit") }
             }
             if !app.terms.isEmpty { Divider() }
             ForEach(app.terms) { term in
@@ -398,6 +404,8 @@ struct PlannerTermMenu: View {
             HStack(spacing: 6) {
                 if course.term.flatMap(app.term)?.current == true {
                     Circle().fill(theme.signalColor).frame(width: 6, height: 6)
+                } else if course.isTransfer {
+                    Icon(.transfer, size: 12).foregroundStyle(theme.posTextColor)
                 }
                 Text(labelText)
                     .font(ThubanFont.body(13, weight: course.term == nil ? .regular : .medium))
@@ -420,12 +428,12 @@ struct PlannerTermMenu: View {
         .onHover { hovering = $0 }
         .accessibilityLabel("Term")
         .accessibilityValue(labelText)
-        .help("Which term you took it in — or To take, for the planner to place")
+        .help("Which term you took it in, Transfer credit (AP, dual enrollment, another college) — or To take, for the planner to place")
     }
 
     private var labelText: String {
         guard let key = course.term else { return "To take" }
-        return app.termLabel(key)
+        return TermKey.isTransfer(key) ? "Transfer" : app.termLabel(key)
     }
 }
 

@@ -125,6 +125,7 @@ struct ClassDetailSheet: View {
         case .inProgress(let key): when = "In progress this term, \(app.termLabel(key))"
         case .planned(let key): when = "Planned for \(app.termLabel(key))"
         case .unplaceable: when = "Can’t be placed — check its prerequisites"
+        case .transfer: when = "Transfer credit — counts as taken"
         case .unscheduled: when = "Taken in \(course.term.map(app.termLabel) ?? "an unlisted term") (not on your semester list)"
         }
         return HStack(spacing: 8) {

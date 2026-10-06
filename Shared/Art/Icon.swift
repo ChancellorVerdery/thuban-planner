@@ -43,6 +43,8 @@ enum IconName: String, CaseIterable {
     case chevronDown
     case chevronRight
     case chevronLeft
+    /// Transfer credit: an arrow coming in to a tray (credit brought in from elsewhere).
+    case transfer
 
     var paths: [String] {
         switch self {
@@ -79,6 +81,7 @@ enum IconName: String, CaseIterable {
         case .chevronDown: return ["M6.5 9.5l5.5 5.5 5.5-5.5"]
         case .chevronRight: return ["M9.5 6l6 6-6 6"]
         case .chevronLeft: return ["M14.5 6l-6 6 6 6"]
+        case .transfer: return ["M3.5 12h10.5", "M10 8l4 4-4 4", "M14.5 4.5h3.5a2 2 0 0 1 2 2v11a2 2 0 0 1 -2 2h-3.5"]
         }
     }
 

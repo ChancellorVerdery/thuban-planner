@@ -10,6 +10,9 @@ struct RouteToolbar: View {
     var body: some View {
         HStack(spacing: 6) {
             HStack(spacing: 14) {
+                if app.schedule.transferColumn != nil {
+                    RouteLegendSwatch(kind: .transfer, label: "Transfer")
+                }
                 RouteLegendSwatch(kind: .past, label: "Taken")
                 RouteLegendSwatch(kind: .current, label: "Current")
                 RouteLegendSwatch(kind: .future, label: "Planned")
@@ -18,7 +21,7 @@ struct RouteToolbar: View {
             }
             .padding(.trailing, 6)
             .accessibilityElement(children: .combine)
-            .accessibilityLabel("Legend: taken, current and planned terms; prerequisites solid, corequisites dashed")
+            .accessibilityLabel("Legend: transfer credit, taken, current and planned terms; prerequisites solid, corequisites dashed")
 
             ToolbarDivider()
 
@@ -57,11 +60,12 @@ private struct RouteLegendSwatch: View {
                 .fill(theme.termFill(kind))
                 .overlay(
                     RoundedRectangle(cornerRadius: 1.5, style: .continuous)
-                        .fill(kind == .current ? theme.signalColor : (kind == .past ? theme.inkFaintColor : theme.brassInkColor))
+                        .fill(kind == .current ? theme.signalColor : kind == .transfer ? theme.posColor
+                              : (kind == .past ? theme.inkFaintColor : theme.brassInkColor))
                         .padding(3.5)
                 )
                 .overlay(RoundedRectangle(cornerRadius: 3, style: .continuous)
-                    .strokeBorder(kind == .current ? theme.signalColor : theme.line2Color, lineWidth: 1))
+                    .strokeBorder(kind == .current ? theme.signalColor : kind == .transfer ? theme.posColor.opacity(0.6) : theme.line2Color, lineWidth: 1))
                 .frame(width: 14, height: 14)
             Text(label)
                 .font(.system(size: 12, weight: .medium))

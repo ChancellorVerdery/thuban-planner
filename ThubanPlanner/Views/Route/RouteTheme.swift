@@ -7,6 +7,7 @@ import ThubanPlannerCore
 /// |---|---|---|---|
 /// | Column card | `panel2`, `line` border | `signalSoft`, `signal` hairline | `panel`, `line2` border |
 /// | Box | `panel`, `line` border, `inkDim` code | `panel`, `signal` border, `signalText` code | `bg`, `line2` border, `ink` code, accent credit badge |
+/// | Transfer credit (column first) | `posSoft`, `pos` 45 % border | box `panel`, `pos` 45 % border, `posText` code | — |
 /// | Selected / hovered box | `accentTint`, `accent` border | same | same |
 extension ResolvedTheme {
     func routeColumnFill(_ kind: TermKind) -> Color { termFill(kind) }
@@ -15,7 +16,7 @@ extension ResolvedTheme {
 
     func routeBoxFill(_ kind: TermKind) -> Color {
         switch kind {
-        case .past, .current: return panelColor
+        case .past, .current, .transfer: return panelColor
         case .future: return bgColor
         }
     }
@@ -25,6 +26,7 @@ extension ResolvedTheme {
         case .past: return lineColor
         case .current: return signalColor.opacity(0.75)
         case .future: return line2Color
+        case .transfer: return posColor.opacity(0.45)
         }
     }
 
@@ -33,7 +35,7 @@ extension ResolvedTheme {
     func routeBoxTitleInk(_ kind: TermKind) -> Color {
         switch kind {
         case .past: return inkFaintColor
-        case .current, .future: return inkDimColor
+        case .current, .future, .transfer: return inkDimColor
         }
     }
 

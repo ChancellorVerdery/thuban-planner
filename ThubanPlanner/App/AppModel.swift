@@ -21,7 +21,9 @@ final class AppModel {
     /// The whole local plan, always `loadCourse()`-normalized. Read freely; write only through `mutate` (or the
     /// named APIs built on it).
     private(set) var data: PlannerData = .empty
-    /// Atlas's `scheduleDegree(data, now)` — the route. Recomputed whenever `data` or `now` changes.
+    /// Atlas's `scheduleDegree(data, now)` — the route — plus the Thuban-only "Transfer credit" column
+    /// (`Scheduler.withTransferColumn`; Atlas's output is otherwise untouched). Recomputed whenever `data` or `now`
+    /// changes.
     private(set) var schedule: Schedule = .empty
     /// The clock the scheduler reads (it only matters when no term is recorded). Refreshed on day change / activation.
     private(set) var now = Date()
@@ -210,7 +212,7 @@ final class AppModel {
     }
 
     private func recomputeSchedule() {
-        let fresh = Scheduler.scheduleDegree(data, now: now, calendar: calendar)
+        let fresh = Scheduler.withTransferColumn(Scheduler.scheduleDegree(data, now: now, calendar: calendar), data)
         if fresh != schedule {
             schedule = fresh
             // The Schedule tab's "Thuban route" source reads the route.

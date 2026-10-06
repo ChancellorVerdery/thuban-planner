@@ -32,6 +32,10 @@ extension AppModel {
     var creditsTaken: Double { taken.reduce(0) { $0 + $1.credits } }
     var creditsTotal: Double { courses.reduce(0) { $0 + $1.credits } }
 
+    /// Transfer / AP credit (term "transfer") — counted in `taken` / `creditsTaken`.
+    var transferCourses: [Course] { data.transferCourses }
+    var transferCredits: Double { transferCourses.reduce(0) { $0 + $1.credits } }
+
     /// The class a requirement code names (case- and space-insensitive; the last class with that code wins).
     func course(forRef ref: String) -> Course? { data.course(forRef: ref) }
 
@@ -86,5 +90,6 @@ extension AppModel {
     /// "3" / "1.5" — credits as Atlas prints them.
     func creditsText(_ credits: Double) -> String { JS.numberString(credits) }
 
-    func termLabel(_ key: String) -> String { TermKey.label(key) }
+    /// "Fall 2025", or "Transfer credit" for transfer credit.
+    func termLabel(_ key: String) -> String { TermKey.displayLabel(key) }
 }

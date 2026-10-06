@@ -148,6 +148,8 @@ struct PlannerGroupHeaderRow: View {
         HStack(spacing: 8) {
             if isCurrent {
                 Circle().fill(theme.signalColor).frame(width: 7, height: 7)
+            } else if group.isTransfer {
+                Icon(.transfer, size: 13).foregroundStyle(theme.posTextColor)
             } else if group.termKey == nil {
                 Icon(.route, size: 13).foregroundStyle(theme.brassInkColor)
             } else {
@@ -165,6 +167,11 @@ struct PlannerGroupHeaderRow: View {
                 .font(ThubanFont.body(12))
                 .monospacedDigit()
                 .foregroundStyle(theme.inkFaintColor)
+            if group.isTransfer {
+                Text("· AP, IB, dual enrollment, other colleges — counts as taken")
+                    .font(ThubanFont.body(12))
+                    .foregroundStyle(theme.inkFaintColor)
+            }
             if group.termKey == nil {
                 Text("· the route places these")
                     .font(ThubanFont.body(12))
@@ -174,7 +181,8 @@ struct PlannerGroupHeaderRow: View {
         }
         .padding(.horizontal, PlannerColumns.inset + 2)
         .frame(height: 32)
-        .plannerCardSides(fill: isCurrent ? theme.signalSoftColor.opacity(0.55) : theme.panel2Color.opacity(0.35))
+        .plannerCardSides(fill: isCurrent ? theme.signalSoftColor.opacity(0.55)
+                          : (group.isTransfer ? theme.posSoftColor.opacity(0.45) : theme.panel2Color.opacity(0.35)))
         .thubanHairline(.top, color: theme.lineColor)
         .accessibilityElement(children: .combine)
         .accessibilityAddTraits(.isHeader)
@@ -212,7 +220,8 @@ struct PlannerClassTableFooter: View {
 
     private var summary: String {
         let total = app.courses.count
-        let base = "\(app.taken.count) taken · \(app.toTake.count) to take · \(app.creditsText(app.creditsTotal)) credits in all"
+        let transfer = app.transferCourses.count
+        let base = "\(app.taken.count) taken\(transfer > 0 ? " (\(transfer) transfer)" : "") · \(app.toTake.count) to take · \(app.creditsText(app.creditsTotal)) credits in all"
         return shown == total ? base : "Showing \(shown) of \(total) · " + base
     }
 }

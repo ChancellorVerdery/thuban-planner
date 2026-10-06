@@ -121,7 +121,9 @@ struct PlannerView: View {
         let done = app.creditsTaken
         return PlannerStatCard {
             VStack(alignment: .leading, spacing: 8) {
-                StatTile(label: "Credits done", value: app.creditsText(done), unit: "of \(app.creditsText(total))")
+                StatTile(label: "Credits done", value: app.creditsText(done), unit: "of \(app.creditsText(total))",
+                         caption: app.plannerTransferCaption)
+                    .help(app.plannerTransferCaption.map { "Credits taken, in progress or transferred (\($0))" } ?? "Credits taken or in progress")
                 ProgressBar(value: total > 0 ? done / total : 0, height: 5)
                     .accessibilityLabel("Credits done")
             }
@@ -334,6 +336,17 @@ private struct PlannerConfirmations: ViewModifier {
                 Button("Cancel", role: .cancel) { state.pendingRemovalTermKey = nil }
             } message: {
                 Text(termKey.flatMap(app.plannerRemoveTermMessage) ?? "")
+            }
+            .confirmationDialog("Move all transfer credit to To take?",
+                                isPresented: Binding(get: { state.pendingClearTransfer }, set: { state.pendingClearTransfer = $0 }),
+                                titleVisibility: .visible) {
+                Button("Move to To take", role: .destructive) {
+                    app.clearTransferCredit()
+                    state.pendingClearTransfer = false
+                }
+                Button("Cancel", role: .cancel) { state.pendingClearTransfer = false }
+            } message: {
+                Text(app.plannerClearTransferMessage)
             }
     }
 }

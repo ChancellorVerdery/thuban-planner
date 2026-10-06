@@ -1,8 +1,10 @@
 import Foundation
 
 /// Where a board column comes from: a recorded past term, the current term, or a term the scheduler planned.
+/// `transfer` (Thuban-only) is the "Transfer credit" column `Scheduler.withTransferColumn` prepends; Atlas's
+/// scheduler never produces it.
 public enum TermKind: String, Codable, Hashable, Sendable {
-    case past, current, future
+    case past, current, future, transfer
 }
 
 /// One column of the route: a term and the classes in it (Atlas `board[]` entry).
@@ -18,8 +20,8 @@ public struct BoardTerm: Codable, Hashable, Sendable, Identifiable {
     public var credits: Double
 
     public var id: String { key }
-    /// "Fall 2027".
-    public var label: String { TermKey.label(key) }
+    /// "Fall 2027" ("Transfer credit" for the transfer column).
+    public var label: String { TermKey.displayLabel(key) }
 
     public init(key: String, season: Season, year: Double, current: Bool, kind: TermKind, courseIds: [String], credits: Double) {
         self.key = key
@@ -84,6 +86,9 @@ public struct Schedule: Codable, Hashable, Sendable {
     /// Columns that have classes (what the Route map draws — Atlas filters empty terms out of the board).
     public var columns: [BoardTerm] { board.filter { !$0.courseIds.isEmpty } }
 
+    /// The "Transfer credit" column (only after `Scheduler.withTransferColumn`, and only when a class has it).
+    public var transferColumn: BoardTerm? { board.first { $0.kind == .transfer } }
+
     /// Planned (future) columns only.
     public var plannedTerms: [BoardTerm] { board.filter { $0.kind == .future } }
 
@@ -100,6 +105,7 @@ public struct Schedule: Codable, Hashable, Sendable {
         case .past: return .taken(column.key)
         case .current: return .inProgress(column.key)
         case .future: return .planned(column.key)
+        case .transfer: return .transfer
         }
     }
 
@@ -123,11 +129,14 @@ public enum CourseStatus: Hashable, Sendable {
     case unplaceable
     /// Recorded in a term key that has no Term row (Atlas counts it as done but draws it nowhere).
     case unscheduled
+    /// Transfer / AP credit (term "transfer"): done before the first semester; in the transfer column.
+    case transfer
 
     /// The term key, when there is one.
     public var termKey: String? {
         switch self {
         case .taken(let k), .inProgress(let k), .planned(let k): return k
+        case .transfer: return TermKey.transfer
         case .unplaceable, .unscheduled: return nil
         }
     }

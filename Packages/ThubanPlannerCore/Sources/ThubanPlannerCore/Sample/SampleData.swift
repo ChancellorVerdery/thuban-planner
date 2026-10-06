@@ -85,4 +85,19 @@ public enum SampleData {
         return PlannerData(courses: courses, terms: terms, disabledTerms: [nextSummer],
                            settings: PlannerSettings(maxCredits: 16, summerMax: 7, strategy: .soonestSummer))
     }
+
+    /// `make` plus transfer credit, for the transfer smoke scenes: three AP / community-college classes appended
+    /// (`c-sample-t1…t3`, so the other ids are unchanged) — STAT 3128 (the class ENGR 3295 names, so a ribbon runs
+    /// from the transfer column), PSYC 1101 and HIST 1110 — and MATH 2164 (`c-sample-42`) moved to transfer.
+    public static func makeWithTransferCredit(now: Date = Date(), calendar: Calendar = .current) -> PlannerData {
+        var data = make(now: now, calendar: calendar)
+        data.courses.append(Course(id: "c-sample-t1", code: "STAT 3128", title: "Probability & Statistics for Engineers",
+                                   credits: 3, summerOk: true, term: TermKey.transfer))
+        data.courses.append(Course(id: "c-sample-t2", code: "PSYC 1101", title: "General Psychology (AP)", credits: 3,
+                                   summerOk: true, term: TermKey.transfer))
+        data.courses.append(Course(id: "c-sample-t3", code: "HIST 1110", title: "U.S. History to 1865 (AP)", credits: 3,
+                                   summerOk: true, term: TermKey.transfer))
+        data.moveToTransfer(["c-sample-42"])
+        return data
+    }
 }

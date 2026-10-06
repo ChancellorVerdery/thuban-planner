@@ -45,6 +45,31 @@ extension SmokeScenes {
                 app.replaceData(SampleData.make(now: app.now, calendar: app.calendar))
                 app.setThemeSelection(ThemeSelection(mode: .light, schemeId: SchemePresets.defaultId, custom: nil))
             },
+            // Transfer credit: the leftmost column, a ribbon from STAT 3128 to ENGR 3295 (zoomed out to the whole board).
+            SmokeScene(name: "route-transfer", settle: 1.6) { app in
+                app.section = .route
+                app.replaceData(SampleData.makeWithTransferCredit(now: app.now, calendar: app.calendar))
+                app.routeFitRequest += 1
+                try? await Task.sleep(nanoseconds: 500_000_000)
+                app.routeZoom = 0.66
+            } cleanup: { app in
+                app.routeZoom = 1; app.routeFitRequest += 1
+                app.replaceData(SampleData.make(now: app.now, calendar: app.calendar))
+            },
+            SmokeScene(name: "route-transfer-dark", settle: 1.6) { app in
+                app.setThemeSelection(ThemeSelection(mode: .dark, schemeId: SchemePresets.defaultId, custom: nil))
+                app.section = .route
+                app.replaceData(SampleData.makeWithTransferCredit(now: app.now, calendar: app.calendar))
+                app.selectedCourseId = "c-sample-t1"
+                app.routeFitRequest += 1
+                try? await Task.sleep(nanoseconds: 500_000_000)
+                app.routeZoom = 0.66
+            } cleanup: { app in
+                app.selectedCourseId = nil
+                app.routeZoom = 1; app.routeFitRequest += 1
+                app.replaceData(SampleData.make(now: app.now, calendar: app.calendar))
+                app.setThemeSelection(ThemeSelection(mode: .light, schemeId: SchemePresets.defaultId, custom: nil))
+            },
             SmokeScene(name: "route-empty") { app in
                 app.section = .route
                 app.replaceData(.empty)

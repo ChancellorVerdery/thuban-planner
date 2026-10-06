@@ -14,6 +14,7 @@ extension AppModel {
         case .planned(let key): return "planned \(termLabel(key))"
         case .unplaceable: return "can’t be placed"
         case .unscheduled: return "taken (term not listed)"
+        case .transfer: return "transfer credit"
         }
     }
 

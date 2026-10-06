@@ -14,18 +14,20 @@ enum PlannerClassFilter: String, CaseIterable, Hashable {
     }
 }
 
-/// One group of rows in the class table: a recorded term (in rank order) or "To take" (last).
+/// One group of rows in the class table: "Transfer credit" (first), a recorded term (in rank order) or "To take"
+/// (last).
 struct PlannerClassGroup: Identifiable, Hashable {
-    /// The recorded term key, or nil for "To take".
+    /// The recorded term key ("transfer" for transfer credit), or nil for "To take".
     var termKey: String?
     var courses: [Course]
     var id: String { termKey ?? "to-take" }
     var credits: Double { courses.reduce(0) { $0 + $1.credits } }
+    var isTransfer: Bool { TermKey.isTransfer(termKey) }
 }
 
 /// Read-only queries for the Planner screen. Derived from `data` / `schedule`; nothing is cached.
 extension AppModel {
-    /// The class table's groups: every recorded term that holds a visible class (rank order), then "To take". A class
+    /// The class table's groups: "Transfer credit" first (when any visible class has it), every recorded term that holds a visible class (rank order), then "To take". A class
     /// whose term key names no recorded term is grouped under that key after the recorded ones. Inside a group,
     /// classes sort by code (empty codes first, so a new class shows at the top), then title.
     func plannerClassGroups(filter: PlannerClassFilter, search: String) -> [PlannerClassGroup] {
@@ -46,9 +48,10 @@ extension AppModel {
             if let key = course.term { byTerm[key, default: []].append(course) } else { toTake.append(course) }
         }
         let recordedKeys = terms.map(\.key)
-        let orphanKeys = byTerm.keys.filter { !recordedKeys.contains($0) }.sorted { TermKey.rank($0) < TermKey.rank($1) }
+        let orphanKeys = byTerm.keys.filter { !recordedKeys.contains($0) && !TermKey.isTransfer($0) }
+            .sorted { TermKey.rank($0) < TermKey.rank($1) }
         var groups: [PlannerClassGroup] = []
-        for key in recordedKeys + orphanKeys {
+        for key in [TermKey.transfer] + recordedKeys + orphanKeys {
             if let list = byTerm[key], !list.isEmpty {
                 groups.append(PlannerClassGroup(termKey: key, courses: list.sorted(by: Self.plannerCourseOrder)))
             }
@@ -113,7 +116,7 @@ extension AppModel {
 
     /// "Its 6 classes go back to To take." (nil when the semester has none).
     func plannerRemoveTermMessage(_ key: String) -> String? {
-        let n = courses(inTerm: key).count
+        let n = TermKey.isTransfer(key) ? transferCourses.count : courses(inTerm: key).count
         guard n > 0 else { return nil }
         return n == 1 ? "Its 1 class goes back to To take." : "Its \(n) classes go back to To take."
     }
@@ -139,7 +142,7 @@ extension AppModel {
         group.termKey.map(termLabel) ?? "To take"
     }
 
-    /// "6 classes · 16 cr" — a class-table group's caption.
+    /// "6 classes · 16 cr" — a class-table group's caption ("Transfer credit · 4 classes · 12 cr" reads from the title).
     func plannerGroupCaption(_ group: PlannerClassGroup) -> String {
         let n = group.courses.count
         return "\(n) class\(n == 1 ? "" : "es") · \(creditsText(group.credits)) cr"
@@ -178,6 +181,18 @@ extension AppModel {
             let list = courses(inTerm: term.key)
             return (term, list.reduce(0) { $0 + $1.credits }, list.count)
         }
+    }
+
+    /// The "Credits done" tile's caption: "incl. 12 transfer" (nil without transfer credit).
+    var plannerTransferCaption: String? {
+        let credits = transferCredits
+        return transferCourses.isEmpty ? nil : "incl. \(creditsText(credits)) transfer"
+    }
+
+    /// "Its 4 classes go back to To take." for clearing transfer credit.
+    var plannerClearTransferMessage: String {
+        let n = transferCourses.count
+        return n == 1 ? "Its 1 class goes back to To take." : "Its \(n) classes go back to To take."
     }
 
     /// True when the add-semester form's term already exists.

@@ -53,11 +53,11 @@ struct RouteCanvasLayer: View, Animatable {
 
             let x = column.frame.minX + 14
             let y = column.frame.minY + 13
-            let labelInk = kind == .past ? palette.inkDim : palette.ink
+            let labelInk = kind == .past ? palette.inkDim : (kind == .transfer ? palette.posText : palette.ink)
             ctx.draw(Text(column.term.label).font(ThubanFont.display(16)).foregroundColor(labelInk),
                      at: CGPoint(x: x, y: y), anchor: .topLeading)
             ctx.draw(Text(theme.termCaption(column.term)).font(.system(size: 12)).monospacedDigit()
-                        .foregroundColor(kind == .current ? palette.signalText : palette.inkDim),
+                        .foregroundColor(kind == .current ? palette.signalText : (kind == .transfer ? palette.posText : palette.inkDim)),
                      at: CGPoint(x: x, y: y + 23), anchor: .topLeading)
 
             // A quiet tag on the right: NOW on the current term, GRADUATE on the last planned one.
@@ -178,7 +178,7 @@ struct RouteCanvasLayer: View, Animatable {
 
 /// Theme colours resolved once per render (the token accessors parse hex strings).
 struct RoutePalette {
-    let ink, inkDim, inkFaint, accent, accentTint, brassInk, signal, signalText: Color
+    let ink, inkDim, inkFaint, accent, accentTint, brassInk, signal, signalText, posText: Color
     /// An opaque colour laid under every box fill.
     let opaqueBase: Color
     /// Border / text opacity of a box off the emphasized chain (higher in dark mode, where dim ink sinks into the bg).
@@ -200,9 +200,10 @@ struct RoutePalette {
         brassInk = theme.brassInkColor
         signal = theme.signalColor
         signalText = theme.signalTextColor
+        posText = theme.posTextColor
         opaqueBase = theme.bgColor
         fadedOpacity = theme.isDark ? 0.5 : 0.36
-        let kinds: [TermKind] = [.past, .current, .future]
+        let kinds: [TermKind] = [.past, .current, .future, .transfer]
         columnFills = Dictionary(uniqueKeysWithValues: kinds.map { ($0, theme.routeColumnFill($0)) })
         columnBorders = Dictionary(uniqueKeysWithValues: kinds.map { ($0, theme.routeColumnBorder($0)) })
         boxFills = Dictionary(uniqueKeysWithValues: kinds.map { ($0, theme.routeBoxFill($0)) })

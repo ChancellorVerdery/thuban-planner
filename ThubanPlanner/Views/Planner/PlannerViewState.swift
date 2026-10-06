@@ -20,6 +20,8 @@ final class PlannerViewState {
     var pendingRemovalCourseId: String?
     /// A semester waiting for the remove confirmation.
     var pendingRemovalTermKey: String?
+    /// "Move all to To take…" on the Transfer credit chip, waiting for its confirmation.
+    var pendingClearTransfer = false
     /// SMOKE / programmatic: ask the table to focus a cell (consumed by the view).
     var focusRequest: PlannerFocus?
 
@@ -30,6 +32,7 @@ final class PlannerViewState {
         isAddingSemesterPopover = false
         pendingRemovalCourseId = nil
         pendingRemovalTermKey = nil
+        pendingClearTransfer = false
         focusRequest = nil
     }
 }
