@@ -411,25 +411,90 @@ struct PlannerAddSemesterForm: View {
 
 // MARK: - Summer terms
 
-/// "Summer terms": one toggle per upcoming summer (on = the planner may use it; off = switched off).
+/// "Summer terms": one chip per upcoming summer. Automatic (default): Banner decides — a summer is on when a class
+/// still to take ran in it (or in the latest released summer, until its schedule is posted); each chip explains why
+/// on hover and the nearest summer's reason shows under the chips. Manual: the toggles (on = the planner may use it;
+/// off = switched off), exactly as stored.
 struct PlannerSummersCard: View {
     @Environment(AppModel.self) private var app
     @Environment(\.thubanTheme) private var theme
 
+    private var automatic: Bool { app.summerMode == .automatic }
+
     var body: some View {
-        PlannerGroupCard("Summer terms", caption: "Switch a summer off (internship, travel) to keep the planner out of it.") {
-            PlannerFlowLayout(spacing: 8) {
-                ForEach(app.upcomingSummers, id: \.self) { key in
-                    let on = !app.isDisabled(key)
-                    ToggleChip(label: app.termLabel(key) + (on ? "" : " · off"), icon: .sun,
-                               isOn: Binding(get: { on }, set: { _ in app.toggleDisabledTerm(key) }))
-                        .accessibilityLabel("\(app.termLabel(key)) summer")
-                        .accessibilityValue(on ? "planned" : "switched off")
-                        .help(on ? "The planner may use \(app.termLabel(key)). Click to switch it off."
-                                 : "\(app.termLabel(key)) is switched off. Click to let the planner use it.")
+        PlannerGroupCard("Summer terms", caption: caption) {
+            modeSwitch
+        } content: {
+            VStack(alignment: .leading, spacing: 10) {
+                PlannerFlowLayout(spacing: 8) {
+                    ForEach(app.upcomingSummers, id: \.self) { key in
+                        chip(key)
+                    }
+                }
+                if automatic, let note = automaticNote {
+                    Text(note)
+                        .font(ThubanFont.body(12))
+                        .foregroundStyle(theme.inkDimColor)
+                        .fixedSize(horizontal: false, vertical: true)
                 }
             }
         }
+    }
+
+    private var caption: String {
+        automatic
+            ? "On when a class you still need runs that summer on Banner."
+            : "Switch a summer off (internship, travel) to keep the planner out of it."
+    }
+
+    private var modeSwitch: some View {
+        HStack(spacing: 6) {
+            Text(app.summerMode.label.uppercased())
+                .font(.system(size: 10.5, weight: .semibold))
+                .kerning(0.6)
+                .foregroundStyle(automatic ? theme.brassInkColor : theme.inkFaintColor)
+                .padding(.horizontal, 6)
+                .frame(height: 18)
+                .background(automatic ? theme.accentTintColor : theme.panel2Color,
+                            in: RoundedRectangle(cornerRadius: 4, style: .continuous))
+            Button(automatic ? "Set manually" : "Make automatic") {
+                app.setSummerMode(automatic ? .manual : .automatic)
+            }
+            .buttonStyle(.plain)
+            .font(ThubanFont.body(12, weight: .semibold))
+            .foregroundStyle(theme.brassInkColor)
+            .help(automatic ? "Switch to the manual summer toggles (your own on / off choices come back as you left them)"
+                            : "Let Banner’s summer schedules switch summers on and off")
+        }
+        .fixedSize()
+    }
+
+    @ViewBuilder
+    private func chip(_ key: String) -> some View {
+        let on = app.isSummerOn(key)
+        let label = app.termLabel(key) + (on ? "" : " · off")
+        if automatic {
+            let reason = app.summerDecision(key)?.reason ?? ""
+            ToggleChip(label: label, icon: .sun, isOn: .constant(on))
+                .allowsHitTesting(false)
+                .overlay(Color.clear.contentShape(Rectangle()).help("\(app.termLabel(key)): \(reason)"))
+                .accessibilityLabel("\(app.termLabel(key)) summer, automatic")
+                .accessibilityValue(reason)
+        } else {
+            ToggleChip(label: label, icon: .sun,
+                       isOn: Binding(get: { on }, set: { _ in app.toggleDisabledTerm(key) }))
+                .accessibilityLabel("\(app.termLabel(key)) summer")
+                .accessibilityValue(on ? "planned" : "switched off")
+                .help(on ? "The planner may use \(app.termLabel(key)). Click to switch it off."
+                         : "\(app.termLabel(key)) is switched off. Click to let the planner use it.")
+        }
+    }
+
+    /// The nearest summer's reason ("Summer 2027: On — …"), or the fetch / no-data state.
+    private var automaticNote: String? {
+        if app.degreeTools.summerFetching { return "Checking Banner’s summer schedules…" }
+        guard let first = app.upcomingSummers.first, let decision = app.summerDecision(first) else { return nil }
+        return "\(app.termLabel(first)): \(decision.reason)"
     }
 }
 

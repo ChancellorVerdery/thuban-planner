@@ -72,4 +72,7 @@ extension AppModel {
     func setMinCredits(_ value: Double) { mutate { $0.setSetting(.minCredits(value)) } }
     func setSummerMin(_ value: Double) { mutate { $0.setSetting(.summerMin(value)) } }
     func setStrategy(_ strategy: Strategy) { mutate { $0.setSetting(.strategy(strategy)) } }
+
+    /// Summer terms: Automatic (from Banner's schedules) or Manual (the toggles, exactly as stored).
+    func setSummerMode(_ mode: SummerMode) { preferences.summerMode = mode }
 }

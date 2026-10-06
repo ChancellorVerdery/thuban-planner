@@ -118,6 +118,24 @@ extension SmokeScenes {
             } cleanup: { _ in
                 plannerSmokeWindow()?.setContentSize(SmokeHarness.windowSize)
             },
+            // Summer terms: Automatic (offline: the bundled Banner snapshot decides) and Manual (the stored toggles).
+            SmokeScene(name: "planner-summers-automatic") { app in
+                app.section = .planner
+                smokeState.reset()
+                app.setSummerMode(.automatic)
+                plannerSmokeScroll(to: 0)
+            },
+            SmokeScene(name: "planner-summers-manual") { app in
+                app.section = .planner
+                smokeState.reset()
+                app.setSummerMode(.manual)
+            } cleanup: { app in app.setSummerMode(.automatic) },
+            SmokeScene(name: "planner-summers-automatic-dark") { app in
+                app.section = .planner
+                smokeState.reset()
+                app.setSummerMode(.automatic)
+                plannerSmokeTheme(app, dark: true)
+            } cleanup: { app in plannerSmokeTheme(app, dark: false) },
             // Transfer credit: the chip before the first semester and the "Transfer credit" group first in the table.
             SmokeScene(name: "planner-transfer") { app in
                 app.section = .planner

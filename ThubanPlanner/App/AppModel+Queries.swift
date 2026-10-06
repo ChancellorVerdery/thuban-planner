@@ -85,6 +85,20 @@ extension AppModel {
     /// The calendar term containing today ("fall-2026"), for the Add-semester form's defaults.
     var calendarTermKey: String { TermKey.current(now: now, calendar: calendar) }
 
+    // MARK: Summer terms
+
+    /// Automatic (Banner decides) or Manual (the toggles). Stored in preferences.json.
+    var summerMode: SummerMode { preferences.summerMode }
+
+    /// The automatic decision for a summer (nil in Manual mode).
+    func summerDecision(_ key: String) -> SummerAutomation.Decision? { summerAutomation?.decision(key) }
+
+    /// Whether the planner may use a summer right now (the automatic decision, else the toggle).
+    func isSummerOn(_ key: String) -> Bool { summerDecision(key)?.enabled ?? !isDisabled(key) }
+
+    /// Automatic mode: the summer availability Banner gives a class still to take (nil = its own box applies).
+    func summerOverride(of courseId: String) -> Bool? { summerAutomation?.summerOverrides[courseId] }
+
     // MARK: Text
 
     /// "3" / "1.5" — credits as Atlas prints them.

@@ -38,10 +38,12 @@ public struct Preferences: Codable, Equatable, Sendable {
     public var lastSection: String?
     /// The first-run "Import from Atlas?" offer was shown (or dismissed) once.
     public var importOffered: Bool = false
+    /// Summer terms: automatic (from Banner's schedules) or the manual toggles. Absent → automatic (2026-10-05).
+    public var summerMode: SummerMode = .automatic
 
     public init() {}
 
-    enum CodingKeys: String, CodingKey { case theme, textSize, reduceMotion, atlasHost, atlasEmail, lastSection, importOffered }
+    enum CodingKeys: String, CodingKey { case theme, textSize, reduceMotion, atlasHost, atlasEmail, lastSection, importOffered, summerMode }
 
     public init(from decoder: Decoder) throws {
         let c = try decoder.container(keyedBy: CodingKeys.self)
@@ -52,6 +54,7 @@ public struct Preferences: Codable, Equatable, Sendable {
         atlasEmail = (try? c.decodeIfPresent(String.self, forKey: .atlasEmail)) ?? Preferences.defaultAtlasEmail
         lastSection = try? c.decodeIfPresent(String.self, forKey: .lastSection)
         importOffered = (try? c.decodeIfPresent(Bool.self, forKey: .importOffered)) ?? false
+        summerMode = (try? c.decodeIfPresent(SummerMode.self, forKey: .summerMode)) ?? .automatic
     }
 
     public static func load() -> Preferences {

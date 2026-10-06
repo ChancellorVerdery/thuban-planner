@@ -25,6 +25,9 @@ final class AppModel {
     /// (`Scheduler.withTransferColumn`; Atlas's output is otherwise untouched). Recomputed whenever `data` or `now`
     /// changes.
     private(set) var schedule: Schedule = .empty
+    /// Automatic summer terms (`preferences.summerMode == .automatic`): the decisions and the EFFECTIVE plan the
+    /// scheduler ran on (stored toggles / "Offered in summer" boxes untouched). nil in Manual mode.
+    private(set) var summerAutomation: SummerAutomation.Result?
     /// The clock the scheduler reads (it only matters when no term is recorded). Refreshed on day change / activation.
     private(set) var now = Date()
     private(set) var isLoaded = false
@@ -50,6 +53,10 @@ final class AppModel {
             if preferences.theme != oldValue.theme {
                 recomputeTheme()
                 SharedTheme.publish(preferences.theme)
+            }
+            if preferences.summerMode != oldValue.summerMode, isLoaded {
+                recomputeSchedule()
+                degreeTools.refreshSummerOfferingsIfNeeded()
             }
         }
     }
@@ -145,6 +152,7 @@ final class AppModel {
         recomputeSchedule()
         observeDayChanges()
         isLoaded = true
+        degreeTools.refreshSummerOfferingsIfNeeded()
         SmokeHarness.startIfEnabled(app: self)
     }
 
@@ -159,6 +167,7 @@ final class AppModel {
         let changed = TermKey.current(now: fresh, calendar: calendar) != TermKey.current(now: now, calendar: calendar)
         now = fresh
         if changed { recomputeSchedule() }
+        if isLoaded { degreeTools.refreshSummerOfferingsIfNeeded() }
     }
 
     private func observeDayChanges() {
@@ -185,9 +194,11 @@ final class AppModel {
         let result = try change(&copy)
         copy.normalize()
         if copy != data {
+            let subjectsChanged = SummerAutomation.subjects(copy) != SummerAutomation.subjects(data)
             data = copy
             recomputeSchedule()
             save()
+            if subjectsChanged { degreeTools.refreshSummerOfferingsIfNeeded() }
         }
         return result
     }
@@ -211,8 +222,19 @@ final class AppModel {
         isFirstRun = value
     }
 
+    /// Banner offerings changed (DegreeToolsModel): automatic summers may decide differently.
+    func offeringsDidChange() {
+        if preferences.summerMode == .automatic, isLoaded { recomputeSchedule() }
+    }
+
     private func recomputeSchedule() {
-        let fresh = Scheduler.withTransferColumn(Scheduler.scheduleDegree(data, now: now, calendar: calendar), data)
+        // Automatic summers: the scheduler runs on an effective copy (summer toggles + per-class summer availability
+        // from Banner); Atlas's scheduler itself is unchanged, and so is the stored plan.
+        let automation = preferences.summerMode == .automatic
+            ? SummerAutomation.evaluate(data, offerings: degreeTools.offerings, now: now, calendar: calendar) : nil
+        if automation != summerAutomation { summerAutomation = automation }
+        let input = automation?.effective ?? data
+        let fresh = Scheduler.withTransferColumn(Scheduler.scheduleDegree(input, now: now, calendar: calendar), data)
         if fresh != schedule {
             schedule = fresh
             // The Schedule tab's "Thuban route" source reads the route.

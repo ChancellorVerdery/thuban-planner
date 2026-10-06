@@ -93,7 +93,11 @@ final class DegreeToolsModel {
 
     @ObservationIgnored weak var app: AppModel?
     let dataset: CatalogDataset?
-    private(set) var offerings: CourseOfferings
+    private(set) var offerings: CourseOfferings {
+        didSet { if offerings != oldValue { app?.offeringsDidChange() } }
+    }
+    /// Automatic summers: a background fetch of the summer terms' schedules is running.
+    private(set) var summerFetching = false
     var offeringsPhase: OfferingsPhase = .idle
     /// The sheet the shell shows.
     var sheet: Sheet?
@@ -116,6 +120,7 @@ final class DegreeToolsModel {
     @ObservationIgnored let offeringsStore: OfferingsStore
     @ObservationIgnored var client = BannerClient()
     @ObservationIgnored private var offeringsTask: Task<Void, Never>?
+    @ObservationIgnored private var summerTask: Task<Void, Never>?
     @ObservationIgnored private var importTask: Task<Void, Never>?
     @ObservationIgnored private var statusCache: (data: PlannerData, offerings: CourseOfferings, now: String, value: [TechElectives.Status])?
 
@@ -306,7 +311,7 @@ final class DegreeToolsModel {
     /// Fetches what the window is missing (finished terms once, the current / upcoming ones weekly). Never in a
     /// smoke run.
     func refreshOfferingsIfNeeded(force: Bool = false) {
-        guard !offline, let dataset, offeringsTask == nil else { return }
+        guard !offline, let dataset, offeringsTask == nil, summerTask == nil else { return }
         let now = Date()
         var start = offeringsStore.load()
         if start.byTerm.isEmpty, let snapshot = CourseOfferings.bundledSnapshot { start = snapshot }
@@ -343,6 +348,43 @@ final class DegreeToolsModel {
                 self?.offeringsPhase = .failed(error.localizedDescription)
             }
             self?.offeringsTask = nil
+        }
+    }
+
+    /// Automatic summer terms: fetches what the rule needs — every horizon summer Banner lists plus the most recent
+    /// listed past summer, for the SUBJECTS of the classes still to take (finished summers once, upcoming ones
+    /// weekly; one paced public search each). Quiet: failures leave the stored manual values in charge. Never in a
+    /// smoke run, never in Manual mode.
+    func refreshSummerOfferingsIfNeeded() {
+        guard !offline, let app, app.preferences.summerMode == .automatic, summerTask == nil, offeringsTask == nil else { return }
+        let now = Date()
+        var start = offeringsStore.load()
+        if start.byTerm.isEmpty, let snapshot = CourseOfferings.bundledSnapshot { start = snapshot }
+        let summers = SummerAutomation.horizon(app.data, now: now, calendar: app.calendar)
+        let subjects = SummerAutomation.subjects(app.data)
+        guard !summers.isEmpty, !subjects.isEmpty else { return }
+        guard start.termsAreStale(now: now)
+                || !OfferingsFetcher.pendingSummers(start, summers: summers, subjects: subjects, now: now).isEmpty else {
+            if start != offerings { offerings = start }
+            return
+        }
+        summerFetching = true
+        let fetcher = OfferingsFetcher(client: client)
+        let store = offeringsStore
+        summerTask = Task { [weak self] in
+            do {
+                let result = try await fetcher.refreshSummers(start, summers: summers, subjects: subjects, now: now, save: { snapshot in
+                    try? store.save(snapshot)
+                    await MainActor.run { self?.offerings = snapshot }
+                })
+                try? store.save(result)
+                self?.offerings = result
+            } catch is CancellationError {
+            } catch {
+                Self.logger.error("summer offerings refresh failed: \(error.localizedDescription, privacy: .public)")
+            }
+            self?.summerFetching = false
+            self?.summerTask = nil
         }
     }
 

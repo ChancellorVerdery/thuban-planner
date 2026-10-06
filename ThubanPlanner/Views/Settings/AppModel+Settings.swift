@@ -6,7 +6,8 @@ extension AppModel {
     /// The route the plan WOULD have with `settings` (a copy of the plan; nothing is written). Used by the Planning
     /// pane's live preview while a cap is still being typed and for each strategy row.
     func settingsPreviewSchedule(_ settings: PlannerSettings) -> Schedule {
-        var copy = data
+        // Automatic summers: preview on the same effective plan the route uses.
+        var copy = summerAutomation?.effective ?? data
         copy.settings = settings
         copy.normalize()
         return Scheduler.scheduleDegree(copy, now: now, calendar: calendar)

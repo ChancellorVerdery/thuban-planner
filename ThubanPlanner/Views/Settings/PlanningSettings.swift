@@ -47,6 +47,52 @@ struct PlanningSettings: View {
                 .thubanPanel(padding: 0)
             }
 
+            SettingsGroup("Summer terms", caption: "Which summers the planner may use, and which classes it may put in them.") {
+                VStack(alignment: .leading, spacing: 0) {
+                    HStack(alignment: .center, spacing: 20) {
+                        VStack(alignment: .leading, spacing: 3) {
+                            Text("Summer terms").font(ThubanFont.body(14, weight: .semibold)).foregroundStyle(theme.inkColor)
+                            Text(app.summerMode == .automatic
+                                 ? "A summer is on when a class you still need ran in it on Banner — or, until its schedule is posted, in the most recent summer. Classes only go in a summer Banner offers them in."
+                                 : "The Summer terms toggles on the Planner and each class’s “Offered in summer” box decide, exactly as you set them.")
+                                .font(ThubanFont.small).foregroundStyle(theme.inkDimColor).fixedSize(horizontal: false, vertical: true)
+                        }
+                        Spacer(minLength: 12)
+                        SegmentedPicker(selection: Binding(get: { app.summerMode }, set: { app.setSummerMode($0) }),
+                                        options: SummerMode.allCases.map { SegmentOption($0, $0.label) })
+                            .fixedSize()
+                            .accessibilityLabel("Summer terms")
+                    }
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 14)
+                    if app.summerMode == .automatic {
+                        VStack(alignment: .leading, spacing: 6) {
+                            ForEach(app.upcomingSummers, id: \.self) { key in
+                                HStack(alignment: .firstTextBaseline, spacing: 10) {
+                                    Text(app.termLabel(key))
+                                        .font(ThubanFont.body(13, weight: .semibold))
+                                        .foregroundStyle(app.isSummerOn(key) ? theme.brassInkColor : theme.inkDimColor)
+                                        .frame(width: 96, alignment: .leading)
+                                    Text(app.summerDecision(key)?.reason ?? "")
+                                        .font(ThubanFont.small)
+                                        .foregroundStyle(theme.inkDimColor)
+                                        .fixedSize(horizontal: false, vertical: true)
+                                }
+                            }
+                            if app.summerAutomation?.hasData == false {
+                                Text("No Banner summer schedule is available yet (offline or not fetched), so your manual settings are used for now.")
+                                    .font(ThubanFont.small).foregroundStyle(theme.negTextColor)
+                            }
+                        }
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 12)
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .thubanHairline(.top, color: theme.lineColor)
+                    }
+                }
+                .thubanPanel(padding: 0)
+            }
+
             SettingsGroup("Route strategy", caption: "How the planner trades off finishing fast against a lighter load.") {
                 VStack(spacing: 8) {
                     ForEach(Strategy.allCases) { strategy in

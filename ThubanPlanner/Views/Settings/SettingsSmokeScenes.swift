@@ -1,3 +1,4 @@
+import AppKit
 import Foundation
 import ThubanPlannerCore
 
@@ -29,6 +30,22 @@ extension SmokeScenes {
             } cleanup: { app in
                 app.setMinCredits(0)
                 app.setSummerMin(0)
+            },
+            // Summer terms: Automatic with each summer's reason (offline: the bundled Banner snapshot), then Manual.
+            SmokeScene(name: "settings-planning-summers") { app in
+                app.setSummerMode(.automatic)
+                app.openSettings(.planning)
+                try? await Task.sleep(nanoseconds: 500_000_000)
+                settingsSmokeScroll(to: 0.62)
+            } cleanup: { _ in settingsSmokeScroll(to: 0) },
+            SmokeScene(name: "settings-planning-summers-manual") { app in
+                app.setSummerMode(.manual)
+                app.openSettings(.planning)
+                try? await Task.sleep(nanoseconds: 500_000_000)
+                settingsSmokeScroll(to: 0.62)
+            } cleanup: { app in
+                settingsSmokeScroll(to: 0)
+                app.setSummerMode(.automatic)
             },
             SmokeScene(name: "settings-planning-empty") { app in
                 settingsSaved = app.data
@@ -171,4 +188,20 @@ enum SettingsSmokeFixtures {
             return .failed(error.localizedDescription)
         }
     }
+}
+
+/// Scrolls the visible pane's scroll view to a fraction of its height (smoke only).
+@MainActor private func settingsSmokeScroll(to fraction: CGFloat) {
+    guard let root = NSApp.windows.first(where: { $0.isVisible && $0.contentView != nil && $0.attachedSheet == nil && !($0 is NSPanel) })?.contentView
+    else { return }
+    func find(_ view: NSView) -> NSScrollView? {
+        if let scroll = view as? NSScrollView, let doc = scroll.documentView, doc.frame.height > scroll.contentSize.height + 100 { return scroll }
+        for sub in view.subviews { if let hit = find(sub) { return hit } }
+        return nil
+    }
+    guard let scroll = find(root), let doc = scroll.documentView else { return }
+    let maxY = max(0, doc.frame.height - scroll.contentSize.height)
+    let y = doc.isFlipped ? maxY * fraction : maxY * (1 - fraction)
+    scroll.contentView.scroll(to: NSPoint(x: 0, y: y))
+    scroll.reflectScrolledClipView(scroll.contentView)
 }

@@ -173,6 +173,27 @@ own minimum) — never adding or removing terms, so the finish term never moves;
 "Fall 2027 has 9 credits — under your 12-credit minimum. Add an elective or lower the minimum."
 Tests: `MinimumCreditsTests`.
 
+**Automatic summer terms (Thuban-only, 2026-10-05; core `Catalog/SummerAutomation.swift`).** `Preferences.summerMode`
+(preferences.json, absent → `.automatic`; NEVER in planner.json, so Atlas documents, parity and golden tests are
+untouched) is `.automatic` or `.manual`. Manual = today's behaviour exactly (`disabledTerms` toggles + each class's
+`summerOk`). Automatic: `SummerAutomation.evaluate(data, offerings, now)` decides every summer of the
+`upcomingSummers` horizon — reference schedule = that summer's own Banner schedule when Banner lists it AND it has
+sections, else the most recent EARLIER summer with sections; a class is offered when the reference has ≥ 1 section
+of its code or an equivalent (`CourseCode.equivalentCodes`); a summer is ON iff a to-take class is summer-eligible
+there (offered by the data, or no data for its subject and its stored box ticked); no data at all → the stored
+value, said so in the reason. It returns an EFFECTIVE copy of the plan (`disabledTerms` per decision; to-take
+classes with data get `summerOk` = offered in the earliest horizon summer's reference — in practice all summers
+share one reference, the latest released summer) and AppModel schedules THAT copy (`app.summerAutomation`); the
+stored plan is never written, so Manual restores every toggle and box. `Scheduler.scheduleDegree` is unchanged;
+summer caps / minimums / transfer credit still apply. Reasons: "On — MEGR 3116, ENGR 3295 offered in Summer 2026
+(Summer 2027 schedule not released)", "Off — none of your remaining classes ran in Summer 2026 (…)". Fetching
+(`DegreeToolsModel.refreshSummerOfferingsIfNeeded`, `OfferingsFetcher.refreshSummers` / `pendingSummers`,
+`SummerAutomation.termsToFetch` / `subjects`): on launch, activation, mode change and when the to-take subjects
+change; every horizon summer Banner lists + the most recent listed past summer, for the subjects (and equivalents'
+subjects) of the to-take classes, one paced public search each through `BannerRequestGuard`, into the shared
+`offerings-cache.json` (finished summers once, others weekly; the bundled snapshot until then; never offline / in
+smoke — the smoke run uses the bundled snapshot). `SummerAutomationTests`.
+
 **Transfer column (Thuban-only post-step, 2026-10-05).** `Scheduler.withTransferColumn(schedule, data)` runs AFTER
 `scheduleDegree` (AppModel: `schedule = withTransferColumn(scheduleDegree(data), data)`): it prepends a `BoardTerm`
 {key "transfer", kind `.transfer`, label "Transfer credit"} with every transfer class (document order, credits summed)
@@ -343,7 +364,12 @@ The working surface: what you've taken, what's left, and a one-line answer to "w
   classes FIRST ("Transfer credit · 4 classes · 12 cr · AP, IB, …"), the status chip says "Transfer" (pos), the
   Term cell "Transfer"; "Credits done" includes them with the caption "incl. 12 transfer"; the footer says
   "33 taken (4 transfer)". No multi-select (the table is single-selection) — move classes one by one.
-- **Summer terms** group (only when `app.upcomingSummers` is non-empty; caption "Switch a summer off (internship,
+- **Summer terms** group, Automatic (default): an "AUTOMATIC" tag + "Set manually"; chips show
+  `app.isSummerOn(key)` read-only with the decision's reason on hover, and the nearest summer's reason under them
+  ("Checking Banner's summer schedules…" while fetching). In the table, a to-take class Banner has data for shows
+  Banner's answer in the Summer column, faded and read-only (`app.summerOverride(of:)`). Settings ▸ Planning has a
+  "Summer terms" group (Automatic / Manual segmented, every summer's reason, a note when there is no data).
+  Manual: unchanged — **Summer terms** group (only when `app.upcomingSummers` is non-empty; caption "Switch a summer off (internship,
   travel) to keep the planner out of it."): one `ToggleChip` per key with `.sun`, on = planned, off = disabled
   (`toggleDisabledTerm`).
 - **Classes**: a native table-like list (fixed columns): Code (mono, editable), Title (editable), Cr (numeric field),
@@ -697,14 +723,15 @@ added banner, remove, Planner with TE marks, import choose / preview (minor, Deg
 `BSMESampleData`, the bundled dataset and offerings snapshot. Transfer scenes (`planner-transfer`, `-rows`, `-dark`,
 `-add`, `route-transfer`, `route-transfer-dark`, `class-detail-transfer`) use `SampleData.makeWithTransferCredit`
 (the sample + STAT 3128 / PSYC 1101 / HIST 1110 as `c-sample-t1…t3`, MATH 2164 moved to transfer). The run's
-timeout is `SMOKE_TIMEOUT` (default 360 s). Always undo state in `cleanup`. Look at your PNGs (Read tool) before you finish. Sample ids are `c-sample-01 … 43`
+timeout is `SMOKE_TIMEOUT` (default 360 s). Summer scenes: `planner-summers-automatic` / `-manual` /
+`-automatic-dark`, `settings-planning-summers` / `-manual`. Always undo state in `cleanup`. Look at your PNGs (Read tool) before you finish. Sample ids are `c-sample-01 … 43`
 (01–29 taken, 30–43 to take; 38 = Senior Design II, the last class).
 
 ## Build / test / smoke
 
 - `DERIVED=.build/DerivedData-<you> scripts/build.sh` — ALWAYS a private DerivedData, run from your own worktree
   (see Git). Regenerates the project first.
-- `scripts/test.sh` — core tests (`swift test`, 250 tests (three live tests skipped) incl. 400 golden cases and the 3,200-case differential run against Atlas's JS; `TechElectivesTests`, `CatalogDatasetTests`, `DegreeDocumentTests`, `DegreeImportMergeTests`). Add tests for core logic you add. `THUBAN_PLANNER_LIVE_OFFERINGS=<json> scripts/test.sh` refreshes an offerings snapshot (public Banner search).
+- `scripts/test.sh` — core tests (`swift test`, 269 tests (three live tests skipped) incl. `TransferCreditTests`, `SummerAutomationTests`, incl. 400 golden cases and the 3,200-case differential run against Atlas's JS; `TechElectivesTests`, `CatalogDatasetTests`, `DegreeDocumentTests`, `DegreeImportMergeTests`). Add tests for core logic you add. `THUBAN_PLANNER_LIVE_OFFERINGS=<json> scripts/test.sh` refreshes an offerings snapshot (public Banner search).
 - `scripts/refresh_catalog.sh` — regenerates the BSME dataset from the catalog (headless Chromium, ~160 paced page loads on a cold cache); `--offerings` refreshes the bundled offerings snapshot.
 - `scripts/golden.sh` — regenerates the golden cases from Atlas's own scheduler (macOS JavaScriptCore; no Node).
 - `scripts/v8check.sh` — needs a real V8 (`node` / `deno`, or `V8_NODE=<Electron binary>`): checks the V8 sort port's

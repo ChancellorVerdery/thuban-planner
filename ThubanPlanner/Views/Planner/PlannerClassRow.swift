@@ -67,10 +67,8 @@ struct PlannerClassRow: View {
             .frame(width: columns.coreqs)
             .zIndex(focus.wrappedValue == .cell(course.id, .coreqs) ? 1 : 0)
 
-            PlannerCheckbox(isOn: course.summerOk, label: "Offered in summer") {
-                app.updateCourse(course.id, CoursePatch(summerOk: !course.summerOk))
-            }
-            .frame(width: columns.summer)
+            summerCell
+                .frame(width: columns.summer)
 
             PlannerTermMenu(course: course)
                 .frame(width: columns.term, alignment: .leading)
@@ -111,6 +109,24 @@ struct PlannerClassRow: View {
             }
             Divider()
             Button("Remove class…", role: .destructive) { state.pendingRemovalCourseId = course.id }
+        }
+    }
+
+    /// "Offered in summer": in Automatic mode a class Banner has data for shows what Banner says (read-only, faded);
+    /// its own box comes back in Manual mode or when there is no data.
+    @ViewBuilder
+    private var summerCell: some View {
+        if let auto = app.summerOverride(of: course.id), let ref = app.summerAutomation?.classReference {
+            PlannerCheckbox(isOn: auto, label: "Offered in summer (automatic)") {}
+                .opacity(0.5)
+                .allowsHitTesting(false)
+                .overlay(Color.clear.contentShape(Rectangle())
+                    .help("Automatic: \(auto ? "ran" : "didn’t run") in \(app.termLabel(ref.termKey)) on Banner. Switch summers to Manual to use your own box."))
+                .accessibilityValue(auto ? "yes, from Banner" : "no, from Banner")
+        } else {
+            PlannerCheckbox(isOn: course.summerOk, label: "Offered in summer") {
+                app.updateCourse(course.id, CoursePatch(summerOk: !course.summerOk))
+            }
         }
     }
 
