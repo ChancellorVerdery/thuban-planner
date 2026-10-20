@@ -4,7 +4,13 @@ import ThubanPlannerCore
 @main
 struct ThubanPlannerApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var delegate
-    @State private var appModel = AppModel()
+    @State private var appModel: AppModel
+
+    init() {
+        // Must run before anything touches NSApplication (see SharedTheme): an icon-only launch exits here.
+        SharedTheme.refreshIconAndExitIfRequested { AppIconRenderer.render(theme: $0) }
+        _appModel = State(initialValue: AppModel())
+    }
 
     var body: some Scene {
         Window("Thuban Planner", id: "main") {
@@ -85,7 +91,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationWillFinishLaunching(_ notification: Notification) {
         // `--refresh-icon`: stamp the themed icon on the bundle and exit before any window appears.
         MainActor.assumeIsolated {
-            SharedTheme.handleRefreshLaunch { AppIconRenderer.render(theme: $0) }
         }
     }
 
