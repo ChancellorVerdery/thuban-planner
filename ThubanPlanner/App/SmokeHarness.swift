@@ -115,14 +115,22 @@ enum SmokeHarness {
         }
         guard let content = window.contentView else { throw ThubanError.store("smoke: window has no content view") }
         let bounds = content.bounds
-        guard let rep = content.bitmapImageRepForCachingDisplay(in: bounds) else {
+        let scale = captureScale(window)
+        guard let rep = NSBitmapImageRep(
+            bitmapDataPlanes: nil, pixelsWide: Int((bounds.width * scale).rounded()), pixelsHigh: Int((bounds.height * scale).rounded()),
+            bitsPerSample: 8, samplesPerPixel: 4, hasAlpha: true, isPlanar: false, colorSpaceName: .deviceRGB, bytesPerRow: 0, bitsPerPixel: 0
+        ) else {
             throw ThubanError.store("smoke: could not create a bitmap for \(name)")
         }
+        rep.size = bounds.size // points; the pixel grid is `scale`× so a 1× main display still yields retina PNGs
         content.cacheDisplay(in: bounds, to: rep)
         guard let png = rep.representation(using: .png, properties: [:]) else { throw ThubanError.store("smoke: PNG encoding failed for \(name)") }
         try png.write(to: url)
         print("smoke: \(name)")
     }
+
+    /// Screenshots are always at least 2× (README images stay retina even when the main display is 1×).
+    private static func captureScale(_ window: NSWindow) -> CGFloat { max(window.backingScaleFactor, 2) }
 
     /// `screencapture -l <window> -o -x`: true when it produced a non-trivial PNG (it needs Screen Recording
     /// permission for the launching terminal; without it the file is missing or only shows the desktop).
@@ -132,7 +140,9 @@ enum SmokeHarness {
         process.arguments = ["-l", String(window.windowNumber), "-o", "-x", url.path]
         do { try process.run() } catch { return false }
         process.waitUntilExit()
-        guard process.terminationStatus == 0, let image = NSImage(contentsOf: url), image.size.width > 100 else {
+        // Reject captures below `captureScale` (a 1× display) so `cacheDisplay` renders them at retina scale instead.
+        guard process.terminationStatus == 0, let rep = NSImageRep(contentsOf: url), rep.pixelsWide > 100,
+              CGFloat(rep.pixelsWide) >= window.frame.width * captureScale(window) - 1 else {
             try? FileManager.default.removeItem(at: url)
             return false
         }
