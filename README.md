@@ -108,11 +108,11 @@ Your plan is stored in `~/Library/Application Support/Thuban Planner/` (or in `$
 
 Native Mac apps that share one theme engine:
 
-- [Thuban Study](https://github.com/GITHUB_USER/thuban-study)
-- [Thuban Graph](https://github.com/GITHUB_USER/thuban-graph)
-- [Thuban Canvas](https://github.com/GITHUB_USER/thuban-canvas)
-- [Thuban Desk](https://github.com/GITHUB_USER/thuban-desk)
-- [Thuban Gym](https://github.com/GITHUB_USER/thuban-gym)
+- [Thuban Study](https://github.com/ChancellorVerdery/thuban-study)
+- [Thuban Graph](https://github.com/ChancellorVerdery/thuban-graph)
+- [Thuban Canvas](https://github.com/ChancellorVerdery/thuban-canvas)
+- [Thuban Desk](https://github.com/ChancellorVerdery/thuban-desk)
+- [Thuban Gym](https://github.com/ChancellorVerdery/thuban-gym)
 
 ---
 
